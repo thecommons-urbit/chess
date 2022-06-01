@@ -1,0 +1,89 @@
+@font-face {
+  font-family: 'Inter';
+  src: url(https://media.urbit.org/fonts/Inter-Regular.woff2) format('woff2');
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+ul {
+  padding: 0;
+}
+
+ul li {
+  list-style: none;
+  padding-bottom: 1em;
+  word-wrap: break-word;
+}
+
+li.game-active {
+  background-color: #d0d0fa;
+}
+
+div.menu-container { 
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-areas: "left right";
+  grid-template-rows: auto;
+  grid-template-columns: 50% 50%;
+}
+
+div.games-container {
+background-color: #fafafa;
+padding: 1em;
+overflow: scroll;
+grid-area: left;
+}
+
+div.challenges-container {
+background-color: #fafafa;
+padding: 1em;
+overflow: scroll;
+grid-area: right;
+}
+
+div.challenge-prompt {
+position: absolute;
+bottom: 1em;
+}
+
+div.board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+div.board-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: 1em;
+}
+
+div.board-draw-offer {
+  grid-column: 1;
+  margin: auto 1em;
+}
+
+div.board-buttons {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  margin: auto 1em;
+}
+
+div.board-promotion {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  margin: auto 1em;
+}

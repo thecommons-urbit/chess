@@ -1,0 +1,8 @@
+- notifications
+- export games
+- customized visual settings
+- en passant
+- if the exact same board state occurs 3 times, game is a draw
+- store completed games
+- store game results against opponents (e.g. 2.5 - 0.5)
+- integrate with %pals for choosing opponents
