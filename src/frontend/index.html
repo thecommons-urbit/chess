@@ -9,6 +9,21 @@
   </head>
   <body>
     <div id="root" />
+    <!--                                                                                                             -->
+    <!--  The globulator in the docket will copy the contents of the given directory of web files to                 -->
+    <!--  '/apps/[desk name]/'. This means that if your desk is named 'hello' and you have the following file        -->
+    <!--  hierarchy:                                                                                                 -->
+    <!--                                                                                                             -->
+    <!--    - output                                                                                                 -->
+    <!--      |- index.html                                                                                          -->
+    <!--      |- js                                                                                                  -->
+    <!--         |- index.js                                                                                         -->
+    <!--                                                                                                             -->
+    <!--  then if you pass the folder 'output' to the globulator, your two files will be located in                  -->
+    <!--  '/apps/hello/index.html' and '/apps/hello/js/index.js'.                                                    -->
+    <!--                                                                                                             -->
+    <!--  In addition, the globulator automatically adds '/session.js' and '/apps/grid/desk.js' to your sources.     -->
+    <!--                                                                                                             -->
     <script src="/session.js"></script>
     <script src="/apps/grid/desk.js"></script>
     <script src="/apps/chess/js/index.js"></script>

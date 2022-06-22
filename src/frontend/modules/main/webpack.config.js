@@ -3,7 +3,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
   mode: 'production',
-  entry: './src/frontend/index.tsx',
+  entry: './src/index.tsx',
   module: {
     rules: [
       {
@@ -16,12 +16,12 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
-      "http": false
+      'http': false
     }
   },
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, './frontend/js')
+    path: path.resolve(__dirname, './src')
   },
   optimization: {
     minimize: true,

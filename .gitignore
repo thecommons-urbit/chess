@@ -1,4 +1,5 @@
-.idea/*
-desk/*
-frontend/*
+.idea
+build
+lila
 node_modules
+TODO.md

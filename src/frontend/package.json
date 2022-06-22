@@ -1,0 +1,40 @@
+{
+  "name": "urbit-chess",
+  "version": "0.9.0",
+  "description": "Experimental chess app for Urbit",
+  "keywords": [
+    "chess",
+    "urbit"
+  ],
+  "license": "(ISC AND GPL3)",
+  "contributors": [
+    {"name":"Raymond E. Pasco", "email": "ray@ameretat.dev", "url": "https://ameretat.dev"},
+    {"name":"Alex Shelkovnykov", "email":"a@ashelkov.com", "url":"https://ashelkov.com"}
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashelkovnykov/urbit-chess.git"
+  },
+  "scripts": {
+    "build": "cd modules/main && npm run-script build",
+    "test": "eslint --ext ts --ext tsx ."
+  },
+  "engines": {
+    "node": ">=10 <17",
+    "npm": "^8.11.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "eslint": "^8.18.0",
+    "eslint-config-ts-standard": "^1.0.5",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-react": "^7.30.0"
+  },
+  "private": true,
+  "workspaces": [
+    "modules/main"
+  ]
+}

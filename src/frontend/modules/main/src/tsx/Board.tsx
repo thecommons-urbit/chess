@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from 'react-router-dom'
 import Chessboard from 'chessboardjsx'
 import { ChessActiveGameInfo, ChessGameID, ChessPositionFEN, ChessSide } from '../ts/types'
-import useStore from '../chessStore';
+import useStore from '../ts/chessStore'
 
 type ChessRank = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
 type ChessFile = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
@@ -54,43 +54,27 @@ type BoardMove = {
   piece: string
 }
 
-export function Board() {
-  const { gameId } = useParams<{ gameId: string }>();
-  const { activeGames, completedGames } = useStore();
-  const history = useHistory();
+function renderActiveGame (activeGame: ChessActiveGameInfo) {
+  const { urbit, declineDraw, offerDraw } = useStore()
+  const navigate = useNavigate()
+  var [promotion, setPromotion] = React.useState('')
+  var [undo, setUndo] = React.useState(false)
 
-  if (activeGames.has(gameId)) {
-    return renderActiveGame(activeGames.get(gameId))
-  } else if (completedGames.has(gameId)) {
-    return renderCompletedGame(completedGames.get(gameId))
-  } else {
-    history.push('/');
-    return (<></>)
-  }
-}
-
-function renderActiveGame(activeGame: ChessActiveGameInfo) {
-
-  const { urbit, declineDraw, offerDraw } = useStore();
-  const history = useHistory();
-  var [promotion, setPromotion] = React.useState('');
-  var [undo, setUndo] = React.useState(false);
-
-  const gameId = activeGame.info.gameID;
-  const side: ChessSide = (urbit.ship === activeGame.info.white.substring(1)) ? ChessSide.White : ChessSide.Black;
+  const gameId = activeGame.info.gameID
+  const side: ChessSide = (urbit.ship === activeGame.info.white.substring(1)) ? ChessSide.White : ChessSide.Black
 
   const darkSquareStyle = { backgroundColor: 'rgb(68, 68, 68)' }
   const lightSquareStyle = { backgroundColor: 'rgb(238, 238, 238)' }
 
   const pokeMove = (move: ChessMoveAction) => {
-    move['chess-action'] = 'move';
+    move['chess-action'] = 'move'
 
     urbit.poke({
       app: 'chess',
       mark: 'chess-action',
       json: move,
-      onError: () => {setUndo(true)}
-    });
+      onError: () => { setUndo(true) }
+    })
   }
 
   const castleSide = (isKing: boolean, isStartPos: boolean, isTargetQueenFar: boolean, isTargetKingFar: boolean) => {
@@ -106,53 +90,52 @@ function renderActiveGame(activeGame: ChessActiveGameInfo) {
   }
 
   const makeMove = ({ sourceSquare, targetSquare, piece }: BoardMove, promotion: ChessPromotion) => {
-
-    var move: ChessMoveAction;
+    var move: ChessMoveAction
     const castle: CastleSide = castleSide(
       piece[1] === 'K',
       (sourceSquare === 'e1' || sourceSquare === 'e8'),
       (targetSquare === 'a1' || targetSquare === 'a8'),
-      (targetSquare === 'h1' || targetSquare === 'h8'));
+      (targetSquare === 'h1' || targetSquare === 'h8'))
 
     switch (castle) {
       case CastleSide.Kingside: {
         move = ({
-            'chess-move': 'castle',
-            'castle-side': 'kingside'
-          } as CastleChessMove)
+          'chess-move': 'castle',
+          'castle-side': 'kingside'
+        } as CastleChessMove)
 
         break
       }
       case CastleSide.Queenside: {
         move = ({
-            'chess-move': 'castle',
-            'castle-side': 'queenside'
-          } as CastleChessMove);
-          
+          'chess-move': 'castle',
+          'castle-side': 'queenside'
+        } as CastleChessMove)
+
         break
       }
       case CastleSide.None: {
-        move =  ({
-            'chess-move': 'move',
-            'from-file': sourceSquare[0],
-            'from-rank': sourceSquare[1],
-            'to-file': targetSquare[0],
-            'to-rank': targetSquare[1],
-            'into': promotion
-          } as NormalChessMove)
+        move = ({
+          'chess-move': 'move',
+          'from-file': sourceSquare[0],
+          'from-rank': sourceSquare[1],
+          'to-file': targetSquare[0],
+          'to-rank': targetSquare[1],
+          'into': promotion
+        } as NormalChessMove)
 
         break
       }
     }
 
-    move['game-id'] = gameId;
+    move['game-id'] = gameId
 
-    pokeMove(move);
+    pokeMove(move)
   }
 
   const makeMoveWithExtra = (promotion: ChessPromotion) => {
     if (undo) {
-      setUndo(false);
+      setUndo(false)
     }
 
     return (boardMove: BoardMove) => makeMove(boardMove, promotion)
@@ -179,7 +162,7 @@ function renderActiveGame(activeGame: ChessActiveGameInfo) {
         'chess-action': 'offer-draw',
         'game-id': gameId
       },
-      onSuccess: () => {offerDraw(gameId)}
+      onSuccess: () => { offerDraw(gameId) }
     })
   }
 
@@ -202,7 +185,7 @@ function renderActiveGame(activeGame: ChessActiveGameInfo) {
         'chess-action': 'decline-draw',
         'game-id': gameId
       },
-      onSuccess: () => {declineDraw(gameId)}
+      onSuccess: () => { declineDraw(gameId) }
     })
   }
 
@@ -248,7 +231,7 @@ function renderActiveGame(activeGame: ChessActiveGameInfo) {
             <button onClick={() => resignGame()}>Resign</button>
           </div>
           <div>
-            <button onClick={() => history.push('/')}>Main Menu</button>
+            <button onClick={() => navigate('/')}>Main Menu</button>
           </div>
         </div>
         <div className='board-promotion'>
@@ -299,15 +282,14 @@ function renderActiveGame(activeGame: ChessActiveGameInfo) {
     </div>)
 }
 
-function renderCompletedGame(completedGame: ChessActiveGameInfo) {
-
-  const { urbit } = useStore();
-  const history = useHistory();
+function renderCompletedGame (completedGame: ChessActiveGameInfo) {
+  const { urbit } = useStore()
+  const navigate = useNavigate()
 
   const darkSquareStyle = { backgroundColor: 'rgb(68, 68, 68)' }
   const lightSquareStyle = { backgroundColor: 'rgb(238, 238, 238)' }
 
-  const side: ChessSide = (urbit.ship === completedGame.info.white) ? ChessSide.White : ChessSide.Black;
+  const side: ChessSide = (urbit.ship === completedGame.info.white) ? ChessSide.White : ChessSide.Black
 
   return (
     <div className='board-container'>
@@ -332,9 +314,24 @@ function renderCompletedGame(completedGame: ChessActiveGameInfo) {
       <div className='board-controls'>
         <div className='board-buttons'>
           <div>
-            <button onClick={() => history.push('/')}>Main Menu</button>
+            <button onClick={() => navigate('/')}>Main Menu</button>
           </div>
         </div>
       </div>
     </div>)
+}
+
+export function Board () {
+  const { gameId } = useParams<{ gameId: string }>()
+  const { activeGames, completedGames } = useStore()
+  const navigate = useNavigate()
+
+  if (activeGames.has(gameId)) {
+    return renderActiveGame(activeGames.get(gameId))
+  } else if (completedGames.has(gameId)) {
+    return renderCompletedGame(completedGames.get(gameId))
+  } else {
+    navigate('/')
+    return (<></>)
+  }
 }
