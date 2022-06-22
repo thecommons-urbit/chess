@@ -24,3 +24,27 @@ majority of this code.
 
 You can find his original repository for Urbit Chess [here](https://git.sr.ht/~ray/urbit-chess) and his Urbit Chess
 Announcements page [here](https://lists.sr.ht/~ray).
+
+## Install
+
+TODO
+
+## Build
+
+TODO
+
+### Resources
+
+#### Frontend
+
+- npm
+  - https://www.npmjs.com 
+  - https://docs.npmjs.com/cli/v8/configuring-npm/package-json
+- webpack
+  - https://webpack.js.org
+- eslint
+  - https://developer.ibm.com/articles/why-and-how-to-use-eslint-in-your-project/
+  - https://eslint.org/docs/user-guide/command-line-interface/
+  - https://eslint.org/docs/user-guide/configuring/
+- lichess UI
+  - https://github.com/lichess-org/lila/tree/master/ui

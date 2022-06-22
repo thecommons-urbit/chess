@@ -1,14 +1,13 @@
 import * as React from 'react'
-import useStore from '../chessStore'
-import { ChessChallenge, ChessSide, Ship } from './types'
+import useStore from '../ts/chessStore'
+import { ChessChallenge, ChessSide, Ship } from '../ts/types'
 
 type ChallengesProps = {
   receivedChallenges: Map<Ship, ChessChallenge>
 }
 
-export function Challenges({receivedChallenges}: ChallengesProps) {
-
-  const { urbit, removeChallenge } = useStore();
+export function Challenges ({ receivedChallenges }: ChallengesProps) {
+  const { urbit, removeChallenge } = useStore()
 
   var [who, setWho] = React.useState('')
   var [event, setEvent] = React.useState('Casual Game')
@@ -75,17 +74,18 @@ export function Challenges({receivedChallenges}: ChallengesProps) {
       <h1>Challenges</h1>
       <div className='challenges-list'>
         <ul>
-          {Array.from(receivedChallenges).map(([challenger, challenge]) => {
-            return (
-              <li key={challenger}>
-                {`Challenged by ${challengerKing(challenge.challengerSide)}${challenger}`}<br/>
-                {`${challenge.event}${extractRound(challenge)}`}<br/>
-                <div className='challenge-reply'>
-                  <button onClick={() => acceptChallenge(challenger)}>Accept</button>
-                  <button onClick={() => declineChallenge(challenger)}>Decline</button>
-                </div>
-              </li>
-            )})
+          {
+            Array.from(receivedChallenges).map(([challenger, challenge]) => {
+              return (
+                <li key={challenger}>
+                  {`Challenged by ${challengerKing(challenge.challengerSide)}${challenger}`}<br/>
+                  {`${challenge.event}${extractRound(challenge)}`}<br/>
+                  <div className='challenge-reply'>
+                    <button onClick={() => acceptChallenge(challenger)}>Accept</button>
+                    <button onClick={() => declineChallenge(challenger)}>Decline</button>
+                  </div>
+                </li>)
+            })
           }
         </ul>
       </div>
