@@ -13,8 +13,8 @@ distribution in an update to Arvo.
 Continuing the `%chess` app's history as a proof-of-concept sandbox, I (Alex Shelkovnykov) updated it to work with the
 software distribution update as a broadly-visible example in time for Assembly 2021.
 
-The `%chess` app has several minor gameplay bugs and one major one. Neither of the developers who worked on it had any
-frontend experience, as is immediately noticeable from its dated appearance. It is debatable whether `%chess` was even
+The `%chess` app has several minor gameplay bugs. Neither of the developers who worked on it had any frontend
+experience, as is immediately noticeable from its dated appearance. It is debatable whether `%chess` was even
 implemented "the right way" (e.g. by replicating Chess logic in Hoon, as opposed to transmitting board states between
 JavaScript apps using the Gall vane).
 
@@ -32,19 +32,3 @@ TODO
 ## Build
 
 TODO
-
-### Resources
-
-#### Frontend
-
-- npm
-  - https://www.npmjs.com 
-  - https://docs.npmjs.com/cli/v8/configuring-npm/package-json
-- webpack
-  - https://webpack.js.org
-- eslint
-  - https://developer.ibm.com/articles/why-and-how-to-use-eslint-in-your-project/
-  - https://eslint.org/docs/user-guide/command-line-interface/
-  - https://eslint.org/docs/user-guide/configuring/
-- lichess UI
-  - https://github.com/lichess-org/lila/tree/master/ui

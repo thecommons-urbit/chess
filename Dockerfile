@@ -6,14 +6,21 @@ FROM node:18.4.0
 # values are 'dev' and 'prod'.
 #ENV NODE_ENV=prod
 ENV NODE_ENV=dev
-WORKDIR /app
 
+# Copy files from source
+WORKDIR /app
 COPY ["src/frontend/", "./frontend/"]
+
+# Build frontend
 WORKDIR /app/frontend
 RUN npm install
-RUN npm test
+RUN npm run-script lint
 RUN npm run-script build
 
-WORKDIR /app
+# Copy output files
+RUN mkdir output
+RUN cp -rfL html/index.html css js output/
+
 # Assumes that some local dir is mounted as a volume at /app/output
-CMD cp -rfL frontend/* output/
+WORKDIR /app
+CMD cp -rfL frontend/output/* output/
