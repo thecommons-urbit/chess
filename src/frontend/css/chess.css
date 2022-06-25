@@ -1,3 +1,39 @@
+div.app-container {
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-areas: "left right";
+  grid-template-rows: auto;
+  grid-template-columns: 75% 25%;
+}
+
+div.new-menu-container {
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-areas:
+    "top"
+    "bottom";
+  grid-template-columns: auto;
+  grid-template-rows: 50% 50%;
+}
+
+div.new-games-container {
+background-color: #e6f7ff;
+padding: 1em;
+overflow: auto;
+grid-area: top;
+}
+
+div.new-challenges-container {
+background-color: #ccffcc;
+padding: 1em;
+overflow: auto;
+grid-area: bottom;
+}
+
+
+
 @font-face {
   font-family: 'Inter';
   src: url(https://media.urbit.org/fonts/Inter-Regular.woff2) format('woff2');

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './App'
+import NewApp from './NewApp'
 
 declare global {
   interface Window {
@@ -10,7 +10,7 @@ declare global {
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <NewApp />
   </React.StrictMode>,
   document.getElementById('root')
 )
