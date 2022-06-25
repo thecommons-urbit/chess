@@ -1,25 +1,25 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { NewGameBoard } from './NewGameBoard'
-import { NewMenu } from './NewMenu'
-import { NewPracticeBoard } from './NewPracticeBoard'
+import { GameBoard } from './GameBoard'
+import { Menu } from './Menu'
+import { PracticeBoard } from './PracticeBoard'
 
-export function NewMain () {
+export function Main () {
   const { gameId } = useParams<{ gameId: string | null }>()
 
   if (gameId) {
     return (
       <div className='app-container'>
-        <NewGameBoard gameId={gameId}/>
-        <NewMenu />
+        <GameBoard gameId={gameId}/>
+        <Menu />
       </div>
     )
   }
 
   return (
     <div className='app-container'>
-      <NewPracticeBoard />
-      <NewMenu />
+      <PracticeBoard />
+      <Menu />
     </div>
   )
 }

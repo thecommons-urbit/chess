@@ -2,7 +2,7 @@ import * as React from 'react'
 import Chessboard from 'chessboardjsx'
 import useStore from '../ts/chessStore'
 
-export function NewPracticeBoard () {
+export function PracticeBoard () {
   const { practicePos, updatePracticePos } = useStore()
 
   return (

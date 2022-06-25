@@ -1,16 +1,14 @@
 import * as React from 'react'
+import useStore from '../ts/chessStore'
 import { useNavigate } from 'react-router-dom'
 import { ChessActiveGameInfo, ChessGameID, ChessGameInfo } from '../ts/types'
 
-type GamesProps = {
-  activeGames: Map<ChessGameID, ChessActiveGameInfo>
-}
-
-export function Games ({ activeGames }: GamesProps) {
+export function Games () {
+  const { activeGames } = useStore()
   const navigate = useNavigate()
 
   const onClick = (gameID: ChessGameID) => {
-    navigate(`/game/${gameID}`)
+    navigate(`/${gameID}`)
   }
 
   const wrapDAU = (gameID: ChessGameID) => {

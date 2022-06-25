@@ -3,10 +3,9 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Urbit from '@urbit/http-api'
 import useStore from '../ts/chessStore'
 import { ChessChallengeUpdate, ChessGameInfo } from '../ts/types'
-import { Board } from './Board'
-import { Menu } from './Menu'
+import { Main } from './Main'
 
-function App () {
+export function App () {
   const { setUrbit, receiveChallenge, receiveGame } = useStore()
 
   const init = async () => {
@@ -37,8 +36,8 @@ function App () {
   return (
     <BrowserRouter basename={'/apps/chess'}>
       <Routes>
-        <Route path="/game/:gameId" element={<Board />} />
-        <Route path="/" element={<Menu />} />
+        <Route path="/:gameId" element={<Main />} />
+        <Route path="/" element={<Main />} />
       </Routes>
     </BrowserRouter>
   )

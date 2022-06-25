@@ -325,7 +325,7 @@ function renderCompletedGame (completedGame: ChessActiveGameInfo) {
     </div>)
 }
 
-export function NewGameBoard ({ gameId }: BoardProps) {
+export function GameBoard ({ gameId }: BoardProps) {
   const { activeGames, completedGames } = useStore()
   const navigate = useNavigate()
 

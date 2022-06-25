@@ -2,7 +2,7 @@ import * as React from 'react'
 import useStore from '../ts/chessStore'
 import { ChessChallenge, ChessSide, Ship } from '../ts/types'
 
-export function NewChallenges () {
+export function Challenges () {
   const { urbit, removeChallenge, receivedChallenges } = useStore()
 
   var [who, setWho] = React.useState('')
@@ -66,7 +66,7 @@ export function NewChallenges () {
   }
 
   return (
-    <div className='new-challenges-container'>
+    <div className='challenges-container'>
       <h1>Challenges</h1>
       <div className='challenges-list'>
         <ul>
