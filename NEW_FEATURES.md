@@ -1,9 +1,29 @@
 - Improved UI
+  - Chessground for board
+    - Practice board
+      - Real moves only
+      - Show valid destinations for pieces
+      - Reset practice board button
+      - Save practice board state
+    - Game board
+  - Improved promotion interface
+  - New panel for games/challenges
+  - lichess challenge window
+  - Improved offer/accept draw and resign icons
 - Customizable board visuals
-- Refactor logic to instead use chess.js
-  - This will fix the en passant and repetition stalemate bugs
-- Store completed games
+  - Modify visuals
+  - Save preferences (as cookie)
+- View completed games
 - Show current record against opponent
-- Export games
 - `%pals` integration
 - Notifications
+- Refactor Hoon logic
+  - Use chess.js instead
+    - This will fix the repetition stalemate bugs
+  - Multiple stored states
+    - Active games
+    - Completed games
+    - Sent challenges
+    - Received challenges
+    - Visual preferences
+- Export games

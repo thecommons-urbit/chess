@@ -1,3 +1,55 @@
+div.app-container {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-areas: "left right";
+  grid-template-rows: auto;
+  grid-template-columns: 75% 25%;
+  align-items: center;
+  justify-items: center;
+}
+
+div.menu-container {
+  grid-area: right;
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-areas:
+    "top"
+    "bottom";
+  grid-template-columns: auto;
+  grid-template-rows: 50% 50%;
+}
+
+div.games-container {
+  grid-area: top;
+  background-color: #e6f7ff;
+  overflow: auto;
+}
+
+div.challenges-container {
+  grid-area: bottom;
+  background-color: #ccffcc;
+  overflow: auto;
+}
+
+div.board-container {
+  grid-area: left;
+  height: calc(min(100vh, 75vw) - calc(2 * min(2vh, 2vw)));
+  width: calc(min(100vh, 75vw) - calc(2 * min(2vh, 2vw)));
+  margin: min(2vh, 2vw);
+}
+
+div.chessboard {
+  display: table;
+  height: 100%;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+
+
+
 @font-face {
   font-family: 'Inter';
   src: url(https://media.urbit.org/fonts/Inter-Regular.woff2) format('woff2');
@@ -27,51 +79,9 @@ li.game-active {
   background-color: #d0d0fa;
 }
 
-div.app-container {
-  height: 100vh;
-  width: 100%;
-  display: grid;
-  grid-template-areas: "left right";
-  grid-template-rows: auto;
-  grid-template-columns: 75% 25%;
-}
-
-div.menu-container {
-  height: 100vh;
-  width: 100%;
-  display: grid;
-  grid-template-areas:
-    "top"
-    "bottom";
-  grid-template-columns: auto;
-  grid-template-rows: 50% 50%;
-}
-
-div.games-container {
-background-color: #e6f7ff;
-padding: 1em;
-overflow: auto;
-grid-area: top;
-}
-
-div.challenges-container {
-background-color: #ccffcc;
-padding: 1em;
-overflow: auto;
-grid-area: bottom;
-}
-
 div.challenge-prompt {
-position: absolute;
-bottom: 1em;
-}
-
-div.board-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
+  position: absolute;
+  bottom: 1em;
 }
 
 div.board-controls {

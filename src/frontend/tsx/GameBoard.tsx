@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Chessboard from 'chessboardjsx'
-import { ChessActiveGameInfo, ChessGameID, ChessPositionFEN, ChessSide } from '../ts/types'
-import useStore from '../ts/chessStore'
+import { ChessActiveGameInfo, ChessGameID, ChessPositionFEN, ChessSide } from '../ts/types/chess'
+import useChessStore from '../ts/stores/chessStore'
 
 type BoardProps = {
   gameId: ChessGameID
@@ -59,7 +59,7 @@ type BoardMove = {
 }
 
 function renderActiveGame (activeGame: ChessActiveGameInfo) {
-  const { urbit, declineDraw, offerDraw } = useStore()
+  const { urbit, declineDraw, offerDraw } = useChessStore()
   const navigate = useNavigate()
   var [promotion, setPromotion] = React.useState('')
   var [undo, setUndo] = React.useState(false)
@@ -287,7 +287,7 @@ function renderActiveGame (activeGame: ChessActiveGameInfo) {
 }
 
 function renderCompletedGame (completedGame: ChessActiveGameInfo) {
-  const { urbit } = useStore()
+  const { urbit } = useChessStore()
   const navigate = useNavigate()
 
   const darkSquareStyle = { backgroundColor: 'rgb(68, 68, 68)' }
@@ -326,7 +326,7 @@ function renderCompletedGame (completedGame: ChessActiveGameInfo) {
 }
 
 export function GameBoard ({ gameId }: BoardProps) {
-  const { activeGames, completedGames } = useStore()
+  const { activeGames, completedGames } = useChessStore()
   const navigate = useNavigate()
 
   if (activeGames.has(gameId)) {

@@ -1,32 +1,13 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
-import { ChessActiveGameInfo, ChessChallenge, ChessChallengeUpdate, ChessDrawDeclinedUpdate, ChessDrawOfferUpdate, ChessGameID, ChessGameInfo, ChessPositionUpdate, ChessResultUpdate, ChessUpdate, Ship } from './types'
+import { ChessActiveGameInfo, ChessChallenge, ChessChallengeUpdate, ChessDrawDeclinedUpdate, ChessDrawOfferUpdate, ChessGameID, ChessGameInfo, ChessPositionUpdate, ChessResultUpdate, ChessUpdate, Ship } from '../types/chess'
+import ChessState from '../states/chessState'
 
-interface ChessStore {
-  urbit: Urbit | null;
-  receivedChallenges: Map<Ship, ChessChallenge>;
-  activeGames: Map<ChessGameID, ChessActiveGameInfo>;
-  completedGames: Map<ChessGameID, ChessActiveGameInfo>;
-  practicePos: string;
-  updatePracticePos: (newPos: string) => void;
-  declineDraw: (gameID: ChessGameID) => void;
-  offerDraw: (gameID: ChessGameID) => void;
-  receiveChallenge: (data: ChessChallengeUpdate) => void;
-  receiveGame: (data: ChessGameInfo) => void;
-  receiveUpdate: (data: ChessUpdate) => void;
-  removeChallenge: (who: Ship) => void;
-  setUrbit: (urbit: Urbit) => void;
-}
-
-const useStore = create<ChessStore>((set, get) => ({
+const useChessStore = create<ChessState>((set, get) => ({
   urbit: null,
   receivedChallenges: new Map(),
   activeGames: new Map(),
   completedGames: new Map(),
-  practicePos: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
-  updatePracticePos: (newPos: string) => {
-    set(state => ({ practicePos: newPos }))
-  },
   declineDraw: (gameID: ChessGameID) => {
     let updatedGame: ChessActiveGameInfo = get().activeGames.get(gameID)
     updatedGame.gotDrawOffer = false
@@ -115,4 +96,4 @@ const useStore = create<ChessStore>((set, get) => ({
   setUrbit: (urbit: Urbit) => set({ urbit })
 }))
 
-export default useStore
+export default useChessStore

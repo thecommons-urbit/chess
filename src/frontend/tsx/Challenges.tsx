@@ -1,9 +1,9 @@
 import * as React from 'react'
-import useStore from '../ts/chessStore'
-import { ChessChallenge, ChessSide, Ship } from '../ts/types'
+import { ChessChallenge, ChessSide, Ship } from '../ts/types/chess'
+import useChessStore from '../ts/stores/chessStore'
 
 export function Challenges () {
-  const { urbit, removeChallenge, receivedChallenges } = useStore()
+  const { urbit, removeChallenge, receivedChallenges } = useChessStore()
 
   var [who, setWho] = React.useState('')
   var [event, setEvent] = React.useState('Casual Game')

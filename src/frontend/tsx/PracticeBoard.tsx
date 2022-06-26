@@ -1,24 +1,26 @@
 import * as React from 'react'
-import Chessboard from 'chessboardjsx'
-import useStore from '../ts/chessStore'
+import updatePracticeBoardStore from '../ts/stores/practiceBoardStore'
+import Chessground from './Chessground'
+
+import 'chessground/assets/chessground.base.css'
+import 'chessground/assets/chessground.brown.css'
+import 'chessground/assets/chessground.cburnett.css'
 
 export function PracticeBoard () {
-  const { practicePos, updatePracticePos } = useStore()
+  const { fen, api, baseConfig, setApi } = updatePracticeBoardStore()
+  const config = {
+    fen: fen,
+    ...baseConfig
+  }
 
   return (
     <div className='board-container'>
-      <div className='board-proper'>
-        <Chessboard
-          id = 'practice'
-          position = {practicePos}
-          onDrop = {() => { updatePracticePos(this.game.fen) }}
-          calcWidth = { ({ screenWidth, screenHeight }) =>
-            Math.min(
-              Math.floor(screenWidth * (4/5)),
-              Math.floor(screenHeight * (4/5))
-            )}
-        />
-      </div>
+      <Chessground
+        api={api}
+        setApi={setApi}
+        contained={true}
+        config={config}
+      />
     </div>
   )
 }

@@ -1,10 +1,10 @@
 import * as React from 'react'
-import useStore from '../ts/chessStore'
 import { useNavigate } from 'react-router-dom'
-import { ChessActiveGameInfo, ChessGameID, ChessGameInfo } from '../ts/types'
+import { ChessActiveGameInfo, ChessGameID, ChessGameInfo } from '../ts/types/chess'
+import useChessStore from '../ts/stores/chessStore'
 
 export function Games () {
-  const { activeGames } = useStore()
+  const { activeGames } = useChessStore()
   const navigate = useNavigate()
 
   const onClick = (gameID: ChessGameID) => {

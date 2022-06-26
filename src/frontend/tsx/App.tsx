@@ -1,12 +1,12 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Urbit from '@urbit/http-api'
-import useStore from '../ts/chessStore'
-import { ChessChallengeUpdate, ChessGameInfo } from '../ts/types'
+import useChessStore from '../ts/stores/chessStore'
+import { ChessChallengeUpdate, ChessGameInfo } from '../ts/types/chess'
 import { Main } from './Main'
 
 export function App () {
-  const { setUrbit, receiveChallenge, receiveGame } = useStore()
+  const { setUrbit, receiveChallenge, receiveGame } = useChessStore()
 
   const init = async () => {
     const urbit = new Urbit('', '')
@@ -31,7 +31,10 @@ export function App () {
     })
   }
 
-  React.useEffect(() => { init() }, [])
+  // One time initialization hooks
+  React.useEffect(
+    () => { init() },
+    [])
 
   return (
     <BrowserRouter basename={'/apps/chess'}>
