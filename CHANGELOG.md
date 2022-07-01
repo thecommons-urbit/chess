@@ -5,15 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Practice board with [chess.js](https://github.com/jhlywa/chess.js) logic
+- Upcoming features list
 ### Changed
-- Updated `%zuse` kelvin version to 418 for `urbit-os-v2.123`
+- New frontend using [Chessground](https://github.com/lichess-org/chessground)
 
-## [0.8.0] - 2021-12-10
+## [0.8.1] - 2021-10-15
 ### Added
 - Dockerfile for building frontend JS using Docker
 - Build/install scripts for adding Chess to Grid
 - Changelog
 ### Changed
+- App frontend
 - Source code directory structure
 - GNU make commands
 
+## [0.7.2] - 2021-03-14
+- Last commit made by Raymond E. Pasco, Initial commit for `%chess` Urbit app

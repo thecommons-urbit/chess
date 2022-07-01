@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:18.4.0
+FROM node:18.4
 # An environment variable made popular by the express web server framework which
 # checks the value when Node is run and may take different actions. The typical
 # values are 'dev' and 'prod'.

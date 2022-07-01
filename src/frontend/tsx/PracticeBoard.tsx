@@ -1,26 +1,62 @@
-import * as React from 'react'
-import updatePracticeBoardStore from '../ts/stores/practiceBoardStore'
+import React, { useState } from 'react'
+import { Chess, ChessInstance, Square, SQUARES } from 'chess.js'
+import { Config as CgConfig } from 'chessground/config'
+import * as cg from 'chessground/types'
+import usePracticeBoardStore from '../ts/stores/practiceBoardStore'
 import Chessground from './Chessground'
 
 import 'chessground/assets/chessground.base.css'
 import 'chessground/assets/chessground.brown.css'
 import 'chessground/assets/chessground.cburnett.css'
 
+function getDests (chess: ChessInstance) {
+  const dests = new Map()
+
+  SQUARES.forEach(function (s: Square) {
+    const ms = chess.moves({ square: s, verbose: true })
+    if (ms.length) {
+      dests.set(s, ms.map(m => m.to))
+    }
+  })
+
+  return dests
+}
+
 export function PracticeBoard () {
-  const { fen, api, baseConfig, setApi } = updatePracticeBoardStore()
-  const config = {
+  const [dirtyState, setDirtyState] = useState(0)
+  const { api, fen, updateFen } = usePracticeBoardStore()
+
+  const chess = new Chess(fen)
+  const colorPlaying = (chess.turn() === 'w') ? 'white' as const : 'black' as const
+  const config: CgConfig = {
     fen: fen,
-    ...baseConfig
+    turnColor: colorPlaying,
+    check: chess.in_check(),
+    viewOnly: chess.game_over(),
+    movable: {
+      dests: getDests(chess),
+      color: colorPlaying,
+      events: {
+        after: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => {
+          const attemptMove = chess.move({ from: orig as Square, to: dest as Square })
+
+          if (attemptMove !== null) {
+            const newFen = chess.fen()
+            updateFen(newFen)
+            setDirtyState(0)
+          } else {
+            setDirtyState(dirtyState + 1)
+          }
+        }
+      }
+    }
   }
+
+  api?.set(config)
 
   return (
     <div className='board-container'>
-      <Chessground
-        api={api}
-        setApi={setApi}
-        contained={true}
-        config={config}
-      />
+      <Chessground />
     </div>
   )
 }

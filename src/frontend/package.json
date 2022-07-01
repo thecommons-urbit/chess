@@ -21,10 +21,11 @@
   },
   "engines": {
     "node": ">=10 <19",
-    "npm": "^8.12.0"
+    "npm": "^8.12.1"
   },
   "dependencies": {
     "@urbit/http-api": "^2.1.1",
+    "chess.js": "^0.13.3",
     "chessboardjsx": "^2.4.7",
     "chessground": "^8.2.1",
     "react": "^18.2.0",
@@ -33,6 +34,7 @@
     "zustand": "^3.7.2"
   },
   "devDependencies": {
+    "@types/chess.js": "^0.13.1",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
     "@types/react-router-dom": "^5.3.3",

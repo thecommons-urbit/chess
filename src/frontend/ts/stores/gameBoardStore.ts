@@ -3,14 +3,15 @@ import { Api as CgApi } from 'chessground/api'
 import { Config as CgConfig } from 'chessground/config'
 import { ChessPositionFEN } from '../types/chess'
 import BoardState from '../states/boardState'
-import ChessConstants from '../constants/chess'
+import { ChessConstants } from '../constants'
 
 const useGameBoardStore = create<BoardState>((set, get) => ({
-  fen: ChessConstants.initialFen,
   api: null,
-  baseConfig: {},
-  setApi: (boardApi: CgApi) => set(state => ({ api: boardApi })),
-  updateConfig: (newConfig: CgConfig) => set(state => ({ baseConfig: newConfig }))
+  fen: ChessConstants.initialFen,
+  baseConfig: ChessConstants.baseGameConfig,
+  setApi: (boardApi: CgApi) => set({ api: boardApi }),
+  updateFen: (newFen: string) => set({ fen: newFen }),
+  updateConfig: (newConfig: CgConfig) => set({ baseConfig: newConfig })
 }))
 
 export default useGameBoardStore

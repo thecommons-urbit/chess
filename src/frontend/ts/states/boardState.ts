@@ -1,12 +1,12 @@
 import { Api as CgApi } from 'chessground/api'
 import { Config as CgConfig } from 'chessground/config'
-import { ChessPositionFEN } from '../types/chess'
 
 interface BoardState {
-  fen: ChessPositionFEN;
   api: CgApi | null;
+  fen: string;
   baseConfig: CgConfig;
   setApi: (boardApi: CgApi) => void;
+  updateFen: (newFen: string) => void;
   updateConfig: (newConfig: CgConfig) => void;
 }
 
