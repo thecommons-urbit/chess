@@ -42,6 +42,18 @@ export function PracticeBoard () {
 
           if (attemptMove !== null) {
             const newFen = chess.fen()
+
+            // Workaround to keep animations for en passant
+            if (attemptMove.flags === 'e') {
+              const tempChess = new Chess(fen)
+              const square = dest.charAt(0) + orig.charAt(1)
+
+              tempChess.remove(square as Square)
+              const workaroundConfig = { fen: tempChess.fen() }
+
+              api?.set(workaroundConfig)
+            }
+
             updateFen(newFen)
             setDirtyState(0)
           } else {

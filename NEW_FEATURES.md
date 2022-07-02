@@ -1,14 +1,9 @@
 v0.9
 - Improved UI
-  - Chessground for board
-    - Practice board
-      - Enable animation after en passant
-      - Save practice board state
-      - Improved promotion interface
-      - Title
-      - Reset Button
-      - Notification for mate
-    - Game board
+  - Chessground for practice board
+    - Improved promotion interface
+    - Title
+  - Chessground for game board
   - New panel for games/challenges
   - lichess challenge interface
   - New side interface for game board
@@ -17,6 +12,8 @@ v0.9
       - accept draw
       - resign
     - Material difference
+  - Reset button for practice board
+  - Notification for mate
 - Minimum viewport width
 
 v0.10
