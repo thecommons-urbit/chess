@@ -1,6 +1,6 @@
 div.app-container {
-  height: 100vh;
-  width: 100vw;
+  height: max(100vh, 480);
+  width: max(100vw, 640);
   display: grid;
   grid-template-areas: "left right";
   grid-template-rows: auto;
@@ -33,11 +33,37 @@ div.challenges-container {
   overflow: auto;
 }
 
-div.board-container {
+div.game-container {
   grid-area: left;
-  height: calc(min(100vh, 75vw) - calc(2 * min(2vh, 2vw)));
-  width: calc(min(100vh, 75vw) - calc(2 * min(2vh, 2vw)));
-  margin: min(2vh, 2vw);
+  margin: min(max(2vh, 10px), max(2vw, 10px));
+  display: grid;
+  grid-template-areas:
+    "top"
+    "bottom";
+  grid-template-columns: auto;
+  grid-template-rows: 10% 90%;
+  align-items: center;
+  justify-items: center;
+}
+
+div.title-container {
+  grid-area: top;
+  height: calc(max(10vh, 48px) - min(max(2vh, 48px), max(2vw, 10px)));
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+
+h1.board-title {
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 2rem;
+  text-align: center;
+}
+
+div.board-container {
+  grid-area: bottom;
+  height: calc(max(min(90vh, 75vw), 432px) - min(max(2vh, 48px), max(2vw, 10px)));
+  width: calc(max(min(90vh, 75vw), 432px) - min(max(2vh, 48px), max(2vw, 10px)));
 }
 
 div.chessboard {
@@ -50,13 +76,9 @@ div.chessboard {
 
 
 
-@font-face {
-  font-family: 'Inter';
-  src: url(https://media.urbit.org/fonts/Inter-Regular.woff2) format('woff2');
-}
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Courier Prime', 'Courier New', monospace;
 }
 
 h1 {

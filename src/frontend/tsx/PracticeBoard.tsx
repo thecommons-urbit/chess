@@ -67,8 +67,13 @@ export function PracticeBoard () {
   api?.set(config)
 
   return (
-    <div className='board-container'>
-      <Chessground />
+    <div className='game-container'>
+      <div className='title-container'>
+        <h1 className='board-title'>{`${window.ship}'s practice board`}</h1>
+      </div>
+      <div className='board-container'>
+        <Chessground />
+      </div>
     </div>
   )
 }

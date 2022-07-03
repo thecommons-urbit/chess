@@ -2,34 +2,35 @@ v0.9
 - Improved UI
   - Chessground for practice board
     - Improved promotion interface
-    - Title
   - Chessground for game board
-  - New panel for games/challenges
-  - lichess challenge interface
-  - New side interface for game board
-    - New buttons
-      - offer draw
-      - accept draw
-      - resign
-    - Material difference
-  - Reset button for practice board
-  - Notification for mate
-- Minimum viewport width
+  - New challenge interface
+  - Accept draw popup
+  - New side panel
+    - Active games
+    - Incoming Challenges
+    - Outgoing Challenges
+    - Options
+      - Send challenge 
+      - Offer draw
+      - Resign
+      - Reset button for practice board
 
 v0.10
-- Customizable board visuals
-  - Modify visuals
-  - Save preferences
+- Notification for mate
+- Material difference
 
 v0.11
+- Customizable board visuals
+
+v0.12
 - View completed games
 - Show current record against opponent
 
-v0.12
+v0.13
 - `%pals` integration
 - Notifications
 
-v0.13
+v0.14
 - Premoves
 
 v1.0
