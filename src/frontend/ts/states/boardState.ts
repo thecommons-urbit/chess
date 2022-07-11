@@ -1,12 +1,16 @@
+import { ChessInstance } from 'chess.js'
 import { Api as CgApi } from 'chessground/api'
 import { Config as CgConfig } from 'chessground/config'
+import { Promotion } from '../types/board'
 
 interface BoardState {
   api: CgApi | null;
-  fen: string;
+  chess: ChessInstance | null;
+  promotion: Promotion | null;
   baseConfig: CgConfig;
   setApi: (boardApi: CgApi) => void;
-  updateFen: (newFen: string) => void;
+  setChess: (chessApi: ChessInstance) => void;
+  updatePromotion: (newPromotionData: Promotion | null) => void;
   updateConfig: (newConfig: CgConfig) => void;
 }
 

@@ -2,13 +2,11 @@ import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Urbit from '@urbit/http-api'
 import useChessStore from '../ts/stores/chessStore'
-import usePracticeBoardStore from '../ts/stores/practiceBoardStore'
 import { ChessChallengeUpdate, ChessGameInfo } from '../ts/types/chess'
 import { Main } from './Main'
 
 export function App () {
   const { setUrbit, receiveChallenge, receiveGame } = useChessStore()
-  const { fen, updateFen } = usePracticeBoardStore()
 
   const init = async () => {
     const urbit = new Urbit('', '')
@@ -37,21 +35,23 @@ export function App () {
   React.useEffect(
     () => { init() },
     [])
-  React.useEffect(
-    () => {
-      const storedFen = window.localStorage.getItem('practiceFen')
-      if (storedFen) {
-        updateFen(storedFen)
-      }
-    },
-    [])
+
+  //   React.useEffect(
+  //     () => {
+  //       const storedFen = window.localStorage.getItem('practiceFen')
+  //       if (storedFen) {
+  //         console.log('GETTING STORED FEN')
+  //         updateFen(storedFen)
+  //       }
+  //     },
+  //     [])
 
   // Load practice board placement from storage
-  React.useEffect(
-    () => {
-      window.localStorage.setItem('practiceFen', fen)
-    },
-    [fen])
+  //   React.useEffect(
+  //     () => {
+  //       window.localStorage.setItem('practiceFen', fen)
+  //     },
+  //     [fen])
 
   return (
     <BrowserRouter basename={'/apps/chess'}>

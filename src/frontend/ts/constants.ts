@@ -1,5 +1,3 @@
-const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-
 const baseGameConfig = {}
 
 const basePracticeConfig =
@@ -13,7 +11,7 @@ const basePracticeConfig =
   },
   animation: {
     enabled: true,
-    duration: 200
+    duration: 250
   },
   movable: {
     free: false,
@@ -45,7 +43,6 @@ const basePracticeConfig =
 }
 
 export const ChessConstants = {
-  initialFen: initialFen,
   baseGameConfig: baseGameConfig,
   basePracticeConfig: basePracticeConfig
 }
