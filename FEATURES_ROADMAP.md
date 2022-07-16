@@ -1,7 +1,6 @@
 v0.9
 - Improved UI
-  - Chessground for game board
-  - Remember practice board state
+  - Scale title
   - Fix en passant animations
   - New challenge interface
   - Accept draw popup
@@ -13,27 +12,34 @@ v0.9
       - Send challenge 
       - Offer draw
       - Resign
-      - Reset button for practice board
   - Documentation
 
 v0.10
-- Notification for mate
-- Material difference
+- Save practice board state
+  - Reset button for practice board
 
 v0.11
 - Customizable board visuals
-  - Store visuals state
 
 v0.12
 - View completed games
 - Show current record against opponent
 
 v0.13
+- Notification for mate
+- Material difference
+
+v0.14
 - `%pals` integration
 - Notifications
 
-v0.14
+v0.15
+- Three-fold repetition draw
+- 50-move draw
+
+v0.16
 - Premoves
 
-v0.15
-- Fix three-fold repetition bug
+Unsorted Issues:
+- Can't resign when it's not your turn
+- Can't browse completed games, so get kicked to home screen when game ends

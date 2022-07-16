@@ -85,7 +85,7 @@ div.chess-promotion {
   height: 100%;
   width: 100%;
   margin-left: -100%;
-  background: rgba(22, 21, 18, 0.7);
+  background: rgba(22, 21, 18, 0.5);
 }
 
 div.chess-promotion square {
@@ -151,7 +151,7 @@ div.challenge-prompt {
 div.board-controls {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  margin: 1em;
+  margin: 10px;
 }
 
 div.board-draw-offer {
@@ -161,13 +161,6 @@ div.board-draw-offer {
 
 div.board-buttons {
   grid-column: 2;
-  display: flex;
-  flex-direction: column;
-  margin: auto 1em;
-}
-
-div.board-promotion {
-  grid-column: 3;
   display: flex;
   flex-direction: column;
   margin: auto 1em;

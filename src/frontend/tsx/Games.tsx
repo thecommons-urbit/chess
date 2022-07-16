@@ -1,23 +1,21 @@
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ChessActiveGameInfo, ChessGameID, ChessGameInfo } from '../ts/types/chess'
-import useChessStore from '../ts/stores/chessStore'
+import { GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
+import useChessStore from '../ts/state/chessStore'
 
 export function Games () {
-  const { activeGames } = useChessStore()
-  const navigate = useNavigate()
+  const { activeGames, setDisplayGame } = useChessStore()
 
-  const onClick = (gameID: ChessGameID) => {
-    navigate(`/${gameID}`)
+  const onClick = (activeGame: ActiveGameInfo) => {
+    setDisplayGame(activeGame)
   }
 
-  const wrapDAU = (gameID: ChessGameID) => {
+  const wrapDAU = (gameID: GameID) => {
     var parts = gameID.split('..')
 
     return parts.join('..\u200b')
   }
 
-  const extractRound = (chessGameInfo: ChessGameInfo) => {
+  const extractRound = (chessGameInfo: GameInfo) => {
     return chessGameInfo.round === '' ? '' : `: Round ${chessGameInfo.round}`
   }
 
@@ -32,7 +30,7 @@ export function Games () {
                 <li
                   key={gameID}
                   className='game-active'
-                  onClick={() => onClick(gameID)}>
+                  onClick={() => onClick(activeGame)}>
                   {`${wrapDAU(gameID)}`}<br/>
                   {`${activeGame.info.event}${extractRound(activeGame.info)}`}<br/>
                   {`${activeGame.info.white}(W) vs. ${activeGame.info.black}(B)`}<br/>

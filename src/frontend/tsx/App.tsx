@@ -1,9 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Urbit from '@urbit/http-api'
-import useChessStore from '../ts/stores/chessStore'
-import { ChessChallengeUpdate, ChessGameInfo } from '../ts/types/chess'
-import { Main } from './Main'
+import useChessStore from '../ts/state/chessStore'
+import { GameInfo, ChallengeUpdate } from '../ts/types/urbitChess'
+import { Chessboard } from './Chessboard'
+import { Menu } from './Menu'
 
 export function App () {
   const { setUrbit, receiveChallenge, receiveGame } = useChessStore()
@@ -18,7 +19,7 @@ export function App () {
       app: 'chess',
       path: '/challenges',
       err: () => {},
-      event: (data: ChessChallengeUpdate) => receiveChallenge(data),
+      event: (data: ChallengeUpdate) => receiveChallenge(data),
       quit: () => {}
     })
 
@@ -26,7 +27,7 @@ export function App () {
       app: 'chess',
       path: '/active-games',
       err: () => {},
-      event: (data: ChessGameInfo) => receiveGame(data),
+      event: (data: GameInfo) => receiveGame(data),
       quit: () => {}
     })
   }
@@ -54,12 +55,10 @@ export function App () {
   //     [fen])
 
   return (
-    <BrowserRouter basename={'/apps/chess'}>
-      <Routes>
-        <Route path="/:gameId" element={<Main />} />
-        <Route path="/" element={<Main />} />
-      </Routes>
-    </BrowserRouter>
+    <div className='app-container'>
+      <Chessboard />
+      <Menu />
+    </div>
   )
 }
 

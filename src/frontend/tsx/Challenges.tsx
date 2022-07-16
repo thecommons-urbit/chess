@@ -1,29 +1,29 @@
 import * as React from 'react'
-import { ChessChallenge, ChessSide, Ship } from '../ts/types/chess'
-import useChessStore from '../ts/stores/chessStore'
+import { Challenge, Side, Ship } from '../ts/types/urbitChess'
+import useChessStore from '../ts/state/chessStore'
 
 export function Challenges () {
-  const { urbit, removeChallenge, receivedChallenges } = useChessStore()
+  const { urbit, incomingChallenges, removeChallenge } = useChessStore()
 
   var [who, setWho] = React.useState('')
   var [event, setEvent] = React.useState('Casual Game')
   var [round, setRound] = React.useState('')
   var [side, setSide] = React.useState('random')
 
-  const challengerKing = (side: ChessSide): string => {
+  const challengerKing = (side: Side): string => {
     switch (side) {
-      case ChessSide.White: {
+      case Side.White: {
         return '♔'
       }
-      case ChessSide.Black: {
+      case Side.Black: {
         return '♚'
       }
-      case ChessSide.Random:
+      case Side.Random:
         return '⚂'
     }
   }
 
-  const extractRound = (challenge: ChessChallenge) => {
+  const extractRound = (challenge: Challenge) => {
     return challenge.round === '' ? '' : `: Round ${challenge.round}`
   }
 
@@ -71,7 +71,7 @@ export function Challenges () {
       <div className='challenges-list'>
         <ul>
           {
-            Array.from(receivedChallenges).map(([challenger, challenge]) => {
+            Array.from(incomingChallenges).map(([challenger, challenge]) => {
               return (
                 <li key={challenger}>
                   {`Challenged by ${challengerKing(challenge.challengerSide)}${challenger}`}<br/>

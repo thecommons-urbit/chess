@@ -1,10 +1,8 @@
-const baseGameConfig = {}
-
-const basePracticeConfig =
+const BASE_CONFIG =
 {
-  orientation: 'white' as const,
   coordinates: true,
   autoCastle: true,
+  viewOnly: false,
   highlight: {
     lastMove: true,
     check: true
@@ -42,7 +40,6 @@ const basePracticeConfig =
   }
 }
 
-export const ChessConstants = {
-  baseGameConfig: baseGameConfig,
-  basePracticeConfig: basePracticeConfig
+export const CHESSGROUND = {
+  baseConfig: BASE_CONFIG
 }

@@ -4,7 +4,7 @@ FROM node:18.4
 # An environment variable made popular by the express web server framework which
 # checks the value when Node is run and may take different actions. The typical
 # values are 'dev' and 'prod'.
-#ENV NODE_ENV=prod
+# ENV NODE_ENV=prod
 ENV NODE_ENV=dev
 
 # Copy files from source
