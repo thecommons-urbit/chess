@@ -40,35 +40,55 @@ div.challenges-container {
 
 div.game-container {
   grid-area: left;
-  margin: min(max(2vh, 10px), max(2vw, 10px));
+  height: calc(100% - calc(2 * max(min(2vh, 2vw), 10px)));
+  width: calc(100% - calc(2 * max(min(2vh, 2vw), 10px)));
+  margin: max(min(2vh, 2vw), 10px);
   display: grid;
   grid-template-areas:
     "top"
+    "middle"
     "bottom";
   grid-template-columns: auto;
-  grid-template-rows: 10% 90%;
+  grid-template-rows: 10% 80% 10%;
   align-items: center;
   justify-items: center;
 }
 
 div.title-container {
   grid-area: top;
-  height: calc(max(10vh, 48px) - min(max(2vh, 48px), max(2vw, 10px)));
-  display: flex;
+  height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
+  width: calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px)));
+  display: grid;
   align-items: center;
   justify-items: center;
 }
 
-h1.board-title {
-  font-family: 'Courier Prime', 'Courier New', monospace;
-  font-size: 2rem;
+p.title-text {
+  position: absolute;
+  height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
+  width: calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px)));
+  text-align: center;
+}
+
+div.turn-container {
+  grid-area: bottom;
+  height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
+  width: 100%;
+  display: grid;
+}
+
+p.turn-text {
+  position: absolute;
+  height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
+  width: calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px)));
+  font-size: max(4.4vh, 28px);
   text-align: center;
 }
 
 div.board-container {
-  grid-area: bottom;
-  height: calc(max(min(90vh, 75vw), 432px) - min(max(2vh, 48px), max(2vw, 10px)));
-  width: calc(max(min(90vh, 75vw), 432px) - min(max(2vh, 48px), max(2vw, 10px)));
+  grid-area: middle;
+  height: min(max(80vh, 384px), calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px))));
+  width: min(max(80vh, 384px), calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px))));
   display: flex;
 }
 

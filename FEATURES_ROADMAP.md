@@ -1,6 +1,6 @@
 v0.9
 - Improved UI
-  - Scale title
+  - Close subscriptions on cleanup
   - Fix en passant animations
   - New challenge interface
   - Accept draw popup
@@ -43,3 +43,4 @@ v0.16
 Unsorted Issues:
 - Can't resign when it's not your turn
 - Can't browse completed games, so get kicked to home screen when game ends
+- Need way to confirm that code in repo is identical to code running on your urbit

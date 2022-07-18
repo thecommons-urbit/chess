@@ -6,6 +6,7 @@ import { Config as CgConfig } from 'chessground/config'
 import * as cg from 'chessground/types'
 import { CHESS } from '../ts/constants/chess'
 import { CHESSGROUND } from '../ts/constants/chessground'
+import { URBIT_CHESS } from '../ts/constants/urbitChess'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
 import { pokeMove, move, castle, resign, offerDraw, acceptDraw, declineDraw } from '../ts/helpers/urbitChess'
@@ -62,11 +63,11 @@ export function Chessboard () {
       ? Side.White
       : Side.Black
     : getCgColor(chess.turn()) as Side
-  const title = (displayGame !== null)
+  const boardTitle = (displayGame !== null)
     ? (orientation === Side.White)
-      ? `${CHESS.pieceWhiteKnight} ${displayGame.info.white} vs. ${CHESS.pieceBlackKnight} ${displayGame.info.black}: ${sideToMove} to move...`
-      : `${CHESS.pieceBlackKnight} ${displayGame.info.black} vs. ${CHESS.pieceWhiteKnight} ${displayGame.info.white}: ${sideToMove} to move...`
-    : `${window.ship}'s practice board`
+      ? `${CHESS.pieceWhiteKnight} ${displayGame.info.white} vs. ${CHESS.pieceBlackKnight} ${displayGame.info.black}`
+      : `${CHESS.pieceBlackKnight} ${displayGame.info.black} vs. ${CHESS.pieceWhiteKnight} ${displayGame.info.white}`
+    : `~${window.ship}'s practice board`
 
   //
   // React hook helper functions
@@ -82,6 +83,8 @@ export function Chessboard () {
     } else {
       chess.load(CHESS.defaultFEN)
     }
+
+    forceRenderWorkaround(Date.now())
   }
 
   const configBoard = () => {
@@ -331,11 +334,16 @@ export function Chessboard () {
   return (
     <div className='game-container'>
       <div className='title-container'>
-        <h1 className='board-title'>{`${title}`}</h1>
+        <p className='title-text' style={{ fontSize: URBIT_CHESS.lengthToFontSize.get(boardTitle.length) }}>
+          {`${boardTitle}`}
+        </p>
       </div>
       <div className='board-container'>
         <div ref={boardRef} className='chessboard cg-wrap' />
         { (promotionMove !== null) ? renderPromotionInterface() : <div/> }
+      </div>
+      <div className='turn-container'>
+        <p className='turn-text'>{`${sideToMove} to move...`}</p>
       </div>
       { (displayGame !== null) ? renderBoardControls() : <div/> }
     </div>
