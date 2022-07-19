@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Beforeunload } from 'react-beforeunload'
 import Urbit from '@urbit/http-api'
 import useChessStore from '../ts/state/chessStore'
 import { GameInfo, ChallengeUpdate } from '../ts/types/urbitChess'
@@ -7,23 +7,25 @@ import { Chessboard } from './Chessboard'
 import { Menu } from './Menu'
 
 export function App () {
-  const { setUrbit, receiveChallenge, receiveGame } = useChessStore()
+  const { urbit, setUrbit, receiveChallenge, receiveGame } = useChessStore()
+
+  //
+  // Helper functions
+  //
 
   const init = async () => {
-    const urbit = new Urbit('', '')
-    urbit.ship = window.ship
+    const newUrbit = new Urbit('', '')
+    newUrbit.ship = window.ship
+    setUrbit(newUrbit)
 
-    setUrbit(urbit)
-
-    await urbit.subscribe({
+    await newUrbit.subscribe({
       app: 'chess',
       path: '/challenges',
       err: () => {},
       event: (data: ChallengeUpdate) => receiveChallenge(data),
       quit: () => {}
     })
-
-    await urbit.subscribe({
+    await newUrbit.subscribe({
       app: 'chess',
       path: '/active-games',
       err: () => {},
@@ -32,33 +34,29 @@ export function App () {
     })
   }
 
-  // One time initialization hooks
+  const teardown = () => {
+    urbit.delete()
+  }
+
+  //
+  // React hooks
+  //
+
   React.useEffect(
     () => { init() },
     [])
 
-  //   React.useEffect(
-  //     () => {
-  //       const storedFen = window.localStorage.getItem('practiceFen')
-  //       if (storedFen) {
-  //         console.log('GETTING STORED FEN')
-  //         updateFen(storedFen)
-  //       }
-  //     },
-  //     [])
-
-  // Load practice board placement from storage
-  //   React.useEffect(
-  //     () => {
-  //       window.localStorage.setItem('practiceFen', fen)
-  //     },
-  //     [fen])
+  //
+  // Render app components
+  //
 
   return (
-    <div className='app-container'>
-      <Chessboard />
-      <Menu />
-    </div>
+    <Beforeunload onBeforeunload={teardown}>
+      <div className='app-container'>
+        <Chessboard />
+        <Menu />
+      </div>
+    </Beforeunload>
   )
 }
 

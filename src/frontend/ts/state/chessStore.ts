@@ -9,6 +9,8 @@ const useChessStore = create<ChessState>((set, get) => ({
   displayGame: null,
   activeGames: new Map(),
   incomingChallenges: new Map(),
+  setUrbit: (urbit: Urbit) => set({ urbit }),
+  setDisplayGame: (displayGame: ActiveGameInfo | null) => set({ displayGame }),
   receiveChallenge: (data: ChallengeUpdate) =>
     set(state => ({ incomingChallenges: state.incomingChallenges.set(data.who, data as Challenge) })),
   receiveGame: async (data: GameInfo) => {
@@ -135,9 +137,7 @@ const useChessStore = create<ChessState>((set, get) => ({
     updatedGame.sentDrawOffer = true
 
     set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-  },
-  setUrbit: (urbit: Urbit) => set({ urbit }),
-  setDisplayGame: (displayGame: ActiveGameInfo | null) => set({ displayGame })
+  }
 }))
 
 export default useChessStore

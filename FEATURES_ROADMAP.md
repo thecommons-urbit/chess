@@ -1,6 +1,5 @@
 v0.9
 - Improved UI
-  - Close subscriptions on cleanup
   - Fix en passant animations
   - New challenge interface
   - Accept draw popup
@@ -12,7 +11,8 @@ v0.9
       - Send challenge 
       - Offer draw
       - Resign
-  - Documentation
+- Documentation
+- Log additional feature ideas
 
 v0.10
 - Save practice board state
