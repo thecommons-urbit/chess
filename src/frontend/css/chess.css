@@ -140,6 +140,21 @@ div.chess-promotion square:hover piece {
   transform: none;
 }
 
+div.draw-resolution {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.popup-content {
+  background: rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 25px;
+}
+
+.popup-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
 
 
 
@@ -172,11 +187,6 @@ div.board-controls {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   margin: 10px;
-}
-
-div.board-draw-offer {
-  grid-column: 1;
-  margin: auto 1em;
 }
 
 div.board-buttons {

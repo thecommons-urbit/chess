@@ -77,8 +77,8 @@ export function Challenges () {
                   {`Challenged by ${challengerKing(challenge.challengerSide)}${challenger}`}<br/>
                   {`${challenge.event}${extractRound(challenge)}`}<br/>
                   <div className='challenge-reply'>
-                    <button onClick={() => acceptChallenge(challenger)}>Accept</button>
-                    <button onClick={() => declineChallenge(challenger)}>Decline</button>
+                    <button className="accept" role="button" onClick={() => acceptChallenge(challenger)}>accept</button>
+                    <button className="reject" role="button" onClick={() => declineChallenge(challenger)}>decline</button>
                   </div>
                 </li>)
             })

@@ -1,6 +1,5 @@
 v0.9
 - Improved UI
-  - Accept draw popup 
   - New challenge interface
   - New side panel
     - Active games
@@ -15,33 +14,22 @@ v0.9
 - Update Changelog
 - Log additional feature ideas
 
-v0.10
-- Save practice board state
+
+Features:
+- Save practice board state when navigating away
   - Reset button for practice board
-
-v0.11
 - Customizable board visuals
-
-v0.12
 - View completed games
 - Show current record against opponent
-
-v0.13
-- Notification for mate
-- Material difference
-
-v0.14
+- Show material difference while playing
+- Show Notification for mate
 - `%pals` integration
 - Notifications
-
-v0.15
-- Three-fold repetition draw
-- 50-move draw
-
-v0.16
 - Premoves
+- Need way to confirm that code in repo is identical to code running on your urbit
 
-Unsorted Issues:
+Bugs:
 - Can't resign when it's not your turn
 - Can't browse completed games, so get kicked to home screen when game ends
-- Need way to confirm that code in repo is identical to code running on your urbit
+- Can't claim three-fold repetition draw
+- Can't claim 50-move draw

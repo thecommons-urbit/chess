@@ -4,6 +4,7 @@ import { Chessground } from 'chessground'
 import { Api as CgApi } from 'chessground/api'
 import { Config as CgConfig } from 'chessground/config'
 import * as cg from 'chessground/types'
+import Popup from 'reactjs-popup'
 import { CHESS } from '../ts/constants/chess'
 import { CHESSGROUND } from '../ts/constants/chessground'
 import { URBIT_CHESS } from '../ts/constants/urbitChess'
@@ -47,7 +48,7 @@ export function Chessboard () {
   const [chess, setChess] = useState<ChessInstance>(new Chess())
   const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null)
   const [renderWorkaround, forceRenderWorkaround] = useState<number>(Date.now())
-  const { urbit, displayGame, activeGames, declinedDraw, offeredDraw, setDisplayGame } = useChessStore()
+  const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame } = useChessStore()
 
   //
   // Non-state constants
@@ -107,21 +108,27 @@ export function Chessboard () {
       }
 
       const attemptUrbitMove = async (flag: string) => {
+        const gameID: GameID = displayGame.info.gameID
+
         if (flag === FLAGS.KSIDE_CASTLE) {
-          await pokeMove(urbit, castle(displayGame.info.gameID, CastleSide.King), onError)
+          await pokeMove(urbit, castle(gameID, CastleSide.King), onError)
         } else if (flag === FLAGS.QSIDE_CASTLE) {
-          await pokeMove(urbit, castle(displayGame.info.gameID, CastleSide.Queen), onError)
+          await pokeMove(urbit, castle(gameID, CastleSide.Queen), onError)
         } else {
           await pokeMove(
             urbit,
             move(
-              displayGame.info.gameID,
+              gameID,
               orig.charAt(1) as Rank,
               orig.charAt(0) as File,
               dest.charAt(1) as Rank,
               dest.charAt(0) as File,
               PromotionRole.None),
             onError)
+        }
+
+        if (displayGame.gotDrawOffer) {
+          await pokeMove(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
         }
       }
 
@@ -270,16 +277,22 @@ export function Chessboard () {
         })
 
         const attemptUrbitMove = async () => {
+          const gameID: GameID = displayGame.info.gameID
+
           await pokeMove(
             urbit,
             move(
-              displayGame.info.gameID,
+              gameID,
               orig.charAt(1) as Rank,
               orig.charAt(0) as File,
               dest.charAt(1) as Rank,
               dest.charAt(0) as File,
               piece.urbitRole),
             onError)
+
+          if (displayGame.gotDrawOffer) {
+            await pokeMove(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+          }
         }
 
         if (attemptMove !== null) {
@@ -320,12 +333,6 @@ export function Chessboard () {
   const renderBoardControls = () => {
     return (
       <div className='board-controls'>
-        <div className='board-draw-offer' hidden={!displayGame.gotDrawOffer}>
-          <p>Opponent offered draw</p>
-          <br/>
-          <button onClick={acceptDrawOnClick}>Accept</button>
-          <button onClick={declineDrawOnClick}>Decline</button>
-        </div>
         <div className='board-buttons'>
           <div>
             <button disabled={displayGame.sentDrawOffer} onClick={offerDrawOnClick}>Offer Draw</button>
@@ -345,6 +352,22 @@ export function Chessboard () {
     )
   }
 
+  const renderDrawPopup = (game: ActiveGameInfo) => {
+    const opponent = (orientation === Side.White) ? game.info.black : game.info.white
+
+    return (
+      <Popup open={game.gotDrawOffer}>
+        <div>
+          <p>{`${opponent} has offered a draw`}</p>
+          <div className='draw-resolution'>
+            <button className="accept" role="button" onClick={acceptDrawOnClick}>accept</button>
+            <button className="reject" role="button" onClick={declineDrawOnClick}>decline</button>
+          </div>
+        </div>
+      </Popup>
+    )
+  }
+
   return (
     <div className='game-container'>
       <div className='title-container'>
@@ -360,6 +383,7 @@ export function Chessboard () {
         <p className='turn-text'>{`${sideToMove} to move...`}</p>
       </div>
       { (displayGame !== null) ? renderBoardControls() : <div/> }
+      { (displayGame !== null) ? renderDrawPopup(displayGame) : <div/> }
     </div>
   )
 }
