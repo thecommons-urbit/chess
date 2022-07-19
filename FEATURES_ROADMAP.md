@@ -1,8 +1,7 @@
 v0.9
 - Improved UI
-  - Fix en passant animations
+  - Accept draw popup 
   - New challenge interface
-  - Accept draw popup
   - New side panel
     - Active games
     - Incoming Challenges
@@ -12,6 +11,8 @@ v0.9
       - Offer draw
       - Resign
 - Documentation
+- Update README
+- Update Changelog
 - Log additional feature ideas
 
 v0.10

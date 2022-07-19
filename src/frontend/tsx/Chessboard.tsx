@@ -97,12 +97,13 @@ export function Chessboard () {
     }
 
     const attemptMove = (orig: cg.Key, dest: cg.Key) => {
+      const fenBeforeMove = chess.fen()
       const moveAttempt = chess.move({ from: orig as Square, to: dest as Square })
 
       const onError = () => {
         console.log('REGULAR MOVE FAILED:')
         console.log(orig + ' -> ' + dest)
-        console.log(chess.fen())
+        console.log(fenBeforeMove)
       }
 
       const attemptUrbitMove = async (flag: string) => {
@@ -127,6 +128,19 @@ export function Chessboard () {
       if (moveAttempt !== null) {
         if (displayGame !== null) {
           attemptUrbitMove(moveAttempt.flags)
+        }
+
+        // Workaround to keep animations for en passant
+        if (moveAttempt.flags === FLAGS.EP_CAPTURE) {
+          const prevState = {
+            fen: fenBeforeMove
+          }
+          const currState = {
+            fen: chess.fen()
+          }
+
+          api.set(prevState)
+          api.set(currState)
         }
       } else {
         console.log('LOCAL FAILURE')

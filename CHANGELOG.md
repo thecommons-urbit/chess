@@ -6,10 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Practice board with [chess.js](https://github.com/jhlywa/chess.js) logic
-- Upcoming features list
+- Practice board
+- Move selection and verification using [chess.js](https://github.com/jhlywa/chess.js)
 ### Changed
 - New frontend using [Chessground](https://github.com/lichess-org/chessground)
+### Fixed
+- App frontend now closes connections to `chess` agent on page unload
 
 ## [0.8.1] - 2021-10-15
 ### Added
