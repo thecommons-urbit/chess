@@ -1,0 +1,14 @@
+input.rejected {
+  animation-duration: 0.5s;
+  animation-name: blink-red;
+}
+
+@keyframes blink-red {
+  from {
+    background-color: #FF0000;
+  }
+
+  to {
+    background-color: #FFFFFF;
+  }
+}

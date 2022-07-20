@@ -1,18 +1,48 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, ChessAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, EndMoveAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, EndMoveAction } from '../types/urbitChess'
 
 function emptyFunction (): void {}
 
-export function pokeMove (urbit: Urbit, move: ChessAction, onError?: () => void, onSuccess?: () => void) {
+export function pokeAction (urbit: Urbit, action: ChessAction, onError?: () => void, onSuccess?: () => void) {
   const pokeInput = {
     app: 'chess',
     mark: 'chess-action',
-    json: move,
+    json: action,
     onError: (typeof onError !== 'undefined') ? onError : emptyFunction,
     onSuccess: (typeof onSuccess !== 'undefined') ? onSuccess : emptyFunction
   }
 
   urbit.poke(pokeInput)
+}
+
+export function challenge (who: Ship, side: Side, description: string) {
+  const action: ChessChallengeAction = {
+    'chess-action': Action.Challenge,
+    'who': who,
+    'challenger-side': side,
+    'event': description,
+    'round': ''
+  }
+
+  return action
+}
+
+export function acceptGame (who: Ship) {
+  const action: ChessAcceptAction = {
+    'chess-action': Action.AcceptGame,
+    'who': who
+  }
+
+  return action
+}
+
+export function declineGame (who: Ship) {
+  const action: ChessDeclineAction = {
+    'chess-action': Action.DeclineGame,
+    'who': who
+  }
+
+  return action
 }
 
 export function move (
@@ -37,34 +67,34 @@ export function move (
 }
 
 export function castle (gameId: GameID, side: CastleSide): CastleMoveAction {
-  const move = {
+  const move: CastleMoveAction = {
     'chess-action': Action.Move,
     'chess-move': MoveActionAction.Castle,
     'game-id': gameId,
     'castle-side': side
   }
 
-  return (move as CastleMoveAction)
+  return move
 }
 
 export function resign (gameId: GameID, side: Side): EndMoveAction {
-  const move = {
+  const move: EndMoveAction = {
     'chess-action': Action.Move,
     'chess-move': MoveActionAction.End,
     'game-id': gameId,
     'result': (side === Side.White) ? Result.BlackVictory : Result.WhiteVictory
   }
 
-  return (move as EndMoveAction)
+  return move
 }
 
 export function offerDraw (gameId: GameID): OfferDrawAction {
-  const move = {
+  const move: OfferDrawAction = {
     'chess-action': Action.OfferDraw,
     'game-id': gameId
   }
 
-  return (move as OfferDrawAction)
+  return move
 }
 
 export function acceptDraw (gameId: GameID): AcceptDrawAction {
@@ -77,10 +107,10 @@ export function acceptDraw (gameId: GameID): AcceptDrawAction {
 }
 
 export function declineDraw (gameId: GameID): DeclineDrawAction {
-  const move = {
+  const move: DeclineDrawAction = {
     'chess-action': Action.DeclineDraw,
     'game-id': gameId
   }
 
-  return (move as DeclineDrawAction)
+  return move
 }

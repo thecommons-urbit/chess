@@ -1,14 +1,40 @@
-import * as React from 'react'
-import { Challenge, Side, Ship } from '../ts/types/urbitChess'
+import React, { useState } from 'react'
+import Popup from 'reactjs-popup'
+import { pokeAction, challenge, acceptGame, declineGame } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
+import { Challenge, Side, Ship } from '../ts/types/urbitChess'
+
+const selectedSideButtonClasses = 'side radio-selected'
+const unselectedSideButtonClasses = 'side radio-unselected'
 
 export function Challenges () {
+  const [who, setWho] = useState('')
+  const [description, setDescription] = useState('')
+  const [side, setSide] = useState(Side.Random)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [badChallengeAttempts, setBadChallengeAttempts] = useState(0)
   const { urbit, incomingChallenges, removeChallenge } = useChessStore()
 
-  var [who, setWho] = React.useState('')
-  var [event, setEvent] = React.useState('Casual Game')
-  var [round, setRound] = React.useState('')
-  var [side, setSide] = React.useState('random')
+  const openModal = () => {
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+  }
+
+  const incrementBadChallengeAttempts = () => {
+    setBadChallengeAttempts(badChallengeAttempts + 1)
+  }
+
+  const resetChallengeInterface = () => {
+    setWho('')
+    setDescription('')
+    setSide(Side.Random)
+    setBadChallengeAttempts(0)
+
+    closeModal()
+  }
 
   const challengerKing = (side: Side): string => {
     switch (side) {
@@ -23,46 +49,32 @@ export function Challenges () {
     }
   }
 
-  const extractRound = (challenge: Challenge) => {
-    return challenge.round === '' ? '' : `: Round ${challenge.round}`
-  }
-
   const acceptChallenge = async (who: Ship) => {
-    await urbit.poke({
-      app: 'chess',
-      mark: 'chess-action',
-      json: {
-        'chess-action': 'accept-game',
-        'who': who
-      },
-      onSuccess: () => { removeChallenge(who) }
-    })
+    const onSuccess = () => {
+      removeChallenge(who)
+    }
+
+    await pokeAction(urbit, acceptGame(who), () => {}, onSuccess)
   }
 
   const declineChallenge = async (who: Ship) => {
-    await urbit.poke({
-      app: 'chess',
-      mark: 'chess-action',
-      json: {
-        'chess-action': 'decline-game',
-        'who': who
-      },
-      onSuccess: () => { removeChallenge(who) }
-    })
+    const onSuccess = () => {
+      removeChallenge(who)
+    }
+
+    await pokeAction(urbit, declineGame(who), () => {}, onSuccess)
   }
 
-  const sendChallenge = async (who: Ship, side: string, event: string, round: string) => {
-    await urbit.poke({
-      app: 'chess',
-      mark: 'chess-action',
-      json: {
-        'chess-action': 'challenge',
-        'who': who,
-        'challenger-side': side,
-        'event': event,
-        'round': round
-      }
-    })
+  const sendChallenge = async () => {
+    const onError = () => {
+      incrementBadChallengeAttempts()
+    }
+
+    const onSuccess = () => {
+      resetChallengeInterface()
+    }
+
+    await pokeAction(urbit, challenge(who, side, description), onError, onSuccess)
   }
 
   return (
@@ -75,7 +87,7 @@ export function Challenges () {
               return (
                 <li key={challenger}>
                   {`Challenged by ${challengerKing(challenge.challengerSide)}${challenger}`}<br/>
-                  {`${challenge.event}${extractRound(challenge)}`}<br/>
+                  {`${challenge.event}`}<br/>
                   <div className='challenge-reply'>
                     <button className="accept" role="button" onClick={() => acceptChallenge(challenger)}>accept</button>
                     <button className="reject" role="button" onClick={() => declineChallenge(challenger)}>decline</button>
@@ -85,45 +97,56 @@ export function Challenges () {
           }
         </ul>
       </div>
-      <div className='challenge-prompt'>
-        Challenge a player:<br/>
-        Player: <input
-          name='who'
-          placeholder={'~sampel-palnet'}
-          onChange={(e) => setWho(e.target.value)}
-        /><br/>
-        Event: <input
-          name='event'
-          defaultValue={'Casual Game'}
-          onChange={(e) => setEvent(e.target.value)}
-        /><br/>
-        Round: <input
-          name='round'
-          onChange={(e) => setRound(e.target.value)}
-        /><br/>
-        <div className='challenge-side'>
-          <input
-            name='side'
-            value='white'
-            type='radio'
-            onChange={(e) => setSide(e.target.value)}
-          /> ♔
-          <input
-            name='side'
-            value='black'
-            type='radio'
-            onChange={(e) => setSide(e.target.value)}
-          /> ♚
-          <input
-            name='side'
-            value='random'
-            defaultChecked={true}
-            type='radio'
-            onChange={(e) => setSide(e.target.value)}
-          /> ⚂
+      <button
+        onClick={openModal}
+        style={{ position: 'absolute', bottom: '1em' }}>
+        new challenge
+      </button>
+      <Popup open={modalOpen} onClose={resetChallengeInterface}>
+        <div className='new-challenge-container'>
+          <p style={{ fontSize: '2em', fontWeight: 'bold' }}>new challenge</p>
+          <div className='challenge-input-container'>
+            <p>opponent:</p>
+            <input
+              className={(badChallengeAttempts > 0) ? 'rejected' : ''}
+              type="text"
+              placeholder={'~sampel-palnet'}
+              onChange={(e) => setWho(e.target.value)}
+              key={badChallengeAttempts}/>
+          </div>
+          <div className='challenge-input-container'>
+            <p>description:</p>
+            <input
+              type="text"
+              placeholder={'(optional)'}
+              onChange={(e) => setDescription(e.target.value)}/>
+          </div>
+          <div className='challenge-side-container'>
+            <button
+              className={(side === Side.White) ? selectedSideButtonClasses : unselectedSideButtonClasses}
+              title='WHITE'
+              style={{
+                backgroundImage: 'url(https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/wK.svg)'
+              }}
+              onClick={() => setSide(Side.White)}/>
+            <button
+              className={(side === Side.Random) ? selectedSideButtonClasses : unselectedSideButtonClasses}
+              title='RANDOM'
+              style={{
+                backgroundImage: 'url(https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/images/wbK.svg)'
+              }}
+              onClick={() => setSide(Side.Random)}/>
+            <button
+              className={(side === Side.Black) ? selectedSideButtonClasses : unselectedSideButtonClasses}
+              title='BLACK'
+              style={{
+                backgroundImage: 'url(https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/bK.svg)'
+              }}
+              onClick={() => setSide(Side.Black)}/>
+          </div>
+          <button onClick={sendChallenge}>send challenge</button>
         </div>
-        <button onClick={() => sendChallenge(who, side, event, round)}>Challenge</button>
-      </div>
+      </Popup>
     </div>
   )
 }

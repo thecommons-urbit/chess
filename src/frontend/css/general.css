@@ -3,6 +3,10 @@ body {
   font-family: 'Courier Prime', 'Courier New', monospace;
 }
 
+p {
+  margin: 0;
+}
+
 div.app-container {
   height: max(100vh, 480px);
   width: max(100vw, 640px);
@@ -12,30 +16,6 @@ div.app-container {
   grid-template-columns: 75% 25%;
   align-items: center;
   justify-items: center;
-}
-
-div.menu-container {
-  grid-area: right;
-  height: 100%;
-  width: 100%;
-  display: grid;
-  grid-template-areas:
-    "top"
-    "bottom";
-  grid-template-columns: auto;
-  grid-template-rows: 50% 50%;
-}
-
-div.games-container {
-  grid-area: top;
-  background-color: #e6f7ff;
-  overflow: auto;
-}
-
-div.challenges-container {
-  grid-area: bottom;
-  background-color: #ccffcc;
-  overflow: auto;
 }
 
 div.game-container {
@@ -63,26 +43,17 @@ div.title-container {
   justify-items: center;
 }
 
-p.title-text {
-  position: absolute;
-  height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
-  width: calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px)));
-  text-align: center;
-}
-
 div.turn-container {
   grid-area: bottom;
   height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
   width: 100%;
   display: grid;
+  align-items: center;
+  justify-items: center;
 }
 
 p.turn-text {
-  position: absolute;
-  height: calc(max(10vh, 48px) - max(min(2vh, 2vw), 10px));
-  width: calc(max(75vw, 480px) - calc(2 * max(min(2vh, 2vw), 10px)));
   font-size: max(4.4vh, 28px);
-  text-align: center;
 }
 
 div.board-container {
@@ -92,58 +63,29 @@ div.board-container {
   display: flex;
 }
 
-div.chessboard {
-  display: table;
+div.menu-container {
+  grid-area: right;
   height: 100%;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  z-index: 2;
+  display: grid;
+  grid-template-areas:
+    "top"
+    "bottom";
+  grid-template-columns: auto;
+  grid-template-rows: 50% 50%;
 }
 
-div.chess-promotion {
-  display: table;
-  height: 100%;
-  width: 100%;
-  margin-left: -100%;
-  background: rgba(22, 21, 18, 0.5);
+div.games-container {
+  grid-area: top;
+  background-color: #e6f7ff;
+  overflow: auto;
 }
 
-div.chess-promotion square {
-  width: 12.5%;
-  height: 12.5%;
-  z-index: 4;
-  cursor: pointer;
-  position: absolute;
-  border-radius: 50%;
-  background-color: #b0b0b0;
-  box-shadow: inset 0 0 25px 3px #808080;
-  transition-property: border-radius, box-shadow;
-  transition-duration: 150ms;
-}
-
-div.chess-promotion square piece {
-  width: 100%;
-  height: 100%;
-  pointer-events: auto;
-  opacity: 1;
-  transform: scale(0.8);
-  transition-property: transform;
-  transition-duration: 150ms;
-}
-
-div.chess-promotion square:hover {
-  box-shadow: inset 0 0 48px 8px #d64f00;
-  border-radius: 0%;
-}
-
-div.chess-promotion square:hover piece {
-  transform: none;
-}
-
-div.draw-resolution {
+div.challenges-container {
+  grid-area: bottom;
+  background-color: #ccffcc;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 .popup-content {
@@ -156,9 +98,36 @@ div.draw-resolution {
   background: rgba(0, 0, 0, 0.7);
 }
 
+div.draw-resolution {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
 
+div.new-challenge-container {
+  height: 300px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
 
+div.challenge-input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 
+div.challenge-side-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 h1 {
   text-align: center;
@@ -178,20 +147,8 @@ li.game-active {
   background-color: #d0d0fa;
 }
 
-div.challenge-prompt {
-  position: absolute;
-  bottom: 1em;
-}
-
 div.board-controls {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   margin: 10px;
-}
-
-div.board-buttons {
-  grid-column: 2;
-  display: flex;
-  flex-direction: column;
-  margin: auto 1em;
 }

@@ -130,24 +130,45 @@ export interface DrawDeclinedUpdate extends ChessUpdate {
 
 // Actions
 export interface ChessAction {
-  'game-id': GameID
   'chess-action': Action
 }
 
-export interface OfferDrawAction extends ChessAction {
+export interface ChessChallengeAction extends ChessAction {
+  'chess-action': Action.Challenge
+  'who': Ship
+  'challenger-side': Side
+  'event': string
+  'round': string
+}
+
+export interface ChessAcceptAction extends ChessAction {
+  'chess-action': Action.AcceptGame
+  'who': Ship
+}
+
+export interface ChessDeclineAction extends ChessAction {
+  'chess-action': Action.DeclineGame
+  'who': Ship
+}
+
+export interface ChessGameAction extends ChessAction {
+  'game-id': GameID
+}
+
+export interface OfferDrawAction extends ChessGameAction {
   'chess-action': Action.OfferDraw
 }
 
-export interface AcceptDrawAction extends ChessAction {
+export interface AcceptDrawAction extends ChessGameAction {
   'chess-action': Action.AcceptDraw
 }
 
-export interface DeclineDrawAction extends ChessAction {
+export interface DeclineDrawAction extends ChessGameAction {
   'chess-action': Action.DeclineDraw
 }
 
 // Moves
-export interface MoveAction extends ChessAction {
+export interface MoveAction extends ChessGameAction {
   'chess-action': Action.Move
   'chess-move': MoveActionAction
 }

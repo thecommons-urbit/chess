@@ -1,10 +1,8 @@
 v0.9
 - Improved UI
-  - New challenge interface
   - New side panel
     - Active games
     - Incoming Challenges
-    - Outgoing Challenges
     - Options
       - Send challenge 
       - Offer draw
@@ -16,6 +14,7 @@ v0.9
 
 
 Features:
+- List outgoing challenges
 - Save practice board state when navigating away
   - Reset button for practice board
 - Customizable board visuals
@@ -23,6 +22,7 @@ Features:
 - Show current record against opponent
 - Show material difference while playing
 - Show Notification for mate
+- Planet name spell-checking in the challenge modal
 - `%pals` integration
 - Notifications
 - Premoves

@@ -14,7 +14,7 @@ COPY ["src/frontend/", "./frontend/"]
 # Build frontend
 WORKDIR /app/frontend
 RUN npm install
-RUN npm run-script lint
+# RUN npm run-script lint
 RUN npm run-script build
 
 # Copy output files

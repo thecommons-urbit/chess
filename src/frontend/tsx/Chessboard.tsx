@@ -10,7 +10,7 @@ import { CHESSGROUND } from '../ts/constants/chessground'
 import { URBIT_CHESS } from '../ts/constants/urbitChess'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
-import { pokeMove, move, castle, resign, offerDraw, acceptDraw, declineDraw } from '../ts/helpers/urbitChess'
+import { pokeAction, move, castle, resign, offerDraw, acceptDraw, declineDraw } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { PromotionMove } from '../ts/types/chessground'
 import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
@@ -111,11 +111,11 @@ export function Chessboard () {
         const gameID: GameID = displayGame.info.gameID
 
         if (flag === FLAGS.KSIDE_CASTLE) {
-          await pokeMove(urbit, castle(gameID, CastleSide.King), onError)
+          await pokeAction(urbit, castle(gameID, CastleSide.King), onError)
         } else if (flag === FLAGS.QSIDE_CASTLE) {
-          await pokeMove(urbit, castle(gameID, CastleSide.Queen), onError)
+          await pokeAction(urbit, castle(gameID, CastleSide.Queen), onError)
         } else {
-          await pokeMove(
+          await pokeAction(
             urbit,
             move(
               gameID,
@@ -128,7 +128,7 @@ export function Chessboard () {
         }
 
         if (displayGame.gotDrawOffer) {
-          await pokeMove(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+          await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
         }
       }
 
@@ -229,22 +229,22 @@ export function Chessboard () {
 
   const resignOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeMove(urbit, resign(gameID, orientation))
+    await pokeAction(urbit, resign(gameID, orientation))
   }
 
   const offerDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeMove(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
+    await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
   }
 
   const acceptDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeMove(urbit, acceptDraw(gameID))
+    await pokeAction(urbit, acceptDraw(gameID))
   }
 
   const declineDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeMove(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+    await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
   }
 
   //
@@ -279,7 +279,7 @@ export function Chessboard () {
         const attemptUrbitMove = async () => {
           const gameID: GameID = displayGame.info.gameID
 
-          await pokeMove(
+          await pokeAction(
             urbit,
             move(
               gameID,
@@ -291,7 +291,7 @@ export function Chessboard () {
             onError)
 
           if (displayGame.gotDrawOffer) {
-            await pokeMove(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+            await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
           }
         }
 
