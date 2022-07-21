@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Practice board
 - Move selection and verification using [chess.js](https://github.com/jhlywa/chess.js)
 ### Changed
-- New frontend using [Chessground](https://github.com/lichess-org/chessground)
+- Massively overhauled interface using [Chessground](https://github.com/lichess-org/chessground)
 ### Fixed
 - App frontend now closes connections to `chess` agent on page unload
 
-## [0.8.1] - 2021-10-15
+## 0.8.1 - 2021-10-15
 ### Added
 - Dockerfile for building frontend JS using Docker
 - Build/install scripts for adding Chess to Grid
@@ -23,5 +23,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Source code directory structure
 - GNU make commands
 
-## [0.7.2] - 2021-03-14
+## 0.7.2 - 2021-03-14
 - Last commit made by Raymond E. Pasco, Initial commit for `%chess` Urbit app

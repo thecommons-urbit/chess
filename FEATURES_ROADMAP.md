@@ -1,10 +1,11 @@
 v0.9
 - Make minimum viewport size bigger
+- Test everything
+- Resolve licenses
 - Documentation
 - Update README
 - Update Changelog
 - Log additional feature ideas
-- Resolve licenses
 
 
 Features:

@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './tsx/index.tsx',
   module: {
     rules: [
@@ -32,5 +32,13 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, './js')
+  },
+  optimization: {
+   minimize: true,
+   minimizer: [
+     new TerserPlugin({
+       extractComments: false
+     })
+   ]
   }
 }
