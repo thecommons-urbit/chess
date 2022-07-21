@@ -6,7 +6,7 @@
     "chess",
     "urbit"
   ],
-  "license": "(ISC AND GPL3)",
+  "license": "GPL3",
   "contributors": [
     {"name":"Raymond E. Pasco", "email": "ray@ameretat.dev", "url": "https://ameretat.dev"},
     {"name":"Alex Shelkovnykov", "email":"a@ashelkov.com", "url":"https://ashelkov.com"}
@@ -16,25 +16,44 @@
     "url": "https://github.com/ashelkovnykov/urbit-chess.git"
   },
   "scripts": {
-    "build": "cd modules/main && npm run-script build",
-    "test": "eslint --ext ts --ext tsx ."
+    "build": "webpack",
+    "lint": "eslint --ext ts --ext tsx ."
   },
   "engines": {
-    "node": ">=10 <17",
-    "npm": "^8.11.0"
+    "node": ">=10 <19",
+    "npm": "^8.12.1"
+  },
+  "dependencies": {
+    "@urbit/http-api": "^2.1.1",
+    "chess.js": "^0.13.3",
+    "chessground": "^8.2.1",
+    "react": "^18.2.0",
+    "react-beforeunload": "^2.5.3",
+    "react-dom": "^18.2.0",
+    "react-tabs": "^5.1.0",
+    "reactjs-popup": "^2.0.5",
+    "zustand": "^3.7.2"
   },
   "devDependencies": {
+    "@types/chess.js": "^0.13.1",
+    "@types/react": "^18.0.14",
+    "@types/react-beforeunload": "^2.1.1",
+    "@types/react-dom": "^18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
+    "css-loader": "^6.7.1",
     "eslint": "^8.18.0",
     "eslint-config-ts-standard": "^1.0.5",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-react": "^7.30.0"
+    "eslint-plugin-react": "^7.30.0",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.4",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0"
   },
-  "private": true,
-  "workspaces": [
-    "modules/main"
-  ]
+  "private": true
 }

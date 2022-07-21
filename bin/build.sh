@@ -47,7 +47,7 @@ docket() {
   echo "  image+'https://peekabooo.icu/images/finmep-chess.svg'" >> $DOCKET_FILE
   echo "  base+'chess'" >> $DOCKET_FILE
   echo "  version+[$VERSION_MAJOR $VERSION_MINOR $VERSION_PATCH]" >> $DOCKET_FILE
-  echo "  license+'ISC and GPL3'" >> $DOCKET_FILE
+  echo "  license+'GPL3'" >> $DOCKET_FILE
   echo "  website+'https://github.com/ashelkovnykov/urbit-chess'" >> $DOCKET_FILE
   
   if [[ -z $URL ]]; then
@@ -130,8 +130,8 @@ echo "~$SHIP" > $DESK_DIR/desk.ship
 echo "[%zuse $KELVIN]" > $DESK_DIR/sys.kelvin
 
 # Build frontend
-docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
-docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
+sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
+sudo docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
 
 # Copy additional src files for frontend
 sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}

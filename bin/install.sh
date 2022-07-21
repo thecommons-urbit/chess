@@ -89,3 +89,4 @@ INSTALL_DIR="$PIER/$SHIP/$DESK"
 echo "Attempting to install to path '$INSTALL_DIR'"
 cp ${DESK_DIR}/* ${INSTALL_DIR}/
 cp -r ${URBIT_DIR}/* ${INSTALL_DIR}/
+echo "Successfully installed to path '$INSTALL_DIR'"
