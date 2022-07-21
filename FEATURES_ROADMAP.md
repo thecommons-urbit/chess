@@ -1,5 +1,4 @@
 v0.9
-- Make minimum viewport size bigger
 - Test everything
 - Resolve licenses
 - Documentation

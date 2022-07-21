@@ -35,7 +35,7 @@
 }
 
 .react-tabs__tab-panel--selected {
-  height: calc(max(100vh, 480px) - 40px);
+  height: calc(max(100vh, 960px) - 40px);
   border-left: 1px solid #666666;
   display: block;
   background-color: #F4F4F4;
