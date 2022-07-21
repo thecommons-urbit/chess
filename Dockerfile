@@ -21,5 +21,6 @@ RUN mkdir output
 RUN cp -rfL html/index.html css js output/
 
 # Assumes that some local dir is mounted as a volume at /app/output
+# (e.g. the way ./bin/build.sh calls 'docker run')
 WORKDIR /app
 CMD cp -rfL frontend/output/* output/

@@ -47,7 +47,7 @@ docket() {
   echo "  image+'https://peekabooo.icu/images/finmep-chess.svg'" >> $DOCKET_FILE
   echo "  base+'chess'" >> $DOCKET_FILE
   echo "  version+[$VERSION_MAJOR $VERSION_MINOR $VERSION_PATCH]" >> $DOCKET_FILE
-  echo "  license+'ISC and GPL3'" >> $DOCKET_FILE
+  echo "  license+'GPL3'" >> $DOCKET_FILE
   echo "  website+'https://github.com/ashelkovnykov/urbit-chess'" >> $DOCKET_FILE
   
   if [[ -z $URL ]]; then
