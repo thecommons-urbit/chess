@@ -1,9 +1,0 @@
-- Improved UI
-- Customizable board visuals
-- Refactor logic to instead use chess.js
-  - This will fix the en passant and repetition stalemate bugs
-- Store completed games
-- Show current record against opponent
-- Export games
-- `%pals` integration
-- Notifications
