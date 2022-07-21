@@ -6,7 +6,7 @@
     "chess",
     "urbit"
   ],
-  "license": "ISC",
+  "license": "GPL3",
   "contributors": [
     {"name":"Raymond E. Pasco", "email": "ray@ameretat.dev", "url": "https://ameretat.dev"},
     {"name":"Alex Shelkovnykov", "email":"a@ashelkov.com", "url":"https://ashelkov.com"}
@@ -26,7 +26,6 @@
   "dependencies": {
     "@urbit/http-api": "^2.1.1",
     "chess.js": "^0.13.3",
-    "chessboardjsx": "^2.4.7",
     "chessground": "^8.2.1",
     "react": "^18.2.0",
     "react-beforeunload": "^2.5.3",
@@ -49,7 +48,6 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.30.0",
-    "serve": "^13.0.2",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.3.0",
     "typescript": "^4.7.4",

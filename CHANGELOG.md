@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move selection and verification using [chess.js](https://github.com/jhlywa/chess.js)
 ### Changed
 - Massively overhauled interface using [Chessground](https://github.com/lichess-org/chessground)
+- Switched to GPL3 license
 ### Fixed
 - App frontend now closes connections to `chess` agent on page unload
+- Made code compliant with licenses of all dependencies
 
 ## 0.8.1 - 2021-10-15
 ### Added
