@@ -89,7 +89,7 @@ export function Challenges () {
 
             return (
               <li className={`game challenge ${colorClass}`} key={key}>
-                <div className='row' style={{ justifyContent: 'space-evenly', margin: '0 0.5em' }}>
+                <div className='row' style={{ justifyContent: 'space-between' }}>
                   <div className='row'>
                     <img
                       src={`https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/${mySide}N.svg`}
@@ -104,7 +104,7 @@ export function Challenges () {
                       </p>
                     </div>
                   </div>
-                  <div className='col' style={{ justifyContent: 'space-evenly' }}>
+                  <div className='col' style={{ justifyContent: 'space-evenly', margin: '0.5em' }}>
                     <button className="accept" onClick={() => acceptChallenge(challenger)}>accept</button>
                     <button className="reject" onClick={() => declineChallenge(challenger)}>decline</button>
                   </div>

@@ -1,5 +1,4 @@
 v0.9
-- Test everything
 - Resolve licenses
 - Documentation
 - Update README
