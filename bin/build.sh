@@ -130,8 +130,8 @@ echo "~$SHIP" > $DESK_DIR/desk.ship
 echo "[%zuse $KELVIN]" > $DESK_DIR/sys.kelvin
 
 # Build frontend
-docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
-docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
+sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
+sudo docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
 
 # Copy additional src files for frontend
 sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}

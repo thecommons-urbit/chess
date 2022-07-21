@@ -16,7 +16,6 @@ export function getChessDests (chess: ChessInstance): Map<string, string[]> {
   return dests
 }
 
-
 /**
  * Determine if a chess move is a pawn promotion
  */
