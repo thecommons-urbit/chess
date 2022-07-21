@@ -10,7 +10,7 @@ import { CHESSGROUND } from '../ts/constants/chessground'
 import { URBIT_CHESS } from '../ts/constants/urbitChess'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
-import { pokeAction, move, castle, resign, offerDraw, acceptDraw, declineDraw } from '../ts/helpers/urbitChess'
+import { pokeAction, move, castle, acceptDraw, declineDraw } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { PromotionMove } from '../ts/types/chessground'
 import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
@@ -227,16 +227,6 @@ export function Chessboard () {
     setPromotionMove(null)
   }
 
-  const resignOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, resign(gameID, orientation))
-  }
-
-  const offerDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
-  }
-
   const acceptDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
     await pokeAction(urbit, acceptDraw(gameID))
@@ -330,28 +320,6 @@ export function Chessboard () {
     )
   }
 
-  const renderBoardControls = () => {
-    return (
-      <div className='board-controls'>
-        <div className='board-buttons'>
-          <div>
-            <button disabled={displayGame.sentDrawOffer} onClick={offerDrawOnClick}>Offer Draw</button>
-            <p hidden={!displayGame.sentDrawOffer}>Offered draw to opponent</p>
-          </div>
-          <div>
-            <button onClick={resignOnClick}>Resign</button>
-          </div>
-          <div>
-            <br/>
-          </div>
-          <div>
-            <button onClick={() => setDisplayGame(null)}>Home</button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   const renderDrawPopup = (game: ActiveGameInfo) => {
     const opponent = (orientation === Side.White) ? game.info.black : game.info.white
 
@@ -359,7 +327,8 @@ export function Chessboard () {
       <Popup open={game.gotDrawOffer}>
         <div>
           <p>{`${opponent} has offered a draw`}</p>
-          <div className='draw-resolution'>
+          <br/>
+          <div className='draw-resolution row'>
             <button className="accept" role="button" onClick={acceptDrawOnClick}>accept</button>
             <button className="reject" role="button" onClick={declineDrawOnClick}>decline</button>
           </div>
@@ -382,7 +351,6 @@ export function Chessboard () {
       <div className='turn-container'>
         <p className='turn-text'>{`${sideToMove} to move...`}</p>
       </div>
-      { (displayGame !== null) ? renderBoardControls() : <div/> }
       { (displayGame !== null) ? renderDrawPopup(displayGame) : <div/> }
     </div>
   )

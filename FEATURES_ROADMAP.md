@@ -1,16 +1,10 @@
 v0.9
-- Improved UI
-  - New side panel
-    - Active games
-    - Incoming Challenges
-    - Options
-      - Send challenge 
-      - Offer draw
-      - Resign
+- Make minimum viewport size bigger
 - Documentation
 - Update README
 - Update Changelog
 - Log additional feature ideas
+- Resolve licenses
 
 
 Features:
@@ -18,6 +12,7 @@ Features:
 - Save practice board state when navigating away
   - Reset button for practice board
 - Customizable board visuals
+- Add sigil image next to challenger
 - View completed games
 - Show current record against opponent
 - Show material difference while playing

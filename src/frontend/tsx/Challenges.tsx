@@ -78,34 +78,46 @@ export function Challenges () {
   }
 
   return (
-    <div className='challenges-container'>
-      <h1>Challenges</h1>
-      <div className='challenges-list'>
-        <ul>
-          {
-            Array.from(incomingChallenges).map(([challenger, challenge]) => {
-              return (
-                <li key={challenger}>
-                  {`Challenged by ${challengerKing(challenge.challengerSide)}${challenger}`}<br/>
-                  {`${challenge.event}`}<br/>
-                  <div className='challenge-reply'>
-                    <button className="accept" role="button" onClick={() => acceptChallenge(challenger)}>accept</button>
-                    <button className="reject" role="button" onClick={() => declineChallenge(challenger)}>decline</button>
+    <div className='challenges-container col'>
+      <button className='option' onClick={openModal}>new challenge</button>
+      <ul className='game-list'>
+        {
+          Array.from(incomingChallenges).map(([challenger, challenge], key) => {
+            const colorClass = (key % 2) ? 'odd' : 'even'
+            const description = challenge.event
+            const mySide = (challenge.challengerSide === Side.White) ? 'b' : 'w'
+
+            return (
+              <li className={`game challenge ${colorClass}`} key={key}>
+                <div className='row' style={{ justifyContent: 'space-evenly', margin: '0 0.5em' }}>
+                  <div className='row'>
+                    <img
+                      src={`https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/${mySide}N.svg`}
+                      height={60}
+                      width={60}/>
+                    <div className='col'>
+                      <p style={{ fontSize: '1.25rem' }}>{challenger}</p>
+                      <p
+                        title={description}
+                        style={{ maxHeight: '5rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {description}
+                      </p>
+                    </div>
                   </div>
-                </li>)
-            })
-          }
-        </ul>
-      </div>
-      <button
-        onClick={openModal}
-        style={{ position: 'absolute', bottom: '1em' }}>
-        new challenge
-      </button>
+                  <div className='col' style={{ justifyContent: 'space-evenly' }}>
+                    <button className="accept" onClick={() => acceptChallenge(challenger)}>accept</button>
+                    <button className="reject" onClick={() => declineChallenge(challenger)}>decline</button>
+                  </div>
+                </div>
+              </li>
+            )
+          })
+        }
+      </ul>
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
-        <div className='new-challenge-container'>
+        <div className='new-challenge-container col'>
           <p style={{ fontSize: '2em', fontWeight: 'bold' }}>new challenge</p>
-          <div className='challenge-input-container'>
+          <div className='challenge-input-container row'>
             <p>opponent:</p>
             <input
               className={(badChallengeAttempts > 0) ? 'rejected' : ''}
@@ -114,14 +126,14 @@ export function Challenges () {
               onChange={(e) => setWho(e.target.value)}
               key={badChallengeAttempts}/>
           </div>
-          <div className='challenge-input-container'>
+          <div className='challenge-input-container row'>
             <p>description:</p>
             <input
               type="text"
               placeholder={'(optional)'}
               onChange={(e) => setDescription(e.target.value)}/>
           </div>
-          <div className='challenge-side-container'>
+          <div className='challenge-side-container row'>
             <button
               className={(side === Side.White) ? selectedSideButtonClasses : unselectedSideButtonClasses}
               title='WHITE'

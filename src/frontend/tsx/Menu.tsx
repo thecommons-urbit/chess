@@ -1,12 +1,22 @@
-import * as React from 'react'
+import React from 'react'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { Challenges } from './Challenges'
 import { Games } from './Games'
 
 export function Menu () {
   return (
-    <div className='menu-container'>
-      <Games />
-      <Challenges />
-    </div>
+    <Tabs className='menu-container'>
+      <TabList>
+        <Tab>games</Tab>
+        <Tab>challenges</Tab>
+      </TabList>
+
+      <TabPanel>
+        <Games />
+      </TabPanel>
+      <TabPanel>
+        <Challenges />
+      </TabPanel>
+    </Tabs>
   )
 }

@@ -77,3 +77,8 @@ button.side {
   background-position: 50% 50%;
   background-repeat: no-repeat;
 }
+
+button.option {
+  width: 80%;
+  margin-top: 1rem;
+}
