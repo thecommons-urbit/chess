@@ -1,6 +1,6 @@
 {
   "name": "urbit-chess",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Experimental chess app for Urbit",
   "keywords": [
     "chess",

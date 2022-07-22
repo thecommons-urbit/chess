@@ -26,27 +26,27 @@
 // GALAXY PRACTICE:     LENGTH = 21     MAX FONT SIZE = min(max(5.8vh, 64px), max(3.0vw, 72px))
 //
 const LENGTH_TO_FONT_SIZE: Map<number, string> = new Map([
-  [17, 'min(max(6.4vh, 56px), max(2.8vw, 56px))'],
-  [20, 'min(max(5.8vh, 56px), max(2.8vw, 56px))'],
-  [23, 'min(max(5.2vh, 56px), max(2.8vw, 56px))'],
-  [27, 'min(max(4.6vh, 56px), max(2.8vw, 56px))'],
-  [30, 'min(max(4.2vh, 56px), max(2.8vw, 50px))'],
-  [37, 'min(max(3.5vh, 56px), max(2.8vw, 40px))'],
-  [41, 'min(max(3.4vh, 56px), max(2.8vw, 36px))'],
-  [44, 'min(max(3.2vh, 56px), max(2.6vw, 34px))'],
-  [51, 'min(max(3.2vh, 56px), max(2.2vw, 30px))'],
-  [65, 'min(max(3.2vh, 56px), max(1.8vw, 28px))'],
-  [70, 'min(max(3.0vh, 56px), max(1.7vw, 28px))'],
-  [73, 'min(max(3.0vh, 56px), max(1.6vw, 28px))'],
-  [80, 'min(max(3.0vh, 56px), max(1.5vw, 28px))'],
-  [94, 'min(max(2.6vh, 50px), max(1.25vw, 28px))'],
-  [123, 'min(max(2.1vh, 38px), max(0.95vw, 24px))'],
+  [17, 'min(max(6.4vh, 42px), max(2.8vw, 42px))'],
+  [20, 'min(max(5.8vh, 42px), max(2.8vw, 42px))'],
+  [23, 'min(max(5.2vh, 42px), max(2.8vw, 42px))'],
+  [27, 'min(max(4.6vh, 42px), max(2.8vw, 42px))'],
+  [30, 'min(max(4.2vh, 42px), max(2.8vw, 37px))'],
+  [37, 'min(max(3.5vh, 42px), max(2.8vw, 30px))'],
+  [41, 'min(max(3.4vh, 42px), max(2.8vw, 27px))'],
+  [44, 'min(max(3.2vh, 42px), max(2.6vw, 25px))'],
+  [51, 'min(max(3.2vh, 42px), max(2.2vw, 22px))'],
+  [65, 'min(max(3.2vh, 42px), max(1.8vw, 21px))'],
+  [70, 'min(max(3.0vh, 42px), max(1.7vw, 21px))'],
+  [73, 'min(max(3.0vh, 42px), max(1.6vw, 21px))'],
+  [80, 'min(max(3.0vh, 42px), max(1.5vw, 21px))'],
+  [94, 'min(max(2.6vh, 37px), max(1.25vw, 21px))'],
+  [123, 'min(max(2.1vh, 28px), max(0.95vw, 18px))'],
   //
-  [21, 'min(max(5.8vh, 64px), max(3.0vw, 72px))'],
-  [24, 'min(max(5.2vh, 64px), max(3.0vw, 62px))'],
-  [31, 'min(max(4.2vh, 64px), max(3.0vw, 48px))'],
-  [45, 'min(max(3.5vh, 64px), max(2.7vw, 34px))'],
-  [74, 'min(max(3.3vh, 64px), max(1.6vw, 24px))']
+  [21, 'min(max(5.8vh, 48px), max(3.0vw, 54px))'],
+  [24, 'min(max(5.2vh, 48px), max(3.0vw, 46px))'],
+  [31, 'min(max(4.2vh, 48px), max(3.0vw, 36px))'],
+  [45, 'min(max(3.5vh, 48px), max(2.6vw, 25px))'],
+  [74, 'min(max(3.3vh, 48px), max(1.6vw, 18px))']
 ])
 
 export const URBIT_CHESS = {
