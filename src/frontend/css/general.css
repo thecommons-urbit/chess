@@ -26,7 +26,7 @@ div.row {
 }
 
 div.app-container {
-  height: max(100vh, 960px);
+  height: max(100vh, 720px);
   width: max(100vw, 1280px);
   display: grid;
   grid-template-areas: "left right";
@@ -38,9 +38,9 @@ div.app-container {
 
 div.game-container {
   grid-area: left;
-  height: calc(100% - calc(2 * max(min(2vh, 2vw), 19px)));
-  width: calc(100% - calc(2 * max(min(2vh, 2vw), 19px)));
-  margin: max(min(2vh, 2vw), 19px);
+  height: calc(100% - calc(2 * max(min(2vh, 2vw), 14px)));
+  width: calc(100% - calc(2 * max(min(2vh, 2vw), 14px)));
+  margin: max(min(2vh, 2vw), 14px);
   display: grid;
   grid-template-areas:
     "top"
@@ -54,8 +54,8 @@ div.game-container {
 
 div.title-container {
   grid-area: top;
-  height: calc(max(10vh, 96px) - max(min(2vh, 2vw), 19px));
-  width: calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 19px)));
+  height: calc(max(10vh, 72px) - max(min(2vh, 2vw), 14px));
+  width: calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 14px)));
   display: grid;
   align-items: center;
   justify-items: center;
@@ -63,7 +63,7 @@ div.title-container {
 
 div.turn-container {
   grid-area: bottom;
-  height: calc(max(10vh, 96px) - max(min(2vh, 2vw), 19px));
+  height: calc(max(10vh, 72px) - max(min(2vh, 2vw), 14px));
   width: 100%;
   display: grid;
   align-items: center;
@@ -71,13 +71,13 @@ div.turn-container {
 }
 
 p.turn-text {
-  font-size: max(4.4vh, 56px);
+  font-size: max(4.4vh, 42px);
 }
 
 div.board-container {
   grid-area: middle;
-  height: min(max(80vh, 768px), calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 19px))));
-  width: min(max(80vh, 768px), calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 19px))));
+  height: min(max(80vh, 576px), calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 14px))));
+  width: min(max(80vh, 576px), calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 14px))));
   display: flex;
 }
 
