@@ -8,6 +8,7 @@
 is a fully-decentralized, peer-to-peer Chess application.
 
 The original `%chess` was made by Raymond E. Pasco for several reasons:
+
 - To practice Hoon
 - As a hobby project
 - As a proof-of-concept that users could share software between ships using Urbit "desks"
@@ -26,6 +27,8 @@ Announcements page [here](https://lists.sr.ht/~ray).
 ## News
 
 The interface has been completely overhauled - `%chess` no longer looks like it's from 1992!
+Chess game is a **simulation** of real life challenges.
+Hence a mobile version of the game should be well structured.
 
 ## Installation
 
@@ -38,6 +41,7 @@ You can find `%chess` on Urbit using the App Search in Grid. Search for `~finmep
 
 Below is a step-by-step guide for developing `%chess` and testing changes. This section assumes at least minor Urbit
 development experience, i.e.:
+
 - familiarity with Linux
 - familiarity with git
 - completion of at least some (preferably all) of
@@ -85,16 +89,19 @@ fully-fledged IDE, instead of vim/emacs/VSC!
 ### 3. Setup test ship
 
 Create a development ship of your choice:
+
 ```
 ./urbit -F zod
 ```
 
 Create a `%chess` desk from inside your dev ship:
+
 ```
 |merge %chess our %base
 ```
 
 Mount the `%chess` desk, so that we can push our updated code to it:
+
 ```
 |mount %chess
 ```
@@ -103,6 +110,7 @@ Mount the `%chess` desk, so that we can push our updated code to it:
 
 Run the provided build script to compile the `%chess` frontend. Substitute the name of your dev ship using the `-s`
 option:
+
 ```
 ./bin/build.sh -s zod
 ```
@@ -110,11 +118,13 @@ option:
 ### 5. Install the `%chess` app
 
 Clear the default files from cloning the `%base` desk:
+
 ```
 rm -rf ../Urbit/zod/chess/*
 ```
 
 Push the core desk files to the `%chess` app on the dev ship:
+
 ```
 cp -rfL ~/[path to urbit source code]/urbit/pkg/base-dev/* ../Urbit/zod/chess/
 cp -rfL ~/[path to urbit source code]/urbit/pkg/garden-dev/* ../Urbit/zod/chess/
@@ -122,11 +132,13 @@ cp -rfL ~/[path to urbit source code]/urbit/pkg/garden-dev/* ../Urbit/zod/chess/
 
 Run the provided installation script to copy the `%chess` backend files to the dev ship. Substitute the path to the pier
 using the `-p` option and the dev ship name using the `-s` option:
+
 ```
 ./bin/install.sh -p /home/user/Urbit -s zod
 ```
 
 Commit the changes from inside your dev ship:
+
 ```
 |commit %chess
 ```
@@ -143,11 +155,12 @@ installed.
 #### NOTE: About browsers
 
 Google Chrome and Chromium based browsers have a tough time clearing the cache and picking up changes made to the
-frontend. If you're developing the frontend, it's recommended to use Firefox for testing. 
+frontend. If you're developing the frontend, it's recommended to use Firefox for testing.
 
 ### 6. Testing with other ships
 
 Once installed, you need to publish `%chess` so that other dev ships on your computer will be able to find it:
+
 ```
 :treaty|publish %chess
 ```
