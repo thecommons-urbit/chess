@@ -63,7 +63,6 @@
   =/  nr  (next-rank +.square)
   ?~  nr  ~
   `[-.square u.nr]
-::  diagonals reckoned filewise (from left to right)
 ++  prev-backward-diagonal-square
   |=  square=chess-square
   ^-  (unit chess-square)
@@ -96,9 +95,7 @@
     next-file-square
     next-rank-square
   ==
-::  knight moves start from (2 ahead, 1 right)
-::  and are counted clockwise
-++  knight-1-square  ::  2 forward, 1 right
+++  knight-1-square 
   |=  square=chess-square
   ^-  (unit chess-square)
   %.  square
@@ -116,7 +113,7 @@
     next-file-square
     next-rank-square
   ==
-++  knight-3-square  ::  2 right, 1 backward
+++  knight-3-square  
   |=  square=chess-square
   ^-  (unit chess-square)
   %.  square
@@ -125,7 +122,7 @@
     next-file-square
     prev-rank-square
   ==
-++  knight-4-square  ::  2 backward, 1 right
+++  knight-4-square 
   |=  square=chess-square
   ^-  (unit chess-square)
   %.  square
@@ -134,7 +131,7 @@
     prev-rank-square
     next-file-square
   ==
-++  knight-5-square  ::  2 backward, 1 left
+++  knight-5-square 
   |=  square=chess-square
   ^-  (unit chess-square)
   %.  square
@@ -152,7 +149,7 @@
     prev-file-square
     prev-rank-square
   ==
-++  knight-7-square  ::  2 left, 1 forward
+++  knight-7-square
   |=  square=chess-square
   ^-  (unit chess-square)
   %.  square
@@ -161,7 +158,7 @@
     prev-file-square
     next-rank-square
   ==
-++  knight-8-square  ::  2 forward, 1 right
+++  knight-8-square
   |=  square=chess-square
   ^-  (unit chess-square)
   %.  square
@@ -536,7 +533,7 @@
             ~
           [prev ~]
       ==
-    ++  pawn-threatens  ::  en passant handled elsewhere
+    ++  pawn-threatens  
       ^-  (list chess-square)
       ?-  -.piece
         %white
@@ -608,7 +605,7 @@
       ?:  =(u.occupant (opposite-side -.piece))
         [u.current squares]
       squares
-    ++  jump-to  ::  for knights, also used for kings, pawns
+    ++  jump-to 
       |=  traverser=chess-traverser
       =/  dest  (traverser square)
       ?~  dest  ~
@@ -871,7 +868,6 @@
   ++  legal-moves
     ^-  (list chess-move)
     %+  skim  (~(all-moves with-board board) player-to-move)
-    ::  dummy gate to avoid mull-grow
     |=  m=chess-move
     ^-  ?
     (legal-move m)
@@ -1099,8 +1095,8 @@
       black=[%name 'Black']
       result=`%'0-1'
   :~
-    [%move [%f %2] [%f %3] ~]  [%move [%e %7] [%e %5] ~]  ::  1. f3 e5
-    [%move [%g %2] [%g %4] ~]  [%move [%d %8] [%h %4] ~]  ::  2. g4 Qh4#
+    [%move [%f %2] [%f %3] ~]  [%move [%e %7] [%e %5] ~] 
+    [%move [%g %2] [%g %4] ~]  [%move [%d %8] [%h %4] ~]  
   ==
   ==
 --
