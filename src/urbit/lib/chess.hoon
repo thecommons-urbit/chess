@@ -366,6 +366,8 @@
     %+  skim  ~(tap by board)
     |=  [square=chess-square piece=chess-piece]
     =([%black %king] piece)
+  ::
+  ::  returns the square the king is on
   ++  king
     |=  side=chess-side
     ^-  chess-square
@@ -373,6 +375,8 @@
       %white  white-king
       %black  black-king
     ==
+  ::
+  ::  return a list of the squares that contain a given chess-piece
   ++  all
     |=  piece=chess-piece
     ^-  (list chess-square)
@@ -382,12 +386,17 @@
     ?:  =(^piece piece)
       `square
     ~
+  ::
+  ::  check whether a square is occupied and return the side occupying the square
   ++  occupied
     |=  square=chess-square
     ^-  (unit chess-side)
     =/  piece  (~(get by board) square)
     ?~  piece  ~
     [~ -.u.piece]
+  ::
+  ::  move a piece by deleting from previous location and adding to new
+  ::  location, promoting if needed
   ++  raw-move
     |=  [from=chess-square to=chess-square into=(unit chess-promotion)]
     ^-  chess-board
@@ -396,6 +405,8 @@
     ?~  into
       (~(put by (~(del by board) from)) [to u.source-piece])
     (~(put by (~(del by board) from)) [to [-.u.source-piece u.into]])
+  ::
+  ::  move the rook and king accordingly for castling
   ++  castle
     |=  [side=chess-side castle=?(%queenside %kingside)]
     ^-  chess-board
@@ -427,22 +438,31 @@
             ==
         ==
     ==
+  ::
+  ::  produces a list of all white pieces on the board
   ++  white-pieces
     ^-  (list chess-piece-on-square)
     %+  skim  ~(tap by board)
     |=  [square=chess-square piece=chess-piece]
     =(%white -.piece)
+  ::
+  ::  produces a list of all black pieces on the board
   ++  black-pieces
     ^-  (list chess-piece-on-square)
     %+  skim  ~(tap by board)
     |=  [square=chess-square piece=chess-piece]
     =(%black -.piece)
+  ::
+  ::  applies a gate to the list of white pieces or black pieces
   ++  map-by-side
     |*  [side=chess-side gate=chess-transformer]
     ?-  side
       %white  (turn white-pieces gate)
       %black  (turn black-pieces gate)
     ==
+  ::
+  ::  returns whether or not a side is in check by making a list
+  ::  of pieces being threatened and checking if the king is in that list
   ++  in-check
     |=  side=chess-side
     ^-  ?
@@ -456,6 +476,8 @@
     ?~  (find ~[king] threats)
       |
     &
+  ::
+  ::  returns a list of all possible moves
   ++  all-moves
     |=  side=chess-side
     ^-  (list chess-move)
@@ -478,8 +500,12 @@
           [%move square.piece-on-square to `%queen]
       ==
     ~[[%move square.piece-on-square to ~]]
+  ::
+  ::  used to check if a piece can move and whether it threatens another piece
   ++  with-piece-on-square
     |_  [square=chess-square piece=chess-piece]
+    ::
+    ::  list of possible moves for a given piece
     ++  moves
       ^-  (list chess-square)
       ?-  +.piece
@@ -490,6 +516,8 @@
         %queen   queen-moves
         %king    king-moves
       ==
+    ::
+    ::  list of possible moves that would threaten another piece
     ++  threatens
       ^-  (list chess-square)
       ?-  +.piece
@@ -500,6 +528,8 @@
         %queen   queen-moves
         %king    king-moves
       ==
+    ::
+    ::  list of possible moves and moves that would threaten another piece
     ++  moves-and-threatens
       ^-  (list chess-square)
       ?-  +.piece
@@ -510,10 +540,13 @@
         %queen   queen-moves
         %king    king-moves
       ==
+    ::
+    ::  list of possible pawn moves
     ++  pawn-moves
       ^-  (list chess-square)
       ?-  -.piece
         %white
+          ::  pawns can move 2 spaces on first move
           ?:  =(+.square %2)
             ?.  ?=(~ (occupied [-.square %3]))
               ~
@@ -525,6 +558,7 @@
             ~
           [next ~]
         %black
+          ::  pawns can move 2 spaces on first move
           ?:  =(+.square %7)
             ?.  ?=(~ (occupied [-.square %6]))
               ~
@@ -536,6 +570,8 @@
             ~
           [prev ~]
       ==
+    ::
+    ::  list of possible pawn moves to capture another piece
     ++  pawn-threatens  ::  en passant handled elsewhere
       ^-  (list chess-square)
       ?-  -.piece
@@ -554,12 +590,18 @@
             next-backward-diagonal-square
           ==
       ==
+    ::
+    :: list of possible pawn moves and captures
     ++  pawn-both
       ^-  (list chess-square)
       (weld pawn-moves pawn-threatens)
+    ::
+    ::  list of possible knight moves
     ++  knight-moves
       ^-  (list chess-square)
       (murn knight-squares jump-to)
+    ::
+    ::  list of possible bishop moves
     ++  bishop-moves
       ^-  (list chess-square)
       ;:  weld
@@ -568,6 +610,8 @@
         (traverse-by prev-forward-diagonal-square)
         (traverse-by next-forward-diagonal-square)
       ==
+    ::
+    ::  list of possible rook moves
     ++  rook-moves
       ^-  (list chess-square)
       ;:  weld
@@ -576,9 +620,13 @@
         (traverse-by prev-file-square)
         (traverse-by next-file-square)
       ==
+    ::
+    ::  list of possible queen moves
     ++  queen-moves
       ^-  (list chess-square)
       (weld rook-moves bishop-moves)
+    ::
+    ::  list of possible king moves
     ++  king-moves
       ^-  (list chess-square)
       %-  murn
@@ -592,7 +640,10 @@
           prev-forward-diagonal-square
           next-forward-diagonal-square
       ==
-    ++  traverse-by  ::  for rook, bishop, queen moves
+   ::
+   ::  list of possible moves by traversing the board in a straight line
+   ::  for rook, bishop, and queen moves
+    ++  traverse-by  
       |=  traverser=chess-traverser
       ^-  (list chess-square)
       =/  squares  *(list chess-square)
@@ -608,7 +659,10 @@
       ?:  =(u.occupant (opposite-side -.piece))
         [u.current squares]
       squares
-    ++  jump-to  ::  for knights, also used for kings, pawns
+    ::
+    ::  list of possible moves by jumping directly to square
+    ::  for knight, king, and pawn moves
+    ++  jump-to  
       |=  traverser=chess-traverser
       =/  dest  (traverser square)
       ?~  dest  ~
@@ -619,9 +673,13 @@
       ~
     --
   --
+::
+::  core for performing operations on a chess-position
 ++  with-position
   |_  chess-position
   +*  position  +6
+  ::
+  ::  render the state of the board and possible actions as a tape
   ++  render
     ^-  (list tape)
     %+  weld
@@ -633,6 +691,8 @@
         "en passant target {<en-passant>}"
         "50 move ply {(scow %ud ply-50-move-rule)}"
     ==
+  ::
+  ::  produce the result of a move in chess notation as a @t
   ++  algebraicize
     |=  move=chess-move
     ^-  @t
@@ -700,11 +760,15 @@
             ==
         ==
     ==
+  ::
+  ::  apply move if it is a legal move
   ++  apply-move
     |=  move=chess-move
     ^-  (unit chess-position)
     ?.  (legal-move move)  ~
     `(naive-apply move)
+  ::
+  ::  apply a move without checking if it is legal
   ++  naive-apply
     |_  move=chess-move
     ++  $

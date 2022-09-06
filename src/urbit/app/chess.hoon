@@ -268,6 +268,8 @@
                    [game position |2.u.game-state]
           ==
       ==
+    ::
+    ::  handle incoming challenges
     %chess-challenge
       =/  challenge  !<(chess-challenge vase)
       :-  :~  :*  %give  %fact  ~[/challenges]
@@ -278,11 +280,16 @@
         challenges-received
           (~(put by challenges-received) src.bowl challenge)
       ==
+    ::
+    ::  handle declined challenges
     %chess-decline-challenge
       :-  ~
       %=  this
         challenges-sent  (~(del by challenges-sent) src.bowl)
       ==
+    ::
+    ::  randomly assign sides for new games
+    ::  XX further document rng logic
     %chess-rng
       =/  rng-data  !<(chess-rng vase)
       =/  commitment  (~(get by rng-state) src.bowl)
@@ -376,6 +383,8 @@
             rng-state  (~(put by rng-state) src.bowl final-commitment)
           ==
       ==
+    ::
+    ::  directly inject FEN positions into games (for debugging)
     %chess-debug-inject
       ?>  =(src.bowl our.bowl)
       =/  action  !<([game-id=@dau game=chess-game] vase)
@@ -394,6 +403,8 @@
       %=  this
         games  (~(put by games) game-id.action [game.action u.new-position & | |])
       ==
+    ::
+    ::  directly inject game subscriptions (for debugging)
     %chess-debug-subscribe
       ?>  =(src.bowl our.bowl)
       =/  action  !<([who=ship game-id=@dau] vase)
@@ -403,6 +414,8 @@
               %watch  /game/(scot %da game-id.action)/moves
           ==
       ==
+    ::
+    ::  delete game from state (for debugging)
     %chess-debug-zap
       ?>  =(src.bowl our.bowl)
       =/  action  !<(game-id=@dau vase)
@@ -415,6 +428,8 @@
   |=  =path
   ^-  (quip card _this)
   ?+  path  (on-watch:default path)
+    ::
+    ::  convert incoming challenges to chess-update marks for subscribers
     [%challenges ~]
       ?>  (team:title our.bowl src.bowl)
       :_  this
@@ -424,6 +439,8 @@
       :*  %give  %fact  ~
           %chess-update  !>([%challenge who challenge])
       ==
+    ::
+    ::  convert active games to chess-game marks for subscribers
     [%active-games ~]
       ?>  (team:title our.bowl src.bowl)
       :_  this
@@ -433,6 +450,8 @@
       :*  %give  %fact  ~
           %chess-game  !>(game)
       ==
+    ::
+    ::  starts a new game
     [%game @ta %moves ~]
       =/  game-id  `(unit @dau)`(slaw %da i.t.path)
       ?~  game-id
@@ -446,6 +465,7 @@
         ?:  ready.game-state
           [~ this]
         =/  players  [white.game.game-state black.game.game-state]
+        ::  ensure that the players in a game are our ship and the requesting ship
         ?:  ?|  =(players [[%ship our.bowl] [%ship src.bowl]])
                 =(players [[%ship src.bowl] [%ship our.bowl]])
             ==
@@ -462,6 +482,8 @@
           "no active game with id {<u.game-id>} or challenge from {<src.bowl>}"
         :~  [%give %watch-ack `~[leaf+err]]
         ==
+      ::
+      ::  assign white and black to players if random was chosen
       ?:  ?=(%random challenger-side.u.challenge)
         =/  commitment  (~(got by rng-state) src.bowl)
         =/  random-bit  %-  ?
@@ -485,10 +507,12 @@
               result=~
               moves=~
           ==
+        ::  subscribe to updates from the other player's agent
         :-  :~  :*  %pass  /player/(scot %da u.game-id)
                     %agent  [src.bowl %chess]
                     %watch  /game/(scot %da u.game-id)/moves
                 ==
+                ::  send the new game as an update to the other player's agent
                 :*  %give  %fact  ~[/active-games]
                     %chess-game  !>(new-game)
                 ==
@@ -498,6 +522,7 @@
           rng-state  (~(del by rng-state) src.bowl)
           games  (~(put by games) u.game-id [new-game *chess-position & | |])
         ==
+      ::  assign white and black to players if challenger chose
       =+  ^=  [white-player black-player]
         ?-  challenger-side.u.challenge
           %white
@@ -516,10 +541,12 @@
                 result=~
                 moves=~
             ==
+      ::  subscribe to updates from the other player's agent
       :-  :~  :*  %pass  /player/(scot %da u.game-id)
                   %agent  [src.bowl %chess]
                   %watch  /game/(scot %da u.game-id)/moves
               ==
+              ::  send the new game as an update to the other player's agent
               :*  %give  %fact  ~[/active-games]
                   %chess-game  !>(new-game)
               ==
