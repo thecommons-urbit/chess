@@ -32,7 +32,8 @@ export enum Update {
   Position = 'position',
   Result = 'result',
   DrawOffer = 'draw-offer',
-  DrawDeclined = 'draw-declined'
+  DrawDeclined = 'draw-declined',
+  SpecialDrawPreference = 'special-draw-preference'
 }
 
 export enum Action {
@@ -42,7 +43,9 @@ export enum Action {
   OfferDraw = 'offer-draw',
   AcceptDraw = 'accept-draw',
   DeclineDraw = 'decline-draw',
-  Move = 'move'
+  Move = 'move',
+  ChangeSpecialDrawPreference = 'change-special-draw-preference',
+  ClaimSpecialDraw = 'claim-special-draw'
 }
 
 // Yes, I know how retarded 'MoveActionAction.Move' looks - thank Ray for the types in sur/chess.hoon
@@ -79,6 +82,8 @@ export type ActiveGameInfo = {
   position: FENPosition,
   gotDrawOffer: boolean,
   sentDrawOffer: boolean,
+  drawClaimAvailable: boolean,
+  autoClaimSpecialDraws: boolean,
   info: GameInfo
 }
 
@@ -110,6 +115,7 @@ export interface PositionUpdate extends ChessUpdate {
   chessUpdate: Update.Position
   gameID: GameID
   position: FENPosition
+  specialDrawAvailable: boolean
 }
 
 export interface ResultUpdate extends ChessUpdate {
@@ -126,6 +132,12 @@ export interface DrawOfferUpdate extends ChessUpdate {
 export interface DrawDeclinedUpdate extends ChessUpdate {
   chessUpdate: Update.DrawDeclined
   gameID: GameID
+}
+
+export interface SpecialDrawPreferenceUpdate extends ChessUpdate {
+  chessUpdate: Update.SpecialDrawPreference
+  gameID: GameID
+  setting: boolean
 }
 
 // Actions
@@ -165,6 +177,15 @@ export interface AcceptDrawAction extends ChessGameAction {
 
 export interface DeclineDrawAction extends ChessGameAction {
   'chess-action': Action.DeclineDraw
+}
+
+export interface ChangeSpecialDrawPreferenceAction extends ChessGameAction {
+  'chess-action': Action.ChangeSpecialDrawPreference
+  'setting': boolean
+}
+
+export interface ClaimSpecialDrawAction extends ChessGameAction {
+  'chess-action': Action.ClaimSpecialDraw
 }
 
 // Moves

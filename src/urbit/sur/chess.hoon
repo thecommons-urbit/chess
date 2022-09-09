@@ -165,10 +165,8 @@
 ::  a queen- or king-side castle;
 ::  or a finishing move with a result
 +$  chess-move
-  $~  [%end %'½–½']
   $%  [%move from=chess-square to=chess-square into=(unit chess-promotion)]
       [%castle ?(%queenside %kingside)]
-      [%end chess-result]
   ==
 ::
 ::  chess-game stores metadata for a game
@@ -179,7 +177,7 @@
           event='?'
           site='Urbit Chess'
           date=*@da
-          ::  the round's default value is 
+          ::  the round's default value is
           ::  ~ if unknown, `~ if inappropriate
           round=~
           white=*chess-player
@@ -236,6 +234,8 @@
       [%offer-draw game-id=@dau]
       [%accept-draw game-id=@dau]
       [%decline-draw game-id=@dau]
+      [%change-special-draw-preference game-id=@dau setting=?]
+      [%claim-special-draw game-id=@dau]
       [%move game-id=@dau move=chess-move]
   ==
 ::
@@ -243,10 +243,11 @@
 ::  subscriber may receive as a %fact from the chess agent
 +$  chess-update
   $%  [%challenge who=ship challenge=chess-challenge]
-      [%position game-id=@dau position=@t]
+      [%position game-id=@dau position=@t special-draw-available=?]
       [%result game-id=@dau result=chess-result]
       [%draw-offer game-id=@dau]
       [%draw-declined game-id=@dau]
+      [%special-draw-preference game-id=@dau setting=?]
   ==
 ::
 ::  XX: document chess-rng
@@ -264,5 +265,10 @@
       her-num=(unit @uvH)
       her-hash=(unit @uvH)
       revealed=_|
+  ==
++$  chess-game-result
+  $:  game-id=@dau
+      result=chess-result
+      move=(unit chess-move)
   ==
 --

@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate } from '../types/urbitChess'
+import { Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
 import ChessState from './chessState'
 
 const useChessStore = create<ChessState>((set, get) => ({
@@ -20,6 +20,8 @@ const useChessStore = create<ChessState>((set, get) => ({
       position: CHESS.defaultFEN,
       gotDrawOffer: false,
       sentDrawOffer: false,
+      drawClaimAvailable: false,
+      autoClaimSpecialDraws: false,
       info: data
     }
 
@@ -46,12 +48,15 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.Position: {
         const positionData = data as PositionUpdate
         const gameID = positionData.gameID
+        const specialDrawAvailable = positionData.specialDrawAvailable
 
         const currentGame = get().activeGames.get(gameID)
         const updatedGame: ActiveGameInfo = {
           position: positionData.position,
           gotDrawOffer: currentGame.gotDrawOffer,
           sentDrawOffer: currentGame.sentDrawOffer,
+          drawClaimAvailable: specialDrawAvailable,
+          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           info: currentGame.info
         }
 
@@ -87,6 +92,8 @@ const useChessStore = create<ChessState>((set, get) => ({
           position: currentGame.position,
           gotDrawOffer: true,
           sentDrawOffer: currentGame.sentDrawOffer,
+          drawClaimAvailable: currentGame.drawClaimAvailable,
+          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           info: currentGame.info
         }
 
@@ -105,6 +112,8 @@ const useChessStore = create<ChessState>((set, get) => ({
           position: currentGame.position,
           gotDrawOffer: currentGame.gotDrawOffer,
           sentDrawOffer: false,
+          drawClaimAvailable: currentGame.drawClaimAvailable,
+          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           info: currentGame.info
         }
 
@@ -112,6 +121,27 @@ const useChessStore = create<ChessState>((set, get) => ({
         updateDisplayGame(updatedGame)
 
         console.log('RECEIVED DRAW DECLINE UPDATE')
+        break
+      }
+      case Update.SpecialDrawPreference: {
+        const preferenceData = data as SpecialDrawPreferenceUpdate
+        const gameID = preferenceData.gameID
+        const setting = preferenceData.setting
+
+        const currentGame = get().activeGames.get(gameID)
+        const updatedGame: ActiveGameInfo = {
+          position: currentGame.position,
+          gotDrawOffer: currentGame.gotDrawOffer,
+          sentDrawOffer: currentGame.sentDrawOffer,
+          drawClaimAvailable: currentGame.drawClaimAvailable,
+          autoClaimSpecialDraws: setting,
+          info: currentGame.info
+        }
+
+        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
+        updateDisplayGame(updatedGame)
+
+        console.log('RECEIVED SPECIAL DRAW PREFERENCE UPDATE')
         break
       }
       default: {

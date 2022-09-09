@@ -23,6 +23,7 @@
         :~  ['chessUpdate' [%s 'position']]
             ['gameID' [%s (scot %da game-id.upd)]]
             ['position' [%s position.upd]]
+            ['specialDrawAvailable' [%b special-draw-available.upd]]
         ==
       %result
         %-  pairs:enjs
@@ -39,6 +40,12 @@
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'draw-declined']]
             ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %special-draw-preference
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'special-draw-preference']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+            ['setting' [%b setting.upd]]
         ==
     ==
   --
