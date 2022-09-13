@@ -154,8 +154,12 @@
 ::  to be recorded in chess-game
 +$  chess-result
   $~  %'½–½'
-  $?  %'1-0'
+  $?  
+    ::  white victory
+      %'1-0'
+    ::  black victory
       %'0-1'
+    ::  draw
       %'½–½'
   ==
 ::
@@ -165,10 +169,8 @@
 ::  a queen- or king-side castle;
 ::  or a finishing move with a result
 +$  chess-move
-  $~  [%end %'½–½']
   $%  [%move from=chess-square to=chess-square into=(unit chess-promotion)]
       [%castle ?(%queenside %kingside)]
-      [%end chess-result]
   ==
 ::
 ::  chess-game stores metadata for a game
@@ -237,6 +239,7 @@
       [%accept-draw game-id=@dau]
       [%decline-draw game-id=@dau]
       [%move game-id=@dau move=chess-move]
+      [%resign game-id=@dau result=chess-result]
   ==
 ::
 ::  chess-update defines the possible values that a

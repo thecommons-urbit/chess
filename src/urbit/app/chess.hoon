@@ -257,6 +257,43 @@
             ::  record that draw offer is gone
             games  (~(put by games) game-id.action u.game(got-draw-offer |))
           ==
+        %resign
+          =/  game-state  (~(get by games) game-id.action)
+          ::
+          ::  we received a resignation with a game id,
+          ::  do we have a game with that id?
+          ?~  game-state
+            ::  if not, error!
+            :_  this
+            =/  err
+              "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  else, is the given result a draw?
+          ?:  =(result.action %'½–½')
+            ::  if so, error!
+            :_  this
+            =/  err
+              "resignation doesn't end in a draw"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  else, return (quip card _this)
+                  ::  tell our opponent we've resigned
+          :-  :~  :*  %give  %fact   ~[/game/(scot %da game-id.action)/updates]
+                      %chess-resign  !>(+.action)
+                  ==
+                  :*  %give  %fact   ~[/game/(scot %da game-id.action)/moves]
+                      %chess-resign  !>(~)
+                  ==
+              ==
+          =/  updated-game  game.u.game-state
+          =.  result.updated-game  `(unit chess-result)``result.action
+          %=  this
+            ::  remove this game from our map of active games
+            games    (~(del by games) game-id.action)
+            ::  add this game to our archive
+            archive  (~(put by archive) game-id.action updated-game)
+          ==
         %move
           =/  game-state  (~(get by games) game-id.action)
           ::  check for valid game
@@ -716,6 +753,24 @@
               ==
             ::
             ::  handle move legality, new games, and finished games
+            %chess-resign
+              ::  determine result based on opponent's side
+              =/  resign-result
+                ?:  =(who.action white.game-state)
+                  %'0-1'
+                %'1-0'
+              ::  return (quip card _this)
+              :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
+                          %chess-resign  !>([u.game-id resign-result])
+                      ==
+              =/  updated-game  game.u.game-state
+              =.  result.updated-game  resign-result
+              %=  this
+                ::  remove this game from our map of active games
+                games    (~(del by games) game-id.action)
+                ::  add this game to our archive
+                archive  (~(put by archive) game-id.action updated-game)
+              ==
             %chess-move
               ::  ensure it’s the opponent ship’s turn
               ?.  =([%ship src.bowl] ship-to-move)
@@ -770,13 +825,11 @@
                       |
                     ~(in-stalemate with-position u.new-position)
   ::  check if game ends by checkmate or stalemate
-  ?:  ?|  ?=(%end -.move)
-          in-checkmate
+  ?:  ?|  in-checkmate
           in-stalemate
       ==
       ::  update result with score
       =.  result.updated-game
-        ?:  ?=(%end -.move)  `+.move
         ?:  in-stalemate  `%'½–½'
         ?:  in-checkmate
           ?-  player-to-move.u.new-position

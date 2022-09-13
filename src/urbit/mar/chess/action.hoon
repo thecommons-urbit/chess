@@ -48,6 +48,13 @@
         %-  ot:dejs
         :~  [%game-id (se:dejs %da)]
         ==
+      %resign
+        :-  %resign
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+            [%result so:dejs]
+        ==
       %move
         :-  %move
         =+  ^-  [game-id=@dau head=@tas]
@@ -83,13 +90,6 @@
             %.  jon
             %-  ot:dejs
             :~  [%castle-side so:dejs]
-            ==
-          %end
-            :-  game-id
-            :-  %end
-            %.  jon
-            %-  ot:dejs
-            :~  [%result so:dejs]
             ==
         ==
     ==

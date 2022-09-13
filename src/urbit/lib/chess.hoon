@@ -702,11 +702,8 @@
   ++  algebraicize
     |=  move=chess-move
     ^-  @t
-    ?>  ?|  ?=(%end -.move)
-            (legal-move move)
-        ==
+    ?>  (legal-move move)
     ?-  -.move
-      %end  +.move
       %castle
         ?-  +.move
           %queenside  'O-O-O'
@@ -776,7 +773,6 @@
     ++  $
       ^-  chess-position
       ?-  -.move
-        %end     position
         %castle
           %=  position
             board             %+  ~(castle with-board board)
@@ -976,6 +972,7 @@
   ::  XX no threefold repetition yet
   ++  draw-claimable
     ^-  ?
+    ::  TODO: to be removed after work on GitHub issue #4
     (legal-move [%end %'½–½'])
   ::
   ::  legal move logic
@@ -1001,14 +998,6 @@
     ++  $
       ^-  ?
       ?-  -.move
-        %end
-          ?-  +.move
-            ::  resignations ('1-0' = white victory, '0-1' = black victory)
-            %'0-1'  =(player-to-move %white)
-            %'1-0'  =(player-to-move %black)
-            ::  check if the 50 play rule is claimable
-            %'½–½'  (gte ply-50-move-rule 100)
-          ==
         %castle  castle-move
         %move    normal-move
       ==
