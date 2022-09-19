@@ -4,8 +4,8 @@
 
 ## About
 
-`%chess` is an [Urbit](https://urbit.org) app which allows you to play correspondence Chess with other Urbit users. It
-is a fully-decentralized, peer-to-peer Chess application.
+`%chess` is an [Urbit](https://urbit.org) app which allows you to play correspondence chess with other Urbit users. It
+is a fully-decentralized, peer-to-peer chess application.
 
 The original `%chess` was made by Raymond E. Pasco for several reasons:
 - To practice Hoon
@@ -14,7 +14,7 @@ The original `%chess` was made by Raymond E. Pasco for several reasons:
 
 Ray paused work on `%chess` in March 2021 due to personal reasons. In August 2021, Tlon released full-fledged software
 distribution in an update to Arvo. I updated `%chess` to work with this update as a broadly-visible example of app
-distribution for Assembly 2021.
+distribution for Assembly 2021. Since then, I have acted as steward for `%chess`.
 
 In my opinion, `%chess` is an experimental, community sandbox to show what's possible with Urbit. As Urbit evolves, so
 too should `%chess`. Ray may feel differently, and is entitled to do so as the original creator of the app (as of today,
@@ -25,7 +25,9 @@ Announcements page [here](https://lists.sr.ht/~ray).
 
 ## News
 
-The interface has been completely overhauled - `%chess` no longer looks like it's from 1992!
+![aid](https://0x0.st/oVSE.jpg)
+
+The [Chess Improvements Bounty](https://urbit.org/grants/chess-bounty) has been posted and filled.
 
 ## Installation
 
@@ -168,3 +170,14 @@ fake galaxies also active on the computer to route for them. Examples:
 ~mex & ~bintex:         BAD
 ~tex, ~mex, & ~bintex:  GOOD
 ```
+
+## Contributors
+
+Appearing in alphabetical order of `@p`:
+
+- `~bonbud-macryg` - [@bonbud-macryg](https://github.com/bonbud-macryg)
+- `~datder-sonnet` - Tom Holford, [@tomholford](https://github.com/tomholford)
+- `~finmep-lanteb` - Alex Shelkovnykov, [@ashelkovnykov](https://github.com/ashelkovnykov), `~walbex`
+- `~nordus-mocwyl` - [@brbenji](https://github.com/brbenji)
+- `~rovmug-ticfyn` - [@rovmug-ticfyn](https://github.com/rovmug-ticfyn)
+- `~sigryn-habrex` - Ray Pasco
