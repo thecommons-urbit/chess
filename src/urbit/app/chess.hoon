@@ -1,4 +1,4 @@
-/+  chess, dbug, default-agent
+/+  chess, dbug, default-agent, hark=hark-store
 =,  chess
 |%
 +$  versioned-state
@@ -273,13 +273,52 @@
       :-  :~  :*  %give  %fact  ~[/challenges]
                   %chess-update  !>([%challenge src.bowl challenge])
               ==
+              :*  %pass   /hark-store
+                  %agent  [our.bowl %hark-store]
+                  %poke   :-  %hark-action
+                          !>  :-  %unread-count
+                              :-  %chess
+                              :-  /challenges
+                              :-  %.y  1
+              ==
+              :*  =/  title=(list content:hark)
+                    ~[[%text (crip "{<src.bowl>} has sent a challenge")]]
+                  =/  body=(list content:hark)
+                    ~[[%text event.challenge]]
+                  =/  =bin:hark
+                    [/chess [%chess /challenges]]
+                  =/  hark-action=action:hark
+                    ::  XX: should link to game
+                    [%add-note bin title body now.bowl / /chess]
+                  =/  =cage
+                    [%hark-action !>(hark-action)]
+                  [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+              ==
           ==
       %=  this
         challenges-received
           (~(put by challenges-received) src.bowl challenge)
       ==
     %chess-decline-challenge
-      :-  ~
+      :-  :~  :*  %pass   /hark-store
+                  %agent  [our.bowl %hark-store]
+                  %poke   :-  %hark-action
+                          !>  :-  %unread-count
+                              :-  %chess
+                              :-  /challenges
+                              :-  %.y  1
+              ==
+              :*  =/  title=(list content:hark)
+                    ~[[%text (crip "{<src.bowl>} declined your challenge")]]
+                  =/  =bin:hark
+                    [/chess [%chess /challenges]]
+                  =/  hark-action=action:hark
+                    [%add-note bin title ~ now.bowl / /chess]
+                  =/  =cage
+                    [%hark-action !>(hark-action)]
+                  [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+              ==
+          ==
       %=  this
         challenges-sent  (~(del by challenges-sent) src.bowl)
       ==
@@ -592,11 +631,41 @@
           ?~  p.sign
             [~ this]
           %-  (slog u.p.sign)
-          :-  ~
+          :-
+            ::  XX: frontend popup: ~sampel-palnet doesn't have %chess!
+            ~
           %=  this
             challenges-sent  (~(del by challenges-sent) src.bowl)
           ==
       ==
+    ::[%active-games ~]
+    ::?+  -.sign  (on-agent:default wire sign)
+    ::  %fact
+    ::    ?+  p.cage.sign  (on-agent:default wire sign)
+    ::      %chess-game
+    ::        :_  this
+    ::        :~  ::  notify us opponent accepted
+    ::            :*  %pass   /hark-store
+    ::                %agent  [our.bowl %hark-store]
+    ::                %poke   :-  %hark-action
+    ::                        !>  :-  %unread-count
+    ::                            :-  %chess
+    ::                            :-  /challenges
+    ::                            :-  %.y  1
+    ::            ==
+    ::            :*  =/  title=(list content:hark)
+    ::                  ~[[%text (crip "{<src.bowl>} accepts your challenge")]]
+    ::                =/  =bin:hark
+    ::                  [/chess [%chess /challenges]]
+    ::                =/  hark-action=action:hark
+    ::                  ::  XX: should link to game
+    ::                  [%add-note bin title ~ now.bowl / /chess]
+    ::                =/  =cage
+    ::                  [%hark-action !>(hark-action)]
+    ::                [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+    ::            ==
+    ::        ==
+    ::    ==
     [%player @ta ~]
       =/  game-id  `(unit @dau)`(slaw %da i.t.wire)
       ?~  game-id
@@ -614,9 +683,52 @@
       ?+  -.sign  (on-agent:default wire sign)
         %fact
           ?+  p.cage.sign  (on-agent:default wire sign)
+             %chess-game
+              :_  this
+              :~  ::  notify us opponent accepted
+                  :*  %pass   /hark-store
+                      %agent  [our.bowl %hark-store]
+                      %poke   :-  %hark-action
+                              !>  :-  %unread-count
+                                  :-  %chess
+                                  :-  /challenges
+                                  :-  %.y  1
+                  ==
+                  :*  =/  title=(list content:hark)
+                        ~[[%text (crip "{<src.bowl>} accepts your challenge")]]
+                      =/  =bin:hark
+                        [/chess [%chess /challenges]]
+                      =/  hark-action=action:hark
+                        ::  XX: should link to game
+                        [%add-note bin title ~ now.bowl / /chess]
+                      =/  =cage
+                        [%hark-action !>(hark-action)]
+                      [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+                  ==
+              ==
             %chess-draw-offer
               :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
                           %chess-update  !>([%draw-offer u.game-id])
+                      ==
+                      ::  notify hark-store
+                      :*  %pass   /hark-store
+                          %agent  [our.bowl %hark-store]
+                          %poke   :-  %hark-action
+                                  !>  :-  %unread-count
+                                      :-  %chess
+                                      :-  /games/(scot %da u.game-id)/updates
+                                      :-  %.y  1
+                      ==
+                      :*  =/  title=(list content:hark)
+                            ~[[%text (crip "{<src.bowl>} offers a draw")]]
+                          =/  =bin:hark
+                            [/chess/games [%chess /games/(scot %da u.game-id)/updates]]
+                          =/  hark-action=action:hark
+                            ::  XX: should link to game
+                            [%add-note bin title ~ now.bowl / /chess]
+                          =/  =cage
+                            [%hark-action !>(hark-action)]
+                          [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
                       ==
                   ==
               %=  this
@@ -634,6 +746,26 @@
                                         ==
                           ~
                       ==
+                      ::  notify hark-store
+                      :*  %pass   /hark-store
+                          %agent  [our.bowl %hark-store]
+                          %poke   :-  %hark-action
+                                  !>  :-  %unread-count
+                                      :-  %chess
+                                      :-  /games/(scot %da u.game-id)/updates
+                                      :-  %.y  1
+                      ==
+                      :*  =/  title=(list content:hark)
+                            ~[[%text (crip "{<src.bowl>} accepts your draw offer")]]
+                          =/  =bin:hark
+                            [/chess/games [%chess /games/(scot %da u.game-id)/updates]]
+                          =/  hark-action=action:hark
+                            ::  XX: should link to game
+                            [%add-note bin title ~ now.bowl / /chess]
+                          =/  =cage
+                            [%hark-action !>(hark-action)]
+                          [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+                      ==
                   ==
               =/  updated-game  game.u.game-state
               =.  result.updated-game  `%'½–½'
@@ -644,6 +776,26 @@
             %chess-draw-decline
               :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
                           %chess-update  !>([%draw-declined u.game-id])
+                      ==
+                      ::  notify hark-store
+                      :*  %pass   /hark-store
+                          %agent  [our.bowl %hark-store]
+                          %poke   :-  %hark-action
+                                  !>  :-  %unread-count
+                                      :-  %chess
+                                      :-  /games/(scot %da u.game-id)/updates
+                                      :-  %.y  1
+                      ==
+                      :*  =/  title=(list content:hark)
+                            ~[[%text (crip "{<src.bowl>} declines your draw offer")]]
+                          =/  =bin:hark
+                            [/chess/games [%chess /games/(scot %da u.game-id)/updates]]
+                          =/  hark-action=action:hark
+                            ::  XX: should link to game
+                            [%add-note bin title ~ now.bowl / /chess]
+                          =/  =cage
+                            [%hark-action !>(hark-action)]
+                          [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
                       ==
                   ==
               %=  this
@@ -658,12 +810,47 @@
               ?~  new.move-result
                 [cards.move-result this]  ::  nice try, cheater
               =,  u.new.move-result
-              :-  cards.move-result
-              ?.  ?=(~ result.game)
+              ::
+              ::  XX: shouldn't notify if %chess is open
+              ::  XX: post-Groups 2, should create more granular
+              ::      notifications about moves:
+              ::      '~sampel-palnet moves E5 pawn to E6'
+              ::      '~sampel-palnet: check!'
+              ::      '~sampel-palnet: checkmate!'
+              ::      '~sampel-palnet promotes XX pawn to queen'
+              ::
+              ::  check if opponent has resigned
+              ::  XX: must change %end check after GitHub issue #3 implemented
+              ::  XX: notification: opponent resigned
+              ?:  ?=(%end -.move)
+                :-  cards.move-result
                 %=  this
                   games    (~(del by games) u.game-id)
                   archive  (~(put by archive) u.game-id game)
                 ==
+              :-
+              %+  welp
+                cards.move-result
+              :~  :*  %pass   /hark-store
+                      %agent  [our.bowl %hark-store]
+                      %poke   :-  %hark-action
+                              !>  :-  %unread-count
+                                  :-  %chess
+                                  :-  /games/(scot %da u.game-id)/moves
+                                  :-  %.y  1
+                  ==
+                  :*  =/  title=(list content:hark)
+                        ~[[%text (crip "{<src.bowl>} has made a move")]]
+                      =/  =bin:hark
+                        [/chess/games [%chess /games/(scot %da u.game-id)/updates]]
+                      =/  hark-action=action:hark
+                        ::  XX: should link to game
+                        [%add-note bin title ~ now.bowl / /chess]
+                      =/  =cage
+                        [%hark-action !>(hark-action)]
+                      [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+                  ==
+              ==
               %=  this
                 games  %+  ~(put by games)  u.game-id
                        [game position |2.u.game-state]
