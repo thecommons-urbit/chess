@@ -614,6 +614,9 @@
   |=  =path
   ^-  (unit (unit cage))
   ?+  path  (on-peek:default path)
+    ::
+    ::  read game info
+    ::  either active or archived
     [%x %game @ta ~]
       =/  game-id  `(unit @dau)`(slaw %da i.t.t.path)
       ?~  game-id  `~
@@ -623,6 +626,9 @@
         ?~  archived-game  ~
         ``[%chess-game !>(u.archived-game)]
       ``[%chess-game !>(game.u.active-game)]
+    ::
+    ::  .^(arch %gy /=chess=/game)
+    ::  collect all the game-id keys
     [%y %game ~]
       :-  ~  :-  ~
       :-  %arch
@@ -639,6 +645,8 @@
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?+  wire  (on-agent:default wire sign)
+    ::
+    ::  remove a sent challenge on nack
     [%poke %challenge ~]
       ?+  -.sign  (on-agent:default wire sign)
         %poke-ack
@@ -650,6 +658,8 @@
             challenges-sent  (~(del by challenges-sent) src.bowl)
           ==
       ==
+    ::
+    ::  handle actions from opponent player
     [%player @ta ~]
       =/  game-id  `(unit @dau)`(slaw %da i.t.wire)
       ?~  game-id
@@ -676,8 +686,10 @@
                 games  (~(put by games) u.game-id u.game-state(got-draw-offer &))
               ==
             %chess-draw-accept
+              ::  first check whether we offered draw
               ?.  sent-draw-offer.u.game-state
                 [~ this]  ::  nice try, cheater
+              ::  log game as a draw, kick subscriber, and archive
               :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
                           %chess-update
                           !>([%result u.game-id %'½–½'])
@@ -702,21 +714,27 @@
               %=  this
                 games    (~(put by games) u.game-id u.game-state(sent-draw-offer |))
               ==
+            ::
+            ::  handle move legality, new games, and finished games
             %chess-move
+              ::  ensure it’s the opponent ship’s turn
               ?.  =([%ship src.bowl] ship-to-move)
                 [~ this]  :: nice try, cheater
               =/  move  !<(chess-move q.cage.sign)
               =/  move-result
                 (try-move game.u.game-state position.u.game-state move)
+              ::  illegal move
               ?~  new.move-result
                 [cards.move-result this]  ::  nice try, cheater
               =,  u.new.move-result
               :-  cards.move-result
               ?.  ?=(~ result.game)
+              ::  archive games with results
                 %=  this
                   games    (~(del by games) u.game-id)
                   archive  (~(put by archive) u.game-id game)
                 ==
+              ::  add new games to our list
               %=  this
                 games  %+  ~(put by games)  u.game-id
                        [game position |2.u.game-state]
@@ -728,6 +746,9 @@
 ++  on-fail   on-fail:default
 --
 |%
+::
+::  helper core for moves
+::  test if a given move is legal
 ++  try-move
   |=  [game=chess-game position=chess-position move=chess-move]
   ^-  [new=(unit [game=chess-game position=chess-position]) cards=(list card)]
@@ -748,10 +769,12 @@
   =/  in-stalemate  ?:  in-checkmate
                       |
                     ~(in-stalemate with-position u.new-position)
+  ::  check if game ends by checkmate or stalemate
   ?:  ?|  ?=(%end -.move)
           in-checkmate
           in-stalemate
       ==
+      ::  update result with score
       =.  result.updated-game
         ?:  ?=(%end -.move)  `+.move
         ?:  in-stalemate  `%'½–½'
@@ -761,18 +784,21 @@
             %black  `%'1-0'
           ==
         !!
+      ::  give a card of the game result to opponent ship
       :-  `[updated-game u.new-position]
       :~  position-update-card
           :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
               %chess-update
               !>([%result game-id.game (need result.updated-game)])
           ==
+          ::  kick subscriber from game
           :*  %give  %kick  :~  /game/(scot %da game-id.game)/updates
                                 /game/(scot %da game-id.game)/moves
                             ==
               ~
           ==
       ==
+  ::  inform opponent of new position
   :-  `[updated-game u.new-position]
   :~  position-update-card
   ==
