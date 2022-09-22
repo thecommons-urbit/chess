@@ -15,8 +15,10 @@ export function Challenges () {
   const [friends, setFriends] = useState([])
   const [challengingFriend, setChallengingFriend] = useState(false)
   const [showingFriends, setFriendsList] = useState(false)
+  const [showingIncoming, setIncoming] = useState(true)
+  const [showingOutgoing, setOutgoing] = useState(false)
   const [badChallengeAttempts, setBadChallengeAttempts] = useState(0)
-  const { urbit, incomingChallenges, removeChallenge } = useChessStore()
+  const { urbit, incomingChallenges, outgoingChallenges } = useChessStore()
 
   const openModal = () => {
     setModalOpen(true)
@@ -54,19 +56,11 @@ export function Challenges () {
   }
 
   const acceptChallenge = async (who: Ship) => {
-    const onSuccess = () => {
-      removeChallenge(who)
-    }
-
-    await pokeAction(urbit, acceptGame(who), () => {}, onSuccess)
+    await pokeAction(urbit, acceptGame(who), () => {})
   }
 
   const declineChallenge = async (who: Ship) => {
-    const onSuccess = () => {
-      removeChallenge(who)
-    }
-
-    await pokeAction(urbit, declineGame(who), () => {}, onSuccess)
+    await pokeAction(urbit, declineGame(who), () => {})
   }
 
   const sendChallenge = async () => {
@@ -87,16 +81,27 @@ export function Challenges () {
     // XX: set showingIncoming and showingOutgoing to false
   }
 
+  const openIncoming = () => {
+    setIncoming(true)
+    setOutgoing(false)
+  }
+
+  const openOutgoing = () => {
+    setOutgoing(true)
+    setIncoming(false)
+  }
+
   return (
     <div className='challenges-container col'>
       <div id="challenges-header" className="control-panel-container col">
         <button className='option' onClick={openModal}>New Challenge</button>
         {/* XX: see how it looks replacing • with ☙ or ❧ or ❦ or 𐫱 */}
         <p>
-          <span>Incoming</span> ☙ <span>Outgoing</span> ❧ <span onClick={openFriends}>Friends</span>
+          <span onClick={openIncoming}>Incoming</span> ☙ <span onClick={openOutgoing}>Outgoing</span> ❧ <span onClick={openFriends}>Friends</span>
         </p>
       </div>
-      <ul id="incoming-challenges" className='game-list'>
+      {/* incoming challenges list */}
+      <ul id="incoming-challenges" className='game-list' style={{ display: (showingIncoming ? 'flex' : ' none') }}>
         {
           Array.from(incomingChallenges).map(([challenger, challenge], key) => {
             const colorClass = (key % 2) ? 'odd' : 'even'
@@ -129,8 +134,35 @@ export function Challenges () {
           })
         }
       </ul>
-      <ul id="outgoing-challenges" className='game-list'>
-        {/* return outgoing list */}
+      {/* outgoing challenges list */}
+      <ul id="outgoing-challenges" className='game-list' style={{ display: (showingOutgoing ? 'flex' : ' none') }}>
+        {
+          Array.from(outgoingChallenges).map(([challenged, challenge], key) => {
+            const colorClass = (key % 2) ? 'odd' : 'even'
+            const description = challenge.event
+            const mySide = (challenge.challengerSide === Side.White) ? 'w' : 'b'
+            return (
+              <li className={`game challenge ${colorClass}`} key={key}>
+                <div className='challenge-box'>
+                  <div className='row'>
+                    <img
+                      src={`https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/${mySide}N.svg`}
+                    />
+                    <div className='col'>
+                      <p className='challenger-name'>{challenged}</p>
+                      <p
+                        title={description}
+                        className='challenger-desc'
+                      >
+                        {description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            )
+          })
+        }
       </ul>
       <ul id="friends" className='game-list' style={{ display: (showingFriends ? 'flex' : ' none') }}>
         {
@@ -147,7 +179,7 @@ export function Challenges () {
                     </div>
                   </div>
                   <div className='col'>
-                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); openModal(); }}>Challenge</button>
+                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); openModal() }}>Challenge</button>
                   </div>
                 </div>
               </li>

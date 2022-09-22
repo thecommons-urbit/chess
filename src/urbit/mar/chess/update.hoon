@@ -9,14 +9,37 @@
   |%
   ++  noun  upd
   ++  json
+    ::  XX: split %chess-update and /updates into several marks/wires
+    ::
+    ::      we shouldn't have all this information in one wire.
+    ::      as the chess app grows this will become unwieldy,
+    ::      subscribers to a wire only want the relevant info.
     ?-  -.upd
-      %challenge
+      %challenge-sent
         %-  pairs:enjs
-        :~  ['chessUpdate' [%s 'challenge']]
+        :~  ['chessUpdate' [%s 'challenge-sent']]
             ['who' [%s (scot %p who.upd)]]
             ['challengerSide' [%s challenger-side.challenge.upd]]
             ['event' [%s event.challenge.upd]]
             ['round' [%s (round-string:chess round.challenge.upd)]]
+        ==
+      %challenge-received
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'challenge-received']]
+            ['who' [%s (scot %p who.upd)]]
+            ['challengerSide' [%s challenger-side.challenge.upd]]
+            ['event' [%s event.challenge.upd]]
+            ['round' [%s (round-string:chess round.challenge.upd)]]
+        ==
+      %challenge-resolved
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'challenge-resolved']]
+            ['who' [%s (scot %p who.upd)]]
+        ==
+      %challenge-replied
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'challenge-replied']]
+            ['who' [%s (scot %p who.upd)]]
         ==
       %position
         %-  pairs:enjs

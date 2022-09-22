@@ -28,7 +28,10 @@ export enum Result {
 }
 
 export enum Update {
-  Challenge = 'challenge',
+  ChallengeSent = 'challenge-sent',
+  ChallengeReceived = 'challenge-received',
+  ChallengeResolved = 'challenge-resolved',
+  ChallengeReplied = 'challenge-replied',
   Position = 'position',
   Result = 'result',
   DrawOffer = 'draw-offer',
@@ -104,8 +107,22 @@ export interface ChessUpdate {
 }
 
 export interface ChallengeUpdate extends ChessUpdate {
-  chessUpdate: Update.Challenge
+  chessUpdate: Update.ChallengeSent |
+               Update.ChallengeReceived |
+               Update.ChallengeResolved |
+               Update.ChallengeReplied
   who: Ship
+}
+
+export interface ChallengeSentUpdate extends ChallengeUpdate {
+  chessUpdate: Update.ChallengeSent
+  challengerSide: Side
+  event: string
+  round: string
+}
+
+export interface ChallengeReceivedUpdate extends ChallengeUpdate {
+  chessUpdate: Update.ChallengeReceived
   challengerSide: Side
   event: string
   round: string

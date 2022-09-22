@@ -90,8 +90,9 @@
               "already challenged {<who.action>}"
             :~  [%give %poke-ack `~[leaf+err]]
             ==
+          ::
           ::  send new challenge
-          :-  :~  :*  %pass  /poke/challenge  %agent  [who.action %chess]
+          :-  :~  :*  %pass  /poke/challenge/send  %agent  [who.action %chess]
                       %poke  %chess-challenge  !>(challenge.action)
                   ==
               ==
@@ -151,6 +152,10 @@
                   :*  %give  %fact  ~[/active-games]
                       %chess-game  !>(new-game)
                   ==
+                  ::  tell our frontend we accepted the challenge
+                  :*  %give  %fact   ~[/challenges]
+                      %chess-update  !>([%challenge-replied who.action])
+                  ==
               ==
           %=  this
             ::  remove our challenger from challenges-received
@@ -172,7 +177,7 @@
             :~  [%give %poke-ack `~[leaf+err]]
             ==
           ::  tell our challenger we decline
-          :-  :~  :*  %pass  /poke/challenge  %agent  [who.action %chess]
+          :-  :~  :*  %pass  /poke/challenge/reply  %agent  [who.action %chess]
                       %poke  %chess-decline-challenge  !>(~)
                   ==
               ==
@@ -402,7 +407,7 @@
     %chess-challenge
       =/  challenge  !<(chess-challenge vase)
       :-  :~  :*  %give  %fact  ~[/challenges]
-                  %chess-update  !>([%challenge src.bowl challenge])
+                  %chess-update  !>([%challenge-received src.bowl challenge])
               ==
           ==
       %=  this
@@ -412,7 +417,10 @@
     ::
     ::  handle declined challenges
     %chess-decline-challenge
-      :-  ~
+      :-  :~  :*  %give  %fact   ~[/challenges]
+                  %chess-update  !>([%challenge-resolved src.bowl])
+              ==
+          ==
       %=  this
         challenges-sent  (~(del by challenges-sent) src.bowl)
       ==
@@ -558,16 +566,27 @@
   ^-  (quip card _this)
   ?+  path  (on-watch:default path)
     ::
-    ::  convert incoming challenges to chess-update marks for subscribers
+    ::  get all challenge updates
     [%challenges ~]
       ?>  (team:title our.bowl src.bowl)
       :_  this
-      %+  turn  ~(tap by challenges-received)
-      |=  [who=ship challenge=chess-challenge]
-      ^-  card
-      :*  %give  %fact  ~
-          %chess-update  !>([%challenge who challenge])
-      ==
+      %-  zing
+      %-  limo
+      ::  challenges sent
+      :-  %+  turn  ~(tap by challenges-sent)
+          |=  [who=ship challenge=chess-challenge]
+          ^-  card
+          :*  %give  %fact   ~
+              %chess-update  !>([%challenge-sent who challenge])
+          ==
+      ::  challenges received
+      :-  %+  turn  ~(tap by challenges-received)
+          |=  [who=ship challenge=chess-challenge]
+          ^-  card
+          :*  %give  %fact   ~
+              %chess-update  !>([%challenge-received who challenge])
+          ==
+      ~
     ::
     ::  convert active games to chess-game marks for subscribers
     [%active-games ~]
@@ -645,6 +664,10 @@
                 :*  %give  %fact  ~[/active-games]
                     %chess-game  !>(new-game)
                 ==
+                ::  tell our frontend our challenge was accepted
+                :*  %give  %fact   ~[/challenges]
+                    %chess-update  !>([%challenge-resolved src.bowl])
+                ==
             ==
         %=  this
           challenges-sent  (~(del by challenges-sent) src.bowl)
@@ -679,11 +702,17 @@
               :*  %give  %fact  ~[/active-games]
                   %chess-game  !>(new-game)
               ==
+              ::  tell our frontend our challenge was accepted
+              :*  %give  %fact   ~[/challenges]
+                  %chess-update  !>([%challenge-resolved src.bowl])
+              ==
           ==
       %=  this
         challenges-sent  (~(del by challenges-sent) src.bowl)
         games  (~(put by games) u.game-id [new-game *chess-position *(map @t @ud) | & | | |])
       ==
+    ::
+    ::  XX: document this
     [%game @ta %updates ~]
       =/  game-id  `(unit @dau)`(slaw %da i.t.path)
       ?~  game-id
@@ -718,6 +747,7 @@
   ^-  (unit (unit cage))
   ?+  path  (on-peek:default path)
     ::
+    ::  .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/noun)
     ::  read game info
     ::  either active or archived
     [%x %game @ta ~]
@@ -730,15 +760,19 @@
         ``[%chess-game !>(u.archived-game)]
       ``[%chess-game !>(game.u.active-game)]
     ::
-    ::  .^(noun %gx /=chess=/friends/noun)
-    ::  .^(json %gx /=chess=/friends/json)
-    ::  read mutual friends
-    [%x %friends ~]
-      ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
+    ::  .^(noun %gx /=chess=/challenges/outgoing/noun)
+    ::  list challenges sent
+    [%x %challenges %outgoing ~]
+      ``[%chess-challenges !>(~(tap by challenges-sent))]
     ::
-    ::  .^(arch %gy /=chess=/game)
+    ::  .^(noun %gx /=chess=/challenges/incoming/noun)
+    ::  list challenges received
+    [%x %challenges %incoming ~]
+      ``[%chess-challenges !>(~(tap by challenges-received))]
+    ::
+    ::  .^(arch %gy /=chess=/games)
     ::  collect all the game-id keys
-    [%y %game ~]
+    [%y %games ~]
       :-  ~  :-  ~
       :-  %arch
       !>  ^-  arch
@@ -749,6 +783,12 @@
       %+  turn  ids
       |=  a=@dau
       [(scot %da a) ~]
+    ::
+    ::  .^(noun %gx /=chess=/friends/noun)
+    ::  .^(json %gx /=chess=/friends/json)
+    ::  read mutual friends
+    [%x %friends ~]
+      ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
   ==
 ++  on-agent
   |=  [=wire =sign:agent:gall]
@@ -756,16 +796,44 @@
   ?+  wire  (on-agent:default wire sign)
     ::
     ::  remove a sent challenge on nack
-    [%poke %challenge ~]
+    [%poke %challenge %send ~]
       ?+  -.sign  (on-agent:default wire sign)
         %poke-ack
+          ::  if opponent has acked our challenge, add it to the frontned
           ?~  p.sign
-            [~ this]
+          ::  
+            :-  :~  :*  %give  %fact   ~[/challenges]
+                        %chess-update  !>([%challenge-sent src.bowl (~(got by challenges-sent) src.bowl)])
+                    ==
+                ==
+            this
+          ::
+          ::  XX: send a notification to the user that an error occurred
+          ::
+          ::  if not, print the error and
+          ::  consider the challenge declined
           %-  (slog u.p.sign)
           :-  ~
           %=  this
             challenges-sent  (~(del by challenges-sent) src.bowl)
           ==
+      ==
+    ::
+    :: get ack/nack when we reject a challenge
+    [%poke %challenge %reply ~]
+      ?+  -.sign  (on-agent:default wire sign)
+        %poke-ack
+          ?~  p.sign
+          ::  if opponent has acked our rejection,
+          ::  confirm that to our frontend
+            :-  :~  :*  %give  %fact   ~[/challenges]
+                        %chess-update  !>([%challenge-replied src.bowl])
+                    ==
+                ==
+            this
+          ::  if nacked, print error
+          %-  (slog u.p.sign)
+            [~ this]
       ==
     ::
     ::  handle actions from opponent player

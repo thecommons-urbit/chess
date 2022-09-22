@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
+import { Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
 import ChessState from './chessState'
 
 const useChessStore = create<ChessState>((set, get) => ({
@@ -10,11 +10,42 @@ const useChessStore = create<ChessState>((set, get) => ({
   practiceBoard: '',
   activeGames: new Map(),
   incomingChallenges: new Map(),
+  outgoingChallenges: new Map(),
   setUrbit: (urbit: Urbit) => set({ urbit }),
   setDisplayGame: (displayGame: ActiveGameInfo | null) => set({ displayGame }),
   setPracticeBoard: (practiceBoard: String | null) => set({ practiceBoard }),
-  receiveChallenge: (data: ChallengeUpdate) =>
-    set(state => ({ incomingChallenges: state.incomingChallenges.set(data.who, data as Challenge) })),
+  receiveChallengeUpdate: (data: ChallengeUpdate) => {
+    switch (data.chessUpdate) {
+      case Update.ChallengeSent: {
+        set(state => ({ outgoingChallenges: state.outgoingChallenges.set(data.who, data as ChallengeSentUpdate) }))
+        break
+      }
+      case Update.ChallengeReceived: {
+        set(state => ({ incomingChallenges: state.incomingChallenges.set(data.who, data as ChallengeReceivedUpdate) }))
+        break
+      }
+      case Update.ChallengeResolved: {
+        let outgoingChallenges: Map<Ship, Challenge> = get().outgoingChallenges
+        outgoingChallenges.delete(data.who)
+
+        set({ outgoingChallenges })
+        break
+      }
+      case Update.ChallengeReplied: {
+        let incomingChallenges: Map<Ship, Challenge> = get().incomingChallenges
+        incomingChallenges.delete(data.who)
+
+        set({ incomingChallenges })
+        break
+      }
+      default: {
+        console.log('RECEIVED BAD UPDATE')
+        console.log(data.chessUpdate)
+        console.log((data as ChallengeUpdate).chessUpdate)
+        console.log((data as ChallengeUpdate).who)
+      }
+    }
+  },
   receiveGame: async (data: GameInfo) => {
     const activeGame: ActiveGameInfo = {
       position: CHESS.defaultFEN,
@@ -151,12 +182,6 @@ const useChessStore = create<ChessState>((set, get) => ({
         console.log((data as PositionUpdate).position)
       }
     }
-  },
-  removeChallenge: (who: Ship) => {
-    let incomingChallenges: Map<Ship, Challenge> = get().incomingChallenges
-    incomingChallenges.delete(who)
-
-    set({ incomingChallenges })
   },
   declinedDraw: (gameID: GameID) => {
     let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
