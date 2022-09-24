@@ -1,10 +1,11 @@
 import React from 'react'
-import { pokeAction, resign, offerDraw } from '../ts/helpers/urbitChess'
 import { Side, GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 import useChessStore from '../ts/state/chessStore'
+import usePreferenceStore from '../ts/state/preferenceStore'
 
 export function Games () {
   const { urbit, displayGame, activeGames, setDisplayGame } = useChessStore()
+  const { pieceTheme } = usePreferenceStore()
   const hasGame: boolean = (displayGame !== null)
 
   const extractDate = (gameID: GameID) => {
@@ -16,12 +17,12 @@ export function Games () {
       <div id="active-archive-toggle">
         <p><span>Active</span> 𐫱 <span>Archive</span></p>
       </div>
-      <ul className='game-list'>
+      <ul className={`game-list ${pieceTheme}`}>
         {
           Array.from(activeGames).map(([gameID, activeGame], key) => {
             const colorClass = (key % 2) ? 'odd' : 'even'
             const description = activeGame.info.event
-            const mySide = (urbit.ship === activeGame.info.white.substring(1)) ? 'w' : 'b'
+            const mySide = (urbit.ship === activeGame.info.white.substring(1)) ? 'white' : 'black'
             const opponent = (urbit.ship === activeGame.info.white.substring(1))
               ? activeGame.info.black
               : activeGame.info.white
@@ -29,14 +30,11 @@ export function Games () {
             return (
               <li
                 key={key}
-                className={`game active ${colorClass}`}
+                className={`game active ${colorClass} ${status}`}
                 title={gameID}
                 onClick={() => setDisplayGame(activeGame)}>
                 <div className='row'>
-                  <img
-                    className='game-icon'
-                    src={`https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/${mySide}N.svg`}
-                  />
+                  <piece className={`game-icon ${mySide} knight`}/>
                   <div className='col game-card'>
                     <p className='game-opponent'>{opponent}</p>
                     <p className='game-date'>{extractDate(gameID)}</p>

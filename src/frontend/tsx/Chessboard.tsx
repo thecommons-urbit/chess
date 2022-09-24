@@ -12,16 +12,9 @@ import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
 import { pokeAction, move, castle, acceptDraw, declineDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
+import usePreferenceStore from '../ts/state/preferenceStore'
 import { PromotionMove } from '../ts/types/chessground'
 import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
-
-//
-// Import Chessground style sheets
-//
-
-import 'chessground/assets/chessground.base.css'
-import 'chessground/assets/chessground.brown.css'
-import 'chessground/assets/chessground.cburnett.css'
 
 //
 // Declare custom HTML elements used by Chessground
@@ -49,6 +42,7 @@ export function Chessboard () {
   const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null)
   const [renderWorkaround, forceRenderWorkaround] = useState<number>(Date.now())
   const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard } = useChessStore()
+  const { pieceTheme, boardTheme } = usePreferenceStore()
 
   //
   // Non-state constants
@@ -386,7 +380,7 @@ export function Chessboard () {
           {`${boardTitle}`}
         </p>
       </div>
-      <div className='board-container'>
+      <div className={`board-container ${boardTheme} ${pieceTheme}`}>
         <div ref={boardRef} className='chessboard cg-wrap' />
         { (promotionMove !== null) ? renderPromotionInterface() : <div/> }
       </div>
