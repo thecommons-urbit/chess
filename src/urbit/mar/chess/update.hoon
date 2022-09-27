@@ -70,6 +70,21 @@
             ['gameID' [%s (scot %da game-id.upd)]]
             ['setting' [%b setting.upd]]
         ==
+      %undo-request
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'undo-request']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %undo-declined
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'undo-declined']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %undo-accepted
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'unco-accepted']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
     ==
   --
 ++  grad  %noun
