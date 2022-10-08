@@ -1,3 +1,6 @@
+
+/* fundamental containers, positioning, etc. */
+
 body {
   margin: 0px;
   font-family: 'Courier Prime', 'Courier New', monospace;
@@ -13,8 +16,6 @@ ul {
   padding: 0px;
 }
 
-
-
 div.col {
   display: flex;
   flex-direction: column;
@@ -25,9 +26,23 @@ div.row {
   flex-direction: row;
 }
 
+.challenge-box {
+  justify-content: space-between;
+}
+
+.challenge-box .row {
+  height: 60px;
+  width: 60px;
+}
+
+.challenge-box .col {
+  justify-content: space-evenly;
+  margin: 0.5em;
+}
+
 div.app-container {
   height: max(100vh, 720px);
-  width: max(100vw, 1280px);
+  width: max(100vw, 1080px);
   display: grid;
   grid-template-areas: "left right";
   grid-template-rows: auto;
@@ -129,22 +144,16 @@ li.game {
   word-wrap: break-word;
 }
 
+div.col.game-card {
+  width: calc(100% - 60px);
+}
+
 li.odd {
   background-color: #E5E5E5;
 }
 
 li.even {
   background-color: #FFFFFF;
-}
-
-.popup-content {
-  background: rgb(255, 255, 255);
-  border-radius: 10px;
-  padding: 25px;
-}
-
-.popup-overlay {
-  background: rgba(0, 0, 0, 0.7);
 }
 
 div.draw-resolution {

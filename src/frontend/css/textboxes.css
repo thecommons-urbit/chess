@@ -1,3 +1,6 @@
+
+/* colors for textboxes */
+
 input.rejected {
   animation-duration: 0.5s;
   animation-name: blink-red;
