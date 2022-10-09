@@ -309,6 +309,7 @@ export function Chessboard () {
   // Render HTML
   //
 
+  // Render pawn promotion popup
   const renderPromotionInterface = () => {
     return (
       <div
@@ -319,9 +320,9 @@ export function Chessboard () {
     )
   }
 
+  // Render draw offer popup
   const renderDrawPopup = (game: ActiveGameInfo) => {
     const opponent = (orientation === Side.White) ? game.info.black : game.info.white
-
     return (
       <Popup open={game.gotDrawOffer}>
         <div>
@@ -336,6 +337,7 @@ export function Chessboard () {
     )
   }
 
+  // Render game area
   return (
     <div className='game-container'>
       <div className='title-container'>

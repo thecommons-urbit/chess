@@ -91,6 +91,7 @@ export function Challenges () {
               <li className={`game challenge ${colorClass}`} key={key}>
                 <div className='challenge-box'>
                   <div className='row'>
+                    {/* XX: should we host the LiChess images locally? */}
                     <img
                       src={`https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/${mySide}N.svg`}
                     />
@@ -114,7 +115,6 @@ export function Challenges () {
           })
         }
       </ul>
-      {/* XX: should we host the LiChess images locally? */}
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
         <div className='new-challenge-container col'>
           <p className='new-challenge-header'>new challenge</p>

@@ -1,3 +1,7 @@
+
+/* global styles, grids, and containers */
+
+/* primitives */
 body {
   margin: 0px;
   font-family: 'Courier Prime', 'Courier New', monospace;
@@ -23,47 +27,118 @@ div.row {
   flex-direction: row;
 }
 
-.challenge-box {
-  justify-content: space-between;
-}
-
-.challenge-box .row {
-  height: 60px;
-  width: 60px;
-}
-
-.challenge-box .col {
-  justify-content: space-evenly;
-  margin: 0.5em;
-}
-
+/* containers */
 div.app-container {
   height: max(100vh, 720px);
   width: max(100vw, 1080px);
   display: grid;
-  grid-template-areas: "left right";
+  grid-template-areas: 'left center right';
   grid-template-rows: auto;
-  grid-template-columns: 75% 25%;
+  grid-template-columns: 25% 50% 25%;
+  align-items: center;
+  justify-items: center;
+}
+
+div.game-panel-container {
+  grid-area: left;
+  height: 100%;
+  width: 100%;
+  grid-template-areas:
+    '.',
+    'game-panel-column-middle',
+    'game-panel-column-bottom';
+  grid-template-columns: auto;
+  grid-template-rows: 25% 50% 25%;
   align-items: center;
   justify-items: center;
 }
 
 div.game-container {
-  grid-area: left;
+  grid-area: center;
   height: calc(100% - calc(2 * max(min(2vh, 2vw), 14px)));
   width: calc(100% - calc(2 * max(min(2vh, 2vw), 14px)));
   margin: max(min(2vh, 2vw), 14px);
   display: grid;
   grid-template-areas:
-    "top"
-    "middle"
-    "bottom";
+    'top'
+    'middle'
+    'bottom';
   grid-template-columns: auto;
   grid-template-rows: 10% 80% 10%;
   align-items: center;
   justify-items: center;
 }
 
+div.menu-container {
+  grid-area: right;
+  height: 100%;
+  width: 100%;
+}
+
+/* game panel */
+div.game-panel {
+  grid-area: 'game-panel-column-middle';
+  height: 100%;
+  width: 100%;
+  grid-template-areas:
+    'game-panel-opp-timer',
+    'game-panel-opp-name',
+    'game-panel-move-list',
+    'game-panel-our-name',
+    'game-panel-our-timer';
+  grid-template-columns: auto;
+  grid-template-rows: 10% 10% 60% 10% 10%;
+  align-items: center;
+  justify-items: center;
+}
+
+div.game-timer {
+  /**/
+}
+
+div.game-player {
+  /**/
+  overflow: ellipsis;
+}
+
+div.game-moves {
+  grid-area: 'game-panel-move-list';
+  height: 100%;
+  width: 100%;
+  overflow: scroll;
+}
+
+div.game-move {
+  height: auto;
+  width: 100%;
+  grid-template-areas:
+    'game-move-number',
+    'game-move-record';
+  grid-template-columns: auto;
+  grid-template-rows: 20% 80%;
+  align-items: center;
+  justify-items: center;
+  justify-self: stretch;
+}
+
+/* XX: make sure selects text */
+div.game-move-active {
+  color: black;
+}
+
+div.game-move-inactive {
+  color: gray;
+}
+
+div.game-buttons-list {
+  grid-area: 'game-panel-column-bottom';
+  height: 100%;
+  width: 100%;
+  align-items: top;
+  justify-items: center;
+}
+
+/* chess game */
 div.title-container {
   grid-area: top;
   height: calc(max(10vh, 72px) - max(min(2vh, 2vw), 14px));
@@ -93,12 +168,7 @@ div.board-container {
   display: flex;
 }
 
-div.menu-container {
-  grid-area: right;
-  height: 100%;
-  width: 100%;
-}
-
+/* control panel */
 div.games-container {
   height: 100%;
   width: 100%;
@@ -120,56 +190,72 @@ div.settings-container {
   overflow: auto;
 }
 
-ul.game-list {
-  width: 100%;
-  margin-top: 1rem;
-  border-top: 1px solid #666666;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-x: visible;
-  overflow-y: auto;
-}
+  /* games */
+  ul.game-list {
+    width: 100%;
+    margin-top: 1rem;
+    border-top: 1px solid #666666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: visible;
+    overflow-y: auto;
+  }
 
-li.game {
-  width: 90%;
-  margin-top: 0.5rem;
-  border: 1px solid black;
-  border-radius: 0.5rem;
-  box-shadow: 2px 2px 5px grey;
-  list-style: none;
-  word-wrap: break-word;
-}
+  li.game {
+    width: 90%;
+    margin-top: 0.5rem;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    box-shadow: 2px 2px 5px grey;
+    list-style: none;
+    word-wrap: break-word;
+  }
 
-div.col.game-card {
-  width: calc(100% - 60px);
-}
+  div.col.game-card {
+    width: calc(100% - 60px);
+  }
 
-li.odd {
-  background-color: #E5E5E5;
-}
+  li.odd {
+    background-color: #E5E5E5;
+  }
 
-li.even {
-  background-color: #FFFFFF;
-}
+  li.even {
+    background-color: #FFFFFF;
+  }
 
-div.draw-resolution {
-  justify-content: space-evenly;
-}
+  div.draw-resolution {
+    justify-content: space-evenly;
+  }
 
-div.new-challenge-container {
-  height: 300px;
-  width: 300px;
-  align-items: center;
-  justify-content: space-between;
-}
+  /* challenges */
+  .challenge-box {
+    justify-content: space-between;
+  }
 
-div.challenge-input-container {
-  width: 100%;
-  justify-content: space-between;
-}
+  .challenge-box .row {
+    height: 60px;
+    width: 60px;
+  }
 
-div.challenge-side-container {
-  width: 100%;
-  justify-content: space-evenly;
-}
+  .challenge-box .col {
+    justify-content: space-evenly;
+    margin: 0.5em;
+  }
+
+  div.new-challenge-container {
+    height: 300px;
+    width: 300px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  div.challenge-input-container {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  div.challenge-side-container {
+    width: 100%;
+    justify-content: space-evenly;
+  }
