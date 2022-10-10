@@ -288,13 +288,6 @@
       :-  :~  :*  %give  %fact  ~[/challenges]
                   %chess-update  !>([%challenge src.bowl challenge])
               ==
-              :*  %pass   /hark-store
-                  %agent  [our.bowl %hark-store]
-                  %poke   :-  %hark-action
-                          !>  :-  %unread-count
-                              :-  [%chess /challenges]
-                              :-  %.y  1
-              ==
               :*  =/  title=(list content)
                     ~[[%ship src.bowl] [%text ' has sent a challenge']]
                   =/  body=(list content)
@@ -314,14 +307,7 @@
           (~(put by challenges-received) src.bowl challenge)
       ==
     %chess-decline-challenge
-      :-  :~  :*  %pass   /hark-store
-                  %agent  [our.bowl %hark-store]
-                  %poke   :-  %hark-action
-                          !>  :-  %unread-count
-                              :-  [%chess /challenges]
-                              :-  %.y  1
-              ==
-              :*  =/  title=(list content)
+      :-  :~  :*  =/  title=(list content)
                     ~[[%ship src.bowl] [%text ' declined your challenge']]
                   =/  =bin
                     [/chess/challenges [%chess /challenges]]
@@ -545,13 +531,6 @@
                     %chess-game  !>(new-game)
                 ==
                 ::  notify us opponent accepted
-                :*  %pass   /hark-store
-                    %agent  [our.bowl %hark-store]
-                    %poke   :-  %hark-action
-                            !>  :-  %unread-count
-                                :-  [%chess /challenges]
-                                :-  %.y  1
-                ==
                 :*  =/  title=(list content)
                       ~[[%ship src.bowl] [%text ' accepts your challenge']]
                     =/  =bin
@@ -692,13 +671,6 @@
                           %chess-update  !>([%draw-offer u.game-id])
                       ==
                       ::  notify hark-store
-                      :*  %pass   /hark-store
-                          %agent  [our.bowl %hark-store]
-                          %poke   :-  %hark-action
-                                  !>  :-  %unread-count
-                                      :-  [%chess /games/(scot %da u.game-id)/updates]
-                                      :-  %.y  1
-                      ==
                       :*  =/  title=(list content)
                             ~[[%ship src.bowl] [%text ' offers a draw']]
                           =/  =bin
@@ -727,13 +699,6 @@
                           ~
                       ==
                       ::  notify hark-store
-                      :*  %pass   /hark-store
-                          %agent  [our.bowl %hark-store]
-                          %poke   :-  %hark-action
-                                  !>  :-  %unread-count
-                                      :-  [%chess /games/(scot %da u.game-id)/updates]
-                                      :-  %.y  1
-                      ==
                       :*  =/  title=(list content)
                             ~[[%ship src.bowl] [%text ' accepts your draw offer']]
                           =/  =bin
@@ -757,13 +722,6 @@
                           %chess-update  !>([%draw-declined u.game-id])
                       ==
                       ::  notify hark-store
-                      :*  %pass   /hark-store
-                          %agent  [our.bowl %hark-store]
-                          %poke   :-  %hark-action
-                                  !>  :-  %unread-count
-                                      :-  [%chess /games/(scot %da u.game-id)/updates]
-                                      :-  %.y  1
-                      ==
                       :*  =/  title=(list content)
                             ~[[%ship src.bowl] [%text ' declines your draw offer']]
                           =/  =bin
@@ -809,14 +767,7 @@
               :-
               %+  welp
                 cards.move-result
-              :~  :*  %pass   /hark-store
-                      %agent  [our.bowl %hark-store]
-                      %poke   :-  %hark-action
-                              !>  :-  %unread-count
-                                  :-  [%chess /games/(scot %da u.game-id)/moves]
-                                  :-  %.y  1
-                  ==
-                  :*  =/  title=(list content)
+              :~  :*  =/  title=(list content)
                         ~[[%ship src.bowl] [%text ' has made a move']]
                       =/  =bin
                         [/chess/updates [%chess /games/(scot %da u.game-id)]]
