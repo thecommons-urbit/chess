@@ -5,6 +5,7 @@ interface ChessState {
   urbit: Urbit | null;
   displayGame: ActiveGameInfo | null;
   activeGames: Map<GameID, ActiveGameInfo>;
+  archivedGames: Map<GameID, ArchivedGameInfo>;
   incomingChallenges: Map<Ship, Challenge>;
   setUrbit: (urbit: Urbit) => void;
   setDisplayGame: (displayGame: ActiveGameInfo | null) => void;

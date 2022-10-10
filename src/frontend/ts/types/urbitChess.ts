@@ -72,7 +72,8 @@ export type GameInfo = {
   round: string,
   white: Ship,
   black: Ship,
-  result: Result
+  result: Result,
+  moves: Array<MoveActionAction>
 }
 
 export type ActiveGameInfo = {
@@ -81,6 +82,13 @@ export type ActiveGameInfo = {
   sentDrawOffer: boolean,
   info: GameInfo
 }
+
+export type ArchivedGameInfo = {
+  position: FENPosition,
+  info: GameInfo
+}
+
+export type GamePanelInfo = ActiveGameInfo | ArchivedGameInfo
 
 export type Challenge = {
   who: Ship,
