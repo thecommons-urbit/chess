@@ -4,14 +4,14 @@ import React from 'react'
 import Urbit from '@urbit/http-api'
 import ChessState from '../ts/state/chessState'
 import useChessStore from '../ts/state/chessStore'
-import { GamePanelInfo } from '../ts/types/urbitChess'
+import { ActiveGameInfo, ArchivedGameInfo, GameID, MoveMoveAction } from '../ts/types/urbitChess'
 
 // XX: should we return a new <GamePanel /> for every game?
 // XX: if so, we might just pass { game }; if not, it needs more
-export function GamePanel (game: GamePanelInfo) {
+export function GamePanel (game: ActiveGameInfo) {
   // get player ship names
   const ourShip = window.ship
-  const oppShip = (ourShip === game.info.white) ? game.info.white : game.info.black
+  const oppShip = (game: ActiveGameInfo) => { return (ourShip === game.info.white) ? game.info.white : game.info.black }
 
   // const: listen for timer info for both players
   //        XX: need timer server
@@ -19,12 +19,13 @@ export function GamePanel (game: GamePanelInfo) {
   // const: listen on <game-id>/moves wire for the list of moves
   //        push the new move to the relevant function
   const watchGameMoves = (gameID: GameID) => {
-    await get().urbit.subscribe({
+    const newUrbit = new Urbit('')
+    newUrbit.subscribe({
       app: 'chess',
-      path: `/game/${data.gameID}/moves`,
+      path: `/game/${gameID}/moves`,
       err: () => {},
-      // XX: need to add a function here, updateGamePanel(data)?
-      event: (move: MoveMoveAction) => {},
+      // XX: need to add a function here, updateGamePanel(move)?
+      // event: (move: MoveMoveAction) => {},
       quit: () => {}
     })
   }

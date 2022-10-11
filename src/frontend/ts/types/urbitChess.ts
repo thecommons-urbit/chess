@@ -88,8 +88,6 @@ export type ArchivedGameInfo = {
   info: GameInfo
 }
 
-export type GamePanelInfo = ActiveGameInfo | ArchivedGameInfo
-
 export type Challenge = {
   who: Ship,
   challengerSide: Side,
