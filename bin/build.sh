@@ -22,12 +22,13 @@ usage() {
   fi
 
   echo -e ""
-  echo -e "Usage:\t$SCRIPT_NAME [-h] [-s SHIP_NAME] [-u URL]"
+  echo -e "Usage:\t$SCRIPT_NAME [-h] [-n] [-s SHIP_NAME] [-u URL]"
   echo -e ""
   echo -e "Build the app frontend and the desk files required to install it in Grid"
   echo -e ""
   echo -e "Options:"
   echo -e "  -h\tPrint script usage info"
+  echo -e "  -n\tUse npm natively instead of through Docker"
   echo -e "  -s\tSet ship name to use (default: $DEFAULT_SHIP)"
   echo -e "  -u\tUse given URL to distribute glob over HTTP instead of over Ames"
   echo -e ""
@@ -73,6 +74,7 @@ BUILD_DIR="$ROOT_DIR/build"
 DESK_DIR="$BUILD_DIR/desk"
 FRONTEND_DIR="$BUILD_DIR/frontend"
 
+DOCKER=1
 DOCKER_IMAGE="urbit-chess"
 
 VERSION_MAJOR=0
@@ -90,11 +92,14 @@ SHIP=$DEFAULT_SHIP
 # --------------------------------------
 
 # Parse arguments
-OPTS=":hs:u:"
+OPTS=":hs:u:n"
 while getopts ${OPTS} opt; do
   case ${opt} in
     h)
       usage 0
+      ;;
+    n)
+      DOCKER=0
       ;;
     s)
       SHIP=$OPTARG
@@ -130,8 +135,12 @@ echo "~$SHIP" > $DESK_DIR/desk.ship
 echo "[%zuse $KELVIN]" > $DESK_DIR/sys.kelvin
 
 # Build frontend
-sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
-sudo docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
+if [ $DOCKER -eq 1 ]; then
+  sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
+  sudo docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
 
-# Copy additional src files for frontend
-sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}
+  # Copy additional src files for frontend
+  sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}
+else
+  (cd "$ROOT_DIR/src/frontend"; npm run build-no-docker)
+fi

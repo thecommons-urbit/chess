@@ -7,10 +7,12 @@ import ChessState from './chessState'
 const useChessStore = create<ChessState>((set, get) => ({
   urbit: null,
   displayGame: null,
+  practiceBoard: '',
   activeGames: new Map(),
   incomingChallenges: new Map(),
   setUrbit: (urbit: Urbit) => set({ urbit }),
   setDisplayGame: (displayGame: ActiveGameInfo | null) => set({ displayGame }),
+  setPracticeBoard: (practiceBoard: String | null) => set({ practiceBoard }),
   receiveChallenge: (data: ChallengeUpdate) =>
     set(state => ({ incomingChallenges: state.incomingChallenges.set(data.who, data as Challenge) })),
   receiveGame: async (data: GameInfo) => {
