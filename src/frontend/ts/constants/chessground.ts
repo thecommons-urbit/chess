@@ -1,5 +1,6 @@
 const BASE_CONFIG =
 {
+  pgn: 'e4 c5 Nf3 d6 e5 Nc6 exd6 Qxd6 Nc3 Nf6', // test pgn XX pass dynamic pgn in
   coordinates: true,
   autoCastle: true,
   viewOnly: false,
