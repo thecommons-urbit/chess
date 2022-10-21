@@ -14,6 +14,7 @@ import { pokeAction, move, castle, acceptDraw, declineDraw } from '../ts/helpers
 import useChessStore from '../ts/state/chessStore'
 import { PromotionMove } from '../ts/types/chessground'
 import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
+// import LichessPgnViewer from 'lichess-pgn-viewer'
 
 //
 // Import Chessground style sheets
@@ -34,6 +35,7 @@ declare global {
       'cg-board': any;
       'piece': any;
       'square': any;
+ //     'gamepanel': any;
     }
   }
 }
@@ -373,6 +375,8 @@ export function Chessboard () {
       </Popup>
     )
   }
+
+  //  const pgn = LichessPgnViewer(gamepanel, { pgn: 'e4 c5 Nf3 d6 e5 Nc6 exd6 Qxd6 Nc3 Nf6' })
 
   return (
     <div className='game-container'>

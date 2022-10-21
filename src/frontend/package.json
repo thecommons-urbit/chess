@@ -41,7 +41,8 @@
     "react-dom": "^18.2.0",
     "react-tabs": "^5.1.0",
     "reactjs-popup": "^2.0.5",
-    "zustand": "^3.7.2"
+    "zustand": "^3.7.2",
+    "lichess-pgn-viewer": "^1.4.1"
   },
   "devDependencies": {
     "@types/chess.js": "^0.13.1",

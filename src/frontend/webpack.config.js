@@ -21,6 +21,12 @@ module.exports = {
       {
         test: /\.svg$/,
         loader: 'url-loader'
+      },
+      {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false
+        }
       }
     ]
   },
