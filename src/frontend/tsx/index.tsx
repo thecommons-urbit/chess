@@ -1,4 +1,9 @@
 import React from 'react'
+import '../css/tabs.css'
+import '../css/buttons.css'
+import '../css/general.css'
+import '../css/textboxes.css'
+import '../css/chessground.css'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 
