@@ -776,23 +776,149 @@
 ++  on-arvo   on-arvo:default
 ++  on-fail   on-fail:default
 --
+::|_  =bowl:gall
+::++  try-move
+::  |=  [game=chess-game position=chess-position move=chess-move]
+::  ::  return [(unit [game position] (list card))]
+::  ^-  [new=(unit [game=chess-game position=chess-position]) cards=(list card)]
+::  ?.  ?=(~ result.game)
+::    [~ ~]
+::  =/  new-position  (~(apply-move with-position position) move)
+::  ?~  new-position
+::    [~ ~]
+::  =/  updated-game  `chess-game`game
+::  ::
+::  =.  moves.updated-game  (snoc moves.updated-game move)
+::  ::
+::  =/  fen  (position-to-fen u.new-position)
+::  ::
+::  =/  ship-to-move
+::    ?-  player-to-move.position
+::      %white
+::        white.game
+::      %black
+::        black.game
+::    ==
+::  ::
+::  =/  position-update-card
+::    :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
+::        %chess-update  !>([%position game-id.game fen])
+::    ==
+::  ::  XX: why does this check [%ship @p] and not chess-player?
+::  ::      why include [%name @t] in chess-player at all if it breaks?
+::  ?>  ?=([%ship @p] ship-to-move)
+::  ?.  =(team:title +.ship-to-move)
+::    ::  causes need-have error
+::    [position-update-card ~]
+::  ::
+::  ::  define some stuff
+::  =/  in-checkmate
+::    ~(in-checkmate with-position u.new-position)
+::  ::
+::  =/  in-stalemate
+::    ?:  in-checkmate
+::      |
+::    ~(in-stalemate with-position u.new-position)
+::  ::
+::  =/  place
+::    :-  %chess
+::    ?:  |(in-checkmate in-stalemate)
+::      /games
+::    /games/(scot %da game-id.game)
+::  ::
+::  =/  notification-text
+::    %+  rap  3
+::      :~  `@`+.ship-to-move
+::          ?:  in-checkmate
+::            `@`': checkmate!'
+::          ?:  in-stalemate
+::            `@`' forced a stalemate'
+::          %+  rap  3
+::            :~
+::              `@`(~(algebraicize with-position u.new-position) move)
+::              ?.  ~(in-check with-position u.new-position)
+::                `@`' has made a move'
+::              `@`', check!'
+::            ==
+::      ==
+::  ::
+::  =/  notification-card
+::    :*  =/  title=(list content)
+::          [[%text notification-text] ~]
+::        =/  =bin
+::          [/chess/games place]
+::        =/  hark-action=action:hark
+::          [%add-note bin title ~ now.bowl / /chess]
+::        =/  =cage
+::          [%hark-action !>(hark-action)]
+::        [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+::    ==
+::  ::
+::  =/  result-cards
+::    ?:  ?|  ?=(%end -.move)
+::            in-checkmate
+::            in-stalemate
+::        ==
+::      ::  if game has result
+::      =.  result.updated-game
+::        ?:  ?=(%end -.move)  `+.move
+::        ?:  in-stalemate  `%'½–½'
+::        ?:  in-checkmate
+::          ?-  player-to-move.u.new-position
+::            %white  `%'0-1'
+::            %black  `%'1-0'
+::          ==
+::        !!
+::      :~  :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
+::              %chess-update
+::              !>([%result game-id.game (need result.updated-game)])
+::          ==
+::          :*  %give  %kick  :~  /game/(scot %da game-id.game)/updates
+::                                /game/(scot %da game-id.game)/moves
+::                            ==
+::              ~
+::          ==
+::          notification-card
+::          position-update-card
+::      ==
+::    ::  if game has no result
+::    :~
+::      notification-card
+::      position-update-card
+::    ==
+::    ::
+::    ::  finally, execute code
+::    [`[updated-game u.new-position] result-cards]
+::--
 |_  =bowl:gall
 ++  try-move
+  |^
   |=  [game=chess-game position=chess-position move=chess-move]
-  ::  return [(unit [game position] (list card))]
   ^-  [new=(unit [game=chess-game position=chess-position]) cards=(list card)]
   ?.  ?=(~ result.game)
     [~ ~]
-  =/  new-position  (~(apply-move with-position position) move)
   ?~  new-position
     [~ ~]
-  =/  updated-game  `chess-game`game
-  ::
   =.  moves.updated-game  (snoc moves.updated-game move)
+  ::  XX: why does this check [%ship @p] and not chess-player?
+  ::      why include [%name @t] in chess-player at all if it breaks?
+  ?>  ?=([%ship @p] ship-to-move)
+  ?.  =(team:title +.ship-to-move)
+    ::  causes need-have error
+    [position-update-card ~]
+  [`[updated-game u.new-position] result-cards]
   ::
-  =/  fen  (position-to-fen u.new-position)
+  =<
+  ++  new-position
+    (~(apply-move with-position position) move)
   ::
-  =/  ship-to-move
+  ++  updated-game
+    `chess-game`game
+  ::
+  ++  fen
+    (position-to-fen u.new-position)
+  ::
+  ++  ship-to-move
     ?-  player-to-move.position
       %white
         white.game
@@ -800,33 +926,26 @@
         black.game
     ==
   ::
-  =/  position-update-card
+  ++  position-update-card
     :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
         %chess-update  !>([%position game-id.game fen])
     ==
-  ::  XX: why does this check [%ship @p] and not chess-player?
-  ::      why include [%name @t] in chess-player at all if it breaks?
-  ?>  ?=([%ship @p] ship-to-move)
-  ?.  =(team:title +.ship-to-move)
-    ::  causes need-have error
-    [position-update-card ~]
   ::
-  ::  define some stuff
-  =/  in-checkmate
+  ++  in-checkmate
     ~(in-checkmate with-position u.new-position)
   ::
-  =/  in-stalemate
+  ++  in-stalemate
     ?:  in-checkmate
       |
     ~(in-stalemate with-position u.new-position)
   ::
-  =/  place
+  ++  place
     :-  %chess
     ?:  |(in-checkmate in-stalemate)
       /games
     /games/(scot %da game-id.game)
   ::
-  =/  notification-text
+  ++  notification-text
     %+  rap  3
       :~  `@`+.ship-to-move
           ?:  in-checkmate
@@ -839,10 +958,9 @@
               ?.  ~(in-check with-position u.new-position)
                 `@`' has made a move'
               `@`', check!'
-            ==
-      ==
+      ==    ==
   ::
-  =/  notification-card
+  ++  notification-card
     :*  =/  title=(list content)
           [[%text notification-text] ~]
         =/  =bin
@@ -854,7 +972,7 @@
         [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
     ==
   ::
-  =/  result-cards
+  ++  result-cards
     ?:  ?|  ?=(%end -.move)
             in-checkmate
             in-stalemate
@@ -886,7 +1004,6 @@
       notification-card
       position-update-card
     ==
-    ::
-    ::  finally, execute code
-    [`[updated-game u.new-position] result-cards]
+  ::
+  --
 --
