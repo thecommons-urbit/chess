@@ -1,9 +1,13 @@
 |%
+::
+::  a chess player is one of two sides
 +$  chess-side
   $~  %white
   $?  %white
       %black
   ==
+::
+::  a chess piece is one of six types
 +$  chess-piece-type
   $~  %pawn
   $?  %pawn
@@ -13,6 +17,8 @@
       %queen
       %king
   ==
+::
+::  a pawn can be promoted to...
 +$  chess-promotion
   $~  %queen
   $?  %knight
@@ -20,27 +26,47 @@
       %rook
       %queen
   ==
+::
+::  a chess piece is a cell of its side and type
 +$  chess-piece
   $~  [%white %pawn]
   $:  chess-side
       chess-piece-type
   ==
+::
+::  a chessboard has eight rows called ranks, numbered %1 to %8
 +$  chess-rank
   $~  %1
   ?(%1 %2 %3 %4 %5 %6 %7 %8)
+::
+::  a chessboard has eight columns called files, labelled %a to %h
 +$  chess-file
   $~  %a
   ?(%a %b %c %d %e %f %g %h)
+::
+::  a chess square is a cell of file and rank
 +$  chess-square
   $~  [%a %1]
   [chess-file chess-rank]
-+$  chess-piece-on-square
-  [square=chess-square piece=chess-piece]
+::
+::  chess-traverser is a gate which takes a chess-square
+::  as input, and could return a chess-square or null.
+::  this helps prevent chess-pieces moving off the board.
 +$  chess-traverser
   $-(chess-square (unit chess-square))
+::
+::  XX: Remove chess-transformer from here and /lib/chess.hoon
 +$  chess-transformer
   $-(chess-piece-on-square *)
+::
+::  XX: `chess-board` should probably be `chessboard`
+::
+::  the chessboard state is a map of square to piece.
+::  this represents what pieces are still in play, and
+::  where they are on the board
 +$  chess-board
+::
+::  the chessboard's default state
   $~
     %-  my
     :~
@@ -78,6 +104,15 @@
       [[%h %7] [%black %pawn]]
     ==
   (map chess-square chess-piece)
+::
+::  chess-piece-on-square helps us deal with
+::  key-value pairs from chess-board
++$  chess-piece-on-square
+  [square=chess-square piece=chess-piece]
+::
+::  chess-castle returns the castle options
+::  available to a player: kingside,
+::  queenside, both, or neither
 +$  chess-castle
   $~  %both
   $?  %both
@@ -85,40 +120,67 @@
       %kingside
       %none
   ==
+::
+::  the current state of the game
 +$  chess-position
   $~  [*chess-board %white %both %both ~ 0 1]
   $:
+  ::  current state of the chessboard
     board=chess-board
+  ::  whose turn is it?
     player-to-move=chess-side
+  ::  white castle options
     white-can-castle=chess-castle
+  ::  black castle options
     black-can-castle=chess-castle
+  ::  position of en passant pawn, if one exists
     en-passant=(unit chess-square)
+  ::  how close are we to invoking the 50-move rule?
     ply-50-move-rule=@
+  ::  how many moves have there been?
     move-number=@
   ==
+::
+::  chess-player is a name, a ship,
+::  or an unknown signora
 +$  chess-player
   $~  [%unknown ~]
   $%  [%name @t]
       [%ship @p]
       [%unknown ~]
   ==
+::
+::  the game's result is a win, loss, or draw
+::  to be recorded in chess-game
 +$  chess-result
   $~  %'½–½'
   $?  %'1-0'
       %'0-1'
       %'½–½'
   ==
+::
+::  a chess-move is one of three types:
+::  a regular move from one square to another,
+::  potentially with a promotion;
+::  a queen- or king-side castle;
+::  or a finishing move with a result
 +$  chess-move
   $~  [%end %'½–½']
   $%  [%move from=chess-square to=chess-square into=(unit chess-promotion)]
       [%castle ?(%queenside %kingside)]
       [%end chess-result]
   ==
+::
+::  chess-game stores metadata for a game
+::  represented by chess-position
 +$  chess-game
+  ::  default values
   $~  :*  game-id=*@dau
           event='?'
           site='Urbit Chess'
           date=*@da
+          ::  the round's default value is 
+          ::  ~ if unknown, `~ if inappropriate
           round=~
           white=*chess-player
           black=*chess-player
@@ -126,16 +188,34 @@
           moves=~
       ==
   $:
+  ::  type definition
+  ::  ~1996.2.16..10.00.00..0000
     game-id=@dau
+  ::  'Kasparov vs. Deep Blue'
     event=@t
+  ::  'Pennsylvania Convention Center'
     site=@t
+  ::  ~1996.2.16
     date=@da
-    round=(unit (list @))  ::  ~ if unknown, `~ if inappropriate
+  ::
+  ::  XX: why is `round`s type (unit (list @))?
+  ::
+  ::  why can't it be something like (unit @ud)?
+  ::
+  ::  [~ [5 ~]]
+    round=(unit (list @))
+  ::  [%name 'Deep Blue']
     white=chess-player
+  ::  [%name 'Garry Kasparov']
     black=chess-player
+  ::  %'0-1'
     result=(unit chess-result)
+  ::  a list of this round's moves
     moves=(list chess-move)
   ==
+::
+::  a challenge is the challenger's side,
+::  a description, and (optionally) this round's number
 +$  chess-challenge
   $~  :*  challenger-side=%random
           event='Casual Game'
@@ -146,6 +226,9 @@
     event=@t
     round=(unit (list @))
   ==
+::
+::  chess-action defines the acceptable
+::  values of a %chess-action poke
 +$  chess-action
   $%  [%challenge who=ship challenge=chess-challenge]
       [%accept-game who=ship]
@@ -155,6 +238,9 @@
       [%decline-draw game-id=@dau]
       [%move game-id=@dau move=chess-move]
   ==
+::
+::  chess-update defines the possible values that a
+::  subscriber may receive as a %fact from the chess agent
 +$  chess-update
   $%  [%challenge who=ship challenge=chess-challenge]
       [%position game-id=@dau position=@t]
@@ -162,10 +248,16 @@
       [%draw-offer game-id=@dau]
       [%draw-declined game-id=@dau]
   ==
+::
+::  XX: document chess-rng
+::
+::  @uvh is an unsigned, 256-bit, base-32 integer
 +$  chess-rng
   $%  [%commit p=@uvH]
       [%reveal p=@uvH]
   ==
+::
+::  XX: document chess-commitment
 +$  chess-commitment
   $:  our-num=@uvH
       our-hash=@uvH
