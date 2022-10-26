@@ -306,7 +306,8 @@
             :~  [%give %poke-ack `~[leaf+err]]
             ==
           =/  move-result
-            (try-move game.u.game-state position.u.game-state move.action)
+            ::  XX: move notification?
+            (try-move:hc game.u.game-state position.u.game-state move.action)
           ::  check the move is legal
           ?~  new.move-result
             :_  this
@@ -838,6 +839,7 @@
                 [~ this]  :: nice try, cheater
               =/  move  !<(chess-move q.cage.sign)
               =/  move-result
+                ::  XX: move notification?
                 (try-move:hc game.u.game-state position.u.game-state move)
               ?~  new.move-result
                 [cards.move-result this]  ::  nice try, cheater
@@ -861,7 +863,7 @@
                   archive  (~(put by archive) u.game-id game)
                 ==
               :-
-                ~[cards.move-result]
+                cards.move-result
               ::  add new games to our list
               %=  this
                 games  %+  ~(put by games)  u.game-id
@@ -873,211 +875,54 @@
 ++  on-arvo   on-arvo:default
 ++  on-fail   on-fail:default
 --
-::|_  =bowl:gall
-::++  try-move
-::  |=  [game=chess-game position=chess-position move=chess-move]
-::  ::  return [(unit [game position] (list card))]
-::  ^-  [new=(unit [game=chess-game position=chess-position]) cards=(list card)]
-::  ?.  ?=(~ result.game)
-::    [~ ~]
-::  =/  new-position  (~(apply-move with-position position) move)
-::  ?~  new-position
-::    [~ ~]
-::  =/  updated-game  `chess-game`game
-::  ::
-::  =.  moves.updated-game  (snoc moves.updated-game move)
-::  ::
-::  =/  fen  (position-to-fen u.new-position)
-::  ::
-::  =/  ship-to-move
-::    ?-  player-to-move.position
-::      %white
-::        white.game
-::      %black
-::        black.game
-::    ==
-::  ::
-::  =/  position-update-card
-::    :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
-::        %chess-update  !>([%position game-id.game fen])
-::    ==
-::  ::  XX: why does this check [%ship @p] and not chess-player?
-::  ::      why include [%name @t] in chess-player at all if it breaks?
-::  ?>  ?=([%ship @p] ship-to-move)
-::  ?.  =(team:title +.ship-to-move)
-::    ::  causes need-have error
-::    [position-update-card ~]
-::  ::
-::  ::  define some stuff
-::  =/  in-checkmate
-::    ~(in-checkmate with-position u.new-position)
-::  ::
-::  =/  in-stalemate
-::    ?:  in-checkmate
-::      |
-::    ~(in-stalemate with-position u.new-position)
-::  ::
-::  =/  place
-::    :-  %chess
-::    ?:  |(in-checkmate in-stalemate)
-::      /games
-::    /games/(scot %da game-id.game)
-::  ::
-::  =/  notification-text
-::    %+  rap  3
-::      :~  `@`+.ship-to-move
-::          ?:  in-checkmate
-::            `@`': checkmate!'
-::          ?:  in-stalemate
-::            `@`' forced a stalemate'
-::          %+  rap  3
-::            :~
-::              `@`(~(algebraicize with-position u.new-position) move)
-::              ?.  ~(in-check with-position u.new-position)
-::                `@`' has made a move'
-::              `@`', check!'
-::            ==
-::      ==
-::  ::
-::  =/  notification-card
-::    :*  =/  title=(list content)
-::          [[%text notification-text] ~]
-::        =/  =bin
-::          [/chess/games place]
-::        =/  hark-action=action:hark
-::          [%add-note bin title ~ now.bowl / /chess]
-::        =/  =cage
-::          [%hark-action !>(hark-action)]
-::        [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
-::    ==
-::  ::
-::  =/  result-cards
-::    ?:  ?|  ?=(%end -.move)
-::            in-checkmate
-::            in-stalemate
-::        ==
-::      ::  if game has result
-::      =.  result.updated-game
-::        ?:  ?=(%end -.move)  `+.move
-::        ?:  in-stalemate  `%'½–½'
-::        ?:  in-checkmate
-::          ?-  player-to-move.u.new-position
-::            %white  `%'0-1'
-::            %black  `%'1-0'
-::          ==
-::        !!
-::      :~  :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
-::              %chess-update
-::              !>([%result game-id.game (need result.updated-game)])
-::          ==
-::          :*  %give  %kick  :~  /game/(scot %da game-id.game)/updates
-::                                /game/(scot %da game-id.game)/moves
-::                            ==
-::              ~
-::          ==
-::          notification-card
-::          position-update-card
-::      ==
-::    ::  if game has no result
-::    :~
-::      notification-card
-::      position-update-card
-::    ==
-::    ::
-::    ::  finally, execute code
-::    [`[updated-game u.new-position] result-cards]
-::--
 |_  =bowl:gall
+::  XX: refactor this whole core
 ::
-::  helper core for moves
-::  test if a given move is legal
+::      should have all the execution code at the top then define
+::      various arms below, as to be more legible.
+::      general problem here as elsewhere: the same face might refer to
+::      two or three different things depending on the context
+::      some of these try-move arms should go in lib/chess
 ++  try-move
-  |^
+  ::  actual execution code:
+  ::
+  ::  |=  [game=chess-game position=chess-position move=chess-move]
+  ::  ^-  [new=(unit [game=chess-game position=chess-position]) cards=(list card)]
+  ::  ?.  ?=(~ result.game)
+  ::    [~ ~]
+  ::  ?~  new-position
+  ::    [~ ~]
+  ::  =.  moves.updated-game  (snoc moves.updated-game move)
+  ::  ?>  ?=([%ship @p] ship-to-move)
+  ::  ?.  =(team:title +.ship-to-move)
+  ::    [position-update-card ~]
+  ::  [`[updated-game u.new-position] result-cards]
+  ::
   |=  [game=chess-game position=chess-position move=chess-move]
   ^-  [new=(unit [game=chess-game position=chess-position]) cards=(list card)]
   ?.  ?=(~ result.game)
     [~ ~]
+  =/  new-position
+    (~(apply-move with-position position) move)
   ?~  new-position
     [~ ~]
+  =/  updated-game  `chess-game`game
   =.  moves.updated-game  (snoc moves.updated-game move)
-  ::  XX: why does this check [%ship @p] and not chess-player?
-  ::      why include [%name @t] in chess-player at all if it breaks?
-  ?>  ?=([%ship @p] ship-to-move)
-  ?.  =(team:title +.ship-to-move)
-    ::  causes need-have error
-    [position-update-card ~]
-  [`[updated-game u.new-position] result-cards]
-  ::
-  =<
-  ++  new-position
-    (~(apply-move with-position position) move)
-  ::
-  ++  updated-game
-    `chess-game`game
-  ::
-  ++  fen
-    (position-to-fen u.new-position)
-  ::
-  ++  ship-to-move
-    ?-  player-to-move.position
-      %white
-        white.game
-      %black
-        black.game
-    ==
-  ::
-  ++  position-update-card
+  =/  fen  (position-to-fen u.new-position)
+  =/  position-update-card
     :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
         %chess-update  !>([%position game-id.game fen])
     ==
-  ::
-  ++  in-checkmate
-    ~(in-checkmate with-position u.new-position)
-  ::
-  ++  in-stalemate
-    ?:  in-checkmate
-      |
-    ~(in-stalemate with-position u.new-position)
-  ::
-  ++  place
-    :-  %chess
-    ?:  |(in-checkmate in-stalemate)
-      /games
-    /games/(scot %da game-id.game)
-  ::
-  ++  notification-text
-    %+  rap  3
-      :~  `@`+.ship-to-move
-          ?:  in-checkmate
-            `@`': checkmate!'
-          ?:  in-stalemate
-            `@`' forced a stalemate'
-          %+  rap  3
-            :~
-              `@`(~(algebraicize with-position u.new-position) move)
-              ?.  ~(in-check with-position u.new-position)
-                `@`' has made a move'
-              `@`', check!'
-      ==    ==
-  ::
-  ++  notification-card
-    :*  =/  title=(list content)
-          [[%text notification-text] ~]
-        =/  =bin
-          [/chess/games place]
-        =/  hark-action=action:hark
-          [%add-note bin title ~ now.bowl / /chess]
-        =/  =cage
-          [%hark-action !>(hark-action)]
-        [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
-    ==
-  ::
-  ++  result-cards
-    ?:  ?|  ?=(%end -.move)
-            in-checkmate
-            in-stalemate
-        ==
-      ::  if game has result
+  =/  in-checkmate  ~(in-checkmate with-position u.new-position)
+  =/  in-stalemate  ?:  in-checkmate
+                      |
+                    ~(in-stalemate with-position u.new-position)
+  ::  check if game ends by checkmate or stalemate
+  ?:  ?|  ?=(%end -.move)
+          in-checkmate
+          in-stalemate
+      ==
+      ::  update result with score
       =.  result.updated-game
         ?:  ?=(%end -.move)  `+.move
         ?:  in-stalemate  `%'½–½'
@@ -1087,7 +932,10 @@
             %black  `%'1-0'
           ==
         !!
-      :~  :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
+      ::  give a card of the game result to opponent ship
+      :-  `[updated-game u.new-position]
+      :~  position-update-card
+          :*  %give  %fact  ~[/game/(scot %da game-id.game)/updates]
               %chess-update
               !>([%result game-id.game (need result.updated-game)])
           ==
@@ -1097,14 +945,9 @@
                             ==
               ~
           ==
-          notification-card
-          position-update-card
       ==
-    ::  if game has no result
-    :~
-      notification-card
-      position-update-card
-    ==
-  ::
-  --
+  ::  inform opponent of new position
+  :-  `[updated-game u.new-position]
+  :~  position-update-card
+  ==
 --
