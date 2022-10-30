@@ -857,13 +857,30 @@
               ::  XX: must change %end check after GitHub issue #3 implemented
               ::  XX: notification: opponent resigned
               ?:  ?=(%end -.move)
+                ::  resignation
                 :-  cards.move-result
                 %=  this
                   games    (~(del by games) u.game-id)
                   archive  (~(put by archive) u.game-id game)
                 ==
-              :-
-                cards.move-result
+              :::-  :~  cards.move-result
+              ::        ?:  ::  are we in checkmate?
+              ::          ::  if in checkmate
+              ::        ?:  ::  are we in stalemate?
+              ::          ::  if in stalemate
+              ::        :*  =/  title=(list content)
+              ::              ~[[%ship src.bowl] [%text ' has made a move']]
+              ::            =/  =bin
+              ::              [/chess/updates [%chess /games/(scot %da u.game-id)]]
+              ::            =/  hark-action=action
+              ::              ::  XX: should link to game
+              ::              [%add-note bin title ~ now.bowl / /chess]
+              ::            =/  =cage
+              ::              [%hark-action !>(hark-action)]
+              ::            [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+              ::        ==
+              ::    ==
+              :-  cards.move-result
               ::  add new games to our list
               %=  this
                 games  %+  ~(put by games)  u.game-id
@@ -945,9 +962,58 @@
                             ==
               ~
           ==
+          ?:  in-checkmate
+            :*  =/  title=(list content)
+                  ~[[%ship src.bowl] [%text ': checkmate!']]
+                =/  =bin
+                  [/chess/updates [%chess /games/(scot %da game-id.game)]]
+                =/  hark-action=action
+                  ::  XX: should link to game
+                  [%add-note bin title ~ now.bowl / /chess]
+                =/  =cage
+                  [%hark-action !>(hark-action)]
+                [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+            ==
+          ?:  in-stalemate
+            :*  =/  title=(list content)
+                  ~[[%ship src.bowl] [%text ' forced a stalemate']]
+                =/  =bin
+                  [/chess/updates [%chess /games/(scot %da game-id.game)]]
+                =/  hark-action=action
+                  ::  XX: should link to game
+                  [%add-note bin title ~ now.bowl / /chess]
+                =/  =cage
+                  [%hark-action !>(hark-action)]
+                [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+            ==
+          :*  =/  title=(list content)
+                  ~[[%ship src.bowl] [%text ' resigned']]
+                =/  =bin
+                  [/chess/updates [%chess /games/(scot %da game-id.game)]]
+                =/  hark-action=action
+                  ::  XX: should link to game
+                  [%add-note bin title ~ now.bowl / /chess]
+                =/  =cage
+                  [%hark-action !>(hark-action)]
+                [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+            ==
       ==
   ::  inform opponent of new position
+  ::
+  ::  XX: filter so that i don't get notifs of my own moves
+  ::
   :-  `[updated-game u.new-position]
   :~  position-update-card
+      :*  =/  title=(list content)
+            ~[[%ship src.bowl] [%text ' has made a move']]
+          =/  =bin
+            [/chess/updates [%chess /games/(scot %da game-id.game)]]
+          =/  hark-action=action
+            ::  XX: should link to game
+            [%add-note bin title ~ now.bowl / /chess]
+          =/  =cage
+            [%hark-action !>(hark-action)]
+          [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
+      ==
   ==
 --
