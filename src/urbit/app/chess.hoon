@@ -956,13 +956,10 @@
               %chess-update
               !>([%result game-id.game (need result.updated-game)])
           ==
-          ::  kick subscriber from game
-          :*  %give  %kick  :~  /game/(scot %da game-id.game)/updates
-                                /game/(scot %da game-id.game)/moves
-                            ==
-              ~
-          ==
+          ::
+          ::  XX: filter so i don't get notifs of my own moves
           ?:  in-checkmate
+            ::  checkmate notif works
             :*  =/  title=(list content)
                   ~[[%ship src.bowl] [%text ': checkmate!']]
                 =/  =bin
@@ -986,6 +983,7 @@
                   [%hark-action !>(hark-action)]
                 [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
             ==
+          ::  resigned notif works
           :*  =/  title=(list content)
                   ~[[%ship src.bowl] [%text ' resigned']]
                 =/  =bin
@@ -997,11 +995,17 @@
                   [%hark-action !>(hark-action)]
                 [%pass /hark-store %agent [our.bowl %hark-store] %poke cage]
             ==
+          ::  kick subscriber from game
+          :*  %give  %kick  :~  /game/(scot %da game-id.game)/updates
+                                /game/(scot %da game-id.game)/moves
+                            ==
+              ~
+          ==
       ==
+  ::
   ::  inform opponent of new position
   ::
   ::  XX: filter so that i don't get notifs of my own moves
-  ::
   :-  `[updated-game u.new-position]
   :~  position-update-card
       :*  =/  title=(list content)
