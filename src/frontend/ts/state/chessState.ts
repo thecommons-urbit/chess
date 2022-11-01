@@ -4,10 +4,12 @@ import { Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, Challen
 interface ChessState {
   urbit: Urbit | null;
   displayGame: ActiveGameInfo | null;
+  practiceBoard: String | null;
   activeGames: Map<GameID, ActiveGameInfo>;
   incomingChallenges: Map<Ship, Challenge>;
   setUrbit: (urbit: Urbit) => void;
   setDisplayGame: (displayGame: ActiveGameInfo | null) => void;
+  setPracticeBoard: (practiceBoard: String | null) => void;
   receiveChallenge: (data: ChallengeUpdate) => void;
   receiveGame: (data: GameInfo) => void;
   receiveUpdate: (data: ChessUpdate) => void;
