@@ -48,7 +48,7 @@ export function Chessboard () {
   const [chess, setChess] = useState<ChessInstance>(new Chess())
   const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null)
   const [renderWorkaround, forceRenderWorkaround] = useState<number>(Date.now())
-  const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame } = useChessStore()
+  const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard } = useChessStore()
 
   //
   // Non-state constants
@@ -78,9 +78,20 @@ export function Chessboard () {
     setApi(Chessground(boardRef.current, CHESSGROUND.baseConfig))
   }
 
+  const initPracticeBoard = () => {
+    const storedBoard = localStorage.getItem('practiceBoard')
+    if (storedBoard !== null) {
+      setPracticeBoard(storedBoard)
+    }
+  }
+
   const updateChess = () => {
+    const practiceBoard = localStorage.getItem('practiceBoard')
+
     if (displayGame !== null) {
       chess.load(displayGame.position)
+    } else if (practiceBoard !== null) {
+      chess.load(practiceBoard)
     } else {
       chess.load(CHESS.defaultFEN)
     }
@@ -188,6 +199,25 @@ export function Chessboard () {
     api?.set(stateConfig)
   }
 
+  const savePracticeBoard = () => {
+    if (displayGame === null) {
+      localStorage.setItem('practiceBoard', chess.fen())
+      setPracticeBoard(chess.fen())
+    }
+  }
+
+  const resetPracticeBoard = () => {
+    if (practiceBoard === null) {
+      localStorage.removeItem('practiceBoard')
+      chess.load(CHESS.defaultFEN)
+      forceRenderWorkaround(Date.now())
+      const config: CgConfig = {
+        lastMove: null
+      }
+      api?.set(config)
+    }
+  }
+
   //
   // React hooks
   //
@@ -195,6 +225,7 @@ export function Chessboard () {
   useEffect(
     () => {
       initBoard()
+      initPracticeBoard()
     },
     [boardRef])
 
@@ -216,8 +247,15 @@ export function Chessboard () {
   useEffect(
     () => {
       updateBoard()
+      savePracticeBoard()
     },
     [promotionMove, renderWorkaround])
+
+    useEffect(
+      () => {
+        resetPracticeBoard()
+      },
+      [practiceBoard])
 
   //
   // HTML element helper functions
