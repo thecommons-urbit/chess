@@ -1,0 +1,17 @@
+
+/* pop-up menus */
+
+.popup-content {
+  background: rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 25px;
+}
+
+.popup-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.chess-promotion.cg-wrap {
+  z-index: 3;
+  pointer-events: auto;
+}

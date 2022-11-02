@@ -351,7 +351,6 @@ export function Chessboard () {
     return (
       <div
         className='chess-promotion cg-wrap'
-        style={{ zIndex: '3', pointerEvents: 'auto' }}
         onClick={cancelPromotion}>
         {promotionTiles()}
       </div>

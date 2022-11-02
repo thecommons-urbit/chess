@@ -1,0 +1,35 @@
+
+/* default typography */
+
+/* opponent @p */
+.game-opponent {
+  font-size: 1.25rem;
+}
+
+/* event description */
+.game-desc {
+  max-height: 2rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* challenger @p */
+.challenge-box
+.challenger-name {
+  font-size: 1.25rem;
+}
+
+/* challenge description */
+.challenge-box
+.challenger-desc {
+  max-height: 5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.new-challenge-header {
+  font-size: 2em;
+  font-weight: bold;
+}

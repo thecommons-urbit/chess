@@ -67,15 +67,16 @@ export function Games () {
                 onClick={() => setDisplayGame(activeGame)}>
                 <div className='row'>
                   <img
+                    className='game-icon'
                     src={`https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/${mySide}N.svg`}
-                    height={60}
-                    width={60}/>
-                  <div className='col' style={{ width: 'calc(100% - 60px)' }}>
-                    <p style={{ fontSize: '1.25rem' }}>{opponent}</p>
-                    <p>{extractDate(gameID)}</p>
+                  />
+                  <div className='col game-card'>
+                    <p className='game-opponent'>{opponent}</p>
+                    <p className='game-date'>{extractDate(gameID)}</p>
                     <p
                       title={description}
-                      style={{ maxHeight: '2rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      className='game-desc'
+                    >
                       {description}
                     </p>
                   </div>
