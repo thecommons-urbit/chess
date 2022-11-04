@@ -251,11 +251,11 @@ export function Chessboard () {
     },
     [promotionMove, renderWorkaround])
 
-    useEffect(
-      () => {
-        resetPracticeBoard()
-      },
-      [practiceBoard])
+  useEffect(
+    () => {
+      resetPracticeBoard()
+    },
+    [practiceBoard])
 
   //
   // HTML element helper functions
@@ -366,8 +366,8 @@ export function Chessboard () {
           <p>{`${opponent} has offered a draw`}</p>
           <br/>
           <div className='draw-resolution row'>
-            <button className="accept" role="button" onClick={acceptDrawOnClick}>accept</button>
-            <button className="reject" role="button" onClick={declineDrawOnClick}>decline</button>
+            <button className="accept" role="button" onClick={acceptDrawOnClick}>Accept</button>
+            <button className="reject" role="button" onClick={declineDrawOnClick}>Decline</button>
           </div>
         </div>
       </Popup>
