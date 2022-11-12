@@ -252,11 +252,12 @@
             :~  [%give %poke-ack `~[leaf+err]]
             ==
           =,  u.new.move-result
-          :-  %+  weld  cards.move-result
-              ^-  (list card)
-              :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
-                      %chess-move  !>(move.action)
-                  ==
+          :-  :_  cards.move-result
+              :*  %give
+                  %fact
+                  ~[/game/(scot %da game-id.action)/moves]
+                  %chess-move
+                  !>(move.action)
               ==
           ?.  ?=(~ result.game)
             %=  this
