@@ -301,12 +301,13 @@
             :~  [%give %poke-ack `~[leaf+err]]
             ==
           =,  u.new.move-result
-          :-  %+  weld  cards.move-result
-              ^-  (list card)
+          :-  :_  cards.move-result
               ::  send move to opponent
-              :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
-                      %chess-move  !>(move.action)
-                  ==
+              :*  %give
+                  %fact
+                  ~[/game/(scot %da game-id.action)/moves]
+                  %chess-move
+                  !>(move.action)
               ==
           ::  check if game is over
           ?.  ?=(~ result.game)
