@@ -517,8 +517,8 @@
                                        (snip moves.game)
                                      (snip (snip moves.game))
             position.u.game-state  ?:  =(+.ship-to-move our.bowl)
-                                     (fen-to-position (tail (rear (snip moves.game))))
-                                   (fen-to-position (tail (rear (snip (snip moves.game)))))
+                                     (fen-to-position (head (tail (rear (snip moves.game)))))
+                                   (fen-to-position (head (tail (rear (snip (snip moves.game))))))
             got-undo-request.u.game-state  |
           ==
           %=  this
@@ -645,46 +645,6 @@
           %=  this
             rng-state  (~(put by rng-state) src.bowl final-commitment)
           ==
-      ==
-    ::
-    ::  directly inject FEN positions into games (for debugging)
-    %chess-debug-inject
-      ?>  =(src.bowl our.bowl)
-      =/  action  !<([game-id=@dau game=chess-game] vase)
-      =/  new-position  (play game.action)
-      ?~  new-position
-        :_  this
-        =/  err
-          "attempted to inject illegal game"
-        :~  [%give %poke-ack `~[leaf+err]]
-        ==
-      =/  fen  (position-to-fen u.new-position)
-      :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                  %chess-update  !>([%position game-id.action fen (check-50-move-rule u.new-position)])
-              ==
-          ==
-      %=  this
-        games  (~(put by games) game-id.action [game.action u.new-position *(map @t @ud) (check-50-move-rule u.new-position) & | | | | |])
-      ==
-    ::
-    ::  directly inject game subscriptions (for debugging)
-    %chess-debug-subscribe
-      ?>  =(src.bowl our.bowl)
-      =/  action  !<([who=ship game-id=@dau] vase)
-      :_  this
-      :~  :*  %pass  /player/(scot %da game-id.action)
-              %agent  [who.action %chess]
-              %watch  /game/(scot %da game-id.action)/moves
-          ==
-      ==
-    ::
-    ::  delete game from state (for debugging)
-    %chess-debug-zap
-      ?>  =(src.bowl our.bowl)
-      =/  action  !<(game-id=@dau vase)
-      :-  ~
-      %=  this
-        games  (~(del by games) game-id.action)
       ==
   ==
 ++  on-watch
@@ -838,7 +798,7 @@
         games  (~(put by games) u.game-id [new-game *chess-position *(map @t @ud) | & | | | | |])
       ==
     ::
-    ::  XX: document this
+    ::  handle frontend subscription to updates on a game
     [%game @ta %updates ~]
       =/  game-id  `(unit @dau)`(slaw %da i.t.path)
       ?~  game-id
@@ -856,10 +816,12 @@
       =/  game-state  (~(got by games) u.game-id)
       =/  fen  (position-to-fen position.game-state)
       =/  cards  ^-  (list card)
-        :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
-                %chess-update  !>([%position u.game-id fen special-draw-available.game-state])
-            ==
-        ==
+         %+  turn
+           moves.game.game-state
+         |=  move=[move=chess-move fen=chess-fen san=chess-san]
+         :*  %give  %fact   ~[/game/(scot %da u.game-id)/updates]
+             %chess-update  !>([%position u.game-id fen.move san.move special-draw-available.game-state])
+         ==
       =?  cards  got-draw-offer.game-state
         :_  cards
         :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
@@ -1038,6 +1000,8 @@
                   archive  (~(put by archive) u.game-id game)
                 ==
               ::  add new games to our list
+              ::  XX: could this be where position update
+              ::      isn't getting move data?
               %=  this
                 games  %+  ~(put by games)  u.game-id
                        u.new.move-result
@@ -1125,8 +1089,8 @@
                                            (snip (snip moves.game))
                                          (snip moves.game)
                 position.u.game-state  ?:  =(+.ship-to-move our.bowl)
-                                         (fen-to-position (tail (rear (snip (snip moves.game)))))
-                                       (fen-to-position (tail (rear (snip moves.game))))
+                                         (fen-to-position (head (tail (rear (snip (snip moves.game))))))
+                                       (fen-to-position (head (tail (rear (snip moves.game)))))
                 got-undo-request.u.game-state  |
               ==
               %=  this
@@ -1153,7 +1117,8 @@
     [~ ~]
   =/  updated-game  `chess-game`game.game-state
   =/  fen  (position-to-fen u.new-position)
-  =.  moves.updated-game  (snoc moves.updated-game [move fen])
+  =/  san  (~(algebraicize with-position position.game-state) move)
+  =.  moves.updated-game  (snoc moves.updated-game [move fen san])
   =/  new-fen-repetition  (increment-repetition fen-repetition.game-state u.new-position)
   =/  in-checkmate  ~(in-checkmate with-position u.new-position)
   =/  in-stalemate  ?:  in-checkmate
@@ -1169,7 +1134,7 @@
         %fact
         ~[/game/(scot %da game-id.game.game-state)/updates]
         %chess-update
-        !>([%position game-id.game.game-state (position-to-fen u.new-position) special-draw-available])
+        !>([%position game-id.game.game-state (position-to-fen u.new-position) san special-draw-available])
     ==
   ::  check if game ends by checkmate, stalemate, or special draw
   ?:  ?|  in-checkmate

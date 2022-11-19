@@ -4,7 +4,7 @@ import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 
 export function Games () {
-  const { urbit, displayGame, activeGames, setDisplayGame } = useChessStore()
+  const { urbit, displayGame, activeGames, setDisplayGame, setDisplayIndex } = useChessStore()
   const { pieceTheme } = usePreferenceStore()
   const hasGame: boolean = (displayGame !== null)
 
@@ -32,7 +32,7 @@ export function Games () {
                 key={key}
                 className={`game active ${colorClass} ${status}`}
                 title={gameID}
-                onClick={() => setDisplayGame(activeGame)}>
+                onClick={() => { setDisplayGame(activeGame); setDisplayIndex(null) }}>
                 <div className='row'>
                   <piece className={`game-icon ${mySide} knight`}/>
                   <div className='col game-card'>
