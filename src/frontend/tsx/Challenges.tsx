@@ -79,14 +79,20 @@ export function Challenges () {
 
   return (
     <div className='challenges-container col'>
-      <button className='option' onClick={openModal}>new challenge</button>
-      <ul className='game-list'>
+      <div id="challenges-header" className="control-panel-container col">
+        <button className='option' onClick={openModal}>New Challenge</button>
+        {/* XX: see how it looks replacing • with ☙ or ❧ or ❦ or 𐫱 */}
+        <p>
+          <span>Incoming</span> ☙ <span>Outgoing</span> ❧ <span>Friends</span>
+        </p>
+      </div>
+      {/* incoming challenges list */}
+      <ul id="incoming-challenges" className='game-list'>
         {
           Array.from(incomingChallenges).map(([challenger, challenge], key) => {
             const colorClass = (key % 2) ? 'odd' : 'even'
             const description = challenge.event
             const mySide = (challenge.challengerSide === Side.White) ? 'b' : 'w'
-
             return (
               <li className={`game challenge ${colorClass}`} key={key}>
                 <div className='challenge-box'>
@@ -105,8 +111,8 @@ export function Challenges () {
                     </div>
                   </div>
                   <div className='col'>
-                    <button className="accept" onClick={() => acceptChallenge(challenger)}>accept</button>
-                    <button className="reject" onClick={() => declineChallenge(challenger)}>decline</button>
+                    <button className="accept" onClick={() => acceptChallenge(challenger)}>Accept</button>
+                    <button className="reject" onClick={() => declineChallenge(challenger)}>Decline</button>
                   </div>
                 </div>
               </li>
@@ -114,12 +120,21 @@ export function Challenges () {
           })
         }
       </ul>
+      {/* outgoing challenges list */}
+      <ul id="outgoing-challenges" className='game-list'>
+        {/* return outgoing list */}
+      </ul>
+      {/* mutual pals list */}
+      <ul id="pals" className="pals-list">
+        {/* return mutual pals list */}
+      </ul>
+      {/* new challenge pop-up */}
       {/* XX: should we host the LiChess images locally? */}
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
         <div className='new-challenge-container col'>
-          <p className='new-challenge-header'>new challenge</p>
+          <p className='new-challenge-header'>New Challenge</p>
           <div className='challenge-input-container row'>
-            <p>opponent:</p>
+            <p>Opponent:</p>
             <input
               className={(badChallengeAttempts > 0) ? 'rejected' : ''}
               type="text"
@@ -128,7 +143,7 @@ export function Challenges () {
               key={badChallengeAttempts}/>
           </div>
           <div className='challenge-input-container row'>
-            <p>description:</p>
+            <p>Description:</p>
             <input
               type="text"
               placeholder={'(optional)'}
@@ -137,27 +152,27 @@ export function Challenges () {
           <div className='challenge-side-container row'>
             <button
               className={(side === Side.White) ? selectedSideButtonClasses : unselectedSideButtonClasses}
-              title='WHITE'
+              title='White'
               style={{
                 backgroundImage: 'url(https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/wK.svg)'
               }}
               onClick={() => setSide(Side.White)}/>
             <button
               className={(side === Side.Random) ? selectedSideButtonClasses : unselectedSideButtonClasses}
-              title='RANDOM'
+              title='Random'
               style={{
                 backgroundImage: 'url(https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/images/wbK.svg)'
               }}
               onClick={() => setSide(Side.Random)}/>
             <button
               className={(side === Side.Black) ? selectedSideButtonClasses : unselectedSideButtonClasses}
-              title='BLACK'
+              title='Black'
               style={{
                 backgroundImage: 'url(https://raw.githubusercontent.com/lichess-org/lila/5a9672eacb870d4d012ae09d95aa4a7fdd5c8dbf/public/piece/cburnett/bK.svg)'
               }}
               onClick={() => setSide(Side.Black)}/>
           </div>
-          <button onClick={sendChallenge}>send challenge</button>
+          <button onClick={sendChallenge}>Send Challenge</button>
         </div>
       </Popup>
     </div>

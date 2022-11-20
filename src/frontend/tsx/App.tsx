@@ -5,6 +5,7 @@ import useChessStore from '../ts/state/chessStore'
 import { GameInfo, ChallengeUpdate } from '../ts/types/urbitChess'
 import { Chessboard } from './Chessboard'
 import { Menu } from './Menu'
+import { GamePanel } from './GamePanel'
 
 export function App () {
   const { urbit, setUrbit, receiveChallenge, receiveGame } = useChessStore()
@@ -53,6 +54,7 @@ export function App () {
   return (
     <Beforeunload onBeforeunload={teardown}>
       <div className='app-container'>
+        <GamePanel />
         <Chessboard />
         <Menu />
       </div>

@@ -11,43 +11,10 @@ export function Games () {
     return (gameID.split('..')[0]).substring(1)
   }
 
-  const resignOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    const side = (urbit.ship === displayGame.info.white.substring(1)) ? Side.White : Side.Black
-    await pokeAction(urbit, resign(gameID, side))
-  }
-
-  const offerDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
-  }
-
   return (
     <div className='games-container col'>
-      <div className='game-options col'>
-        <button
-          className='option'
-          disabled={!hasGame || displayGame.sentDrawOffer}
-          onClick={offerDrawOnClick}>
-          offer draw</button>
-        <button
-          className='option'
-          disabled={!hasGame}
-          onClick={resignOnClick}>
-          resign</button>
-        {hasGame ? (
-          <button
-            className='option'
-            disabled={!hasGame}
-            onClick={() => setDisplayGame(null)}>
-            practice board</button>
-         ) : (
-          <button
-            className='option'
-            disabled={hasGame}
-            onClick={() => setPracticeBoard(null)}>
-            reset practice board</button>
-         )}
+      <div id="active-archive-toggle">
+        <p><span>Active</span> 𐫱 <span>Archive</span></p>
       </div>
       <ul className='game-list'>
         {
