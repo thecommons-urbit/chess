@@ -44,8 +44,8 @@ docket() {
   echo ":~" > $DOCKET_FILE
   echo "  title+'Chess'" >> $DOCKET_FILE
   echo "  info+'Fully peer-to-peer chess over Urbit'" >> $DOCKET_FILE
-  echo "  color+0xff.ffff" >> $DOCKET_FILE
-  echo "  image+'https://peekabooo.icu/images/finmep-chess.svg'" >> $DOCKET_FILE
+  echo "  color+0xea.e4d5" >> $DOCKET_FILE
+  echo "  image+'https://raw.githubusercontent.com/bonbud-macryg/urbit-chess/a977770dbb30b4712788f200721d1466a16b3460/images/tile.svg'" >> $DOCKET_FILE
   echo "  base+'chess'" >> $DOCKET_FILE
   echo "  version+[$VERSION_MAJOR $VERSION_MINOR $VERSION_PATCH]" >> $DOCKET_FILE
   echo "  license+'GPL3'" >> $DOCKET_FILE
