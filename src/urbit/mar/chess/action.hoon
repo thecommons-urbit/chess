@@ -61,12 +61,6 @@
         %-  ot:dejs
         :~  [%game-id (se:dejs %da)]
         ==
-      %decline-special-draw
-        :-  %decline-special-draw
-        %.  jon
-        %-  ot:dejs
-        :~  [%game-id (se:dejs %da)]
-        ==
       %move
         :-  %move
         =+  ^-  [game-id=@dau head=@tas]
