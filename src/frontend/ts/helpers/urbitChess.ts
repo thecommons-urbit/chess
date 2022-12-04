@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, EndMoveAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, EndMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction } from '../types/urbitChess'
 
 function emptyFunction (): void {}
 
@@ -40,6 +40,16 @@ export function declineGame (who: Ship) {
   const action: ChessDeclineAction = {
     'chess-action': Action.DeclineGame,
     'who': who
+  }
+
+  return action
+}
+
+export function changeSpecialDrawPreference (gameId: GameID, setting: boolean): ChangeSpecialDrawPreferenceAction {
+  const action: ChangeSpecialDrawPreferenceAction = {
+    'chess-action': Action.ChangeSpecialDrawPreference,
+    'game-id': gameId,
+    'setting': setting
   }
 
   return action
@@ -113,4 +123,13 @@ export function declineDraw (gameId: GameID): DeclineDrawAction {
   }
 
   return move
+}
+
+export function claimSpecialDraw (gameId: GameID): ClaimSpecialDrawAction {
+  const action: ClaimSpecialDrawAction = {
+    'chess-action': Action.ClaimSpecialDraw,
+    'game-id': gameId
+  }
+
+  return action
 }

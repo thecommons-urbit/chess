@@ -1,6 +1,6 @@
 import React from 'react'
 import useChessStore from '../ts/state/chessStore'
-import { pokeAction, resign, offerDraw } from '../ts/helpers/urbitChess'
+import { pokeAction, resign, offerDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
 import { Side, GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function GamePanel () {
@@ -16,6 +16,11 @@ export function GamePanel () {
   const offerDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
     await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
+  }
+
+  const claimSpecialDrawOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, claimSpecialDraw(gameID))
   }
 
   return (
@@ -73,6 +78,15 @@ export function GamePanel () {
           disabled={!hasGame}
           onClick={resignOnClick}>
           Resign</button>
+        {/* claim special draw */}
+        {hasGame ? (
+          <button
+            className='option'
+            disabled={!displayGame.drawClaimAvailable}
+            onClick={claimSpecialDrawOnClick}>
+            Claim Special Draw</button>
+        ) : (null)
+        }
         {/* (reset) practice board */}
         {hasGame ? (
           <button

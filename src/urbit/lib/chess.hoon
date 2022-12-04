@@ -327,7 +327,7 @@
 ::  as forsyth-edwards notation
 ++  position-to-fen
   |_  chess-position
-  ++  $
+  ++  simplified
     ^-  @t
     ;:  (cury cat 3)
       board-to-fen
@@ -342,6 +342,11 @@
       ?~  en-passant
         '-'
       (square-to-algebraic u.en-passant)
+    ==
+  ++  $
+    ^-  @t
+    ;:  (cury cat 3)
+      simplified
       ' '
       (scot %ud ply-50-move-rule)
       ' '
@@ -762,11 +767,8 @@
   ++  algebraicize
     |=  move=chess-move
     ^-  @t
-    ?>  ?|  ?=(%end -.move)
-            (legal-move move)
-        ==
+    ?>  (legal-move move)
     ?-  -.move
-      %end  +.move
       %castle
         ?-  +.move
           %queenside  'O-O-O'
@@ -840,7 +842,6 @@
     ++  $
       ^-  chess-position
       ?-  -.move
-        %end     position
         %castle
           %=  position
             board             %+  ~(castle with-board board)
@@ -1037,11 +1038,6 @@
     ^-  ?
     &(!in-check no-legal-moves)
   ::
-  ::  XX no threefold repetition yet
-  ++  draw-claimable
-    ^-  ?
-    (legal-move [%end %'½–½'])
-  ::
   ::  legal move logic
   ::
   ::  the list of legal moves is empty
@@ -1065,14 +1061,6 @@
     ++  $
       ^-  ?
       ?-  -.move
-        %end
-          ?-  +.move
-            ::  resignations ('1-0' = white victory, '0-1' = black victory)
-            %'0-1'  =(player-to-move %white)
-            %'1-0'  =(player-to-move %black)
-            ::  check if the 50 play rule is claimable
-            %'½–½'  (gte ply-50-move-rule 100)
-          ==
         %castle  castle-move
         %move    normal-move
       ==

@@ -10,7 +10,7 @@ import { CHESSGROUND } from '../ts/constants/chessground'
 import { URBIT_CHESS } from '../ts/constants/urbitChess'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
-import { pokeAction, move, castle, acceptDraw, declineDraw } from '../ts/helpers/urbitChess'
+import { pokeAction, move, castle, acceptDraw, declineDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { PromotionMove } from '../ts/types/chessground'
 import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
@@ -273,6 +273,11 @@ export function Chessboard () {
   const declineDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
     await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+  }
+
+  const acceptSpecialDrawOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, claimSpecialDraw(gameID))
   }
 
   //
