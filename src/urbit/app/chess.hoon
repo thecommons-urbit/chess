@@ -526,11 +526,11 @@
         ==
       =/  fen  (position-to-fen u.new-position)
       :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                  %chess-update  !>([%position game-id.action fen |])
+                  %chess-update  !>([%position game-id.action fen (check-50-move-rule u.new-position)])
               ==
           ==
       %=  this
-        games  (~(put by games) game-id.action [game.action u.new-position *(map @t @ud) | & | | |])
+        games  (~(put by games) game-id.action [game.action u.new-position *(map @t @ud) (check-50-move-rule u.new-position) & | | |])
       ==
     ::
     ::  directly inject game subscriptions (for debugging)
@@ -905,12 +905,18 @@
   =/  in-stalemate  ?:  in-checkmate
                       |
                     ~(in-stalemate with-position u.new-position)
-  =/  special-draw-available  (check-threefold new-fen-repetition u.new-position)
+  =/  special-draw-available
+    ?|  (check-threefold new-fen-repetition u.new-position)
+        (check-50-move-rule u.new-position)
+    ==
   =/  special-draw-claim  &(special-draw-available auto-claim-special-draws.game-state)
   =/  position-update-card
-  :*  %give  %fact  ~[/game/(scot %da game-id.game.game-state)/updates]
-      %chess-update  !>([%position game-id.game.game-state (position-to-fen u.new-position) special-draw-available])
-  ==
+    :*  %give
+        %fact
+        ~[/game/(scot %da game-id.game.game-state)/updates]
+        %chess-update
+        !>([%position game-id.game.game-state (position-to-fen u.new-position) special-draw-available])
+    ==
   ::  check if game ends by checkmate, stalemate, or special draw
   ?:  ?|  in-checkmate
           in-stalemate
@@ -976,4 +982,8 @@
   ?~  count
     |
   (gth (need count) 2)
+++  check-50-move-rule
+   |=  position=chess-position
+   ^-  ?
+   (gte ply-50-move-rule.position 100)
 --
