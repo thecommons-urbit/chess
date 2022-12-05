@@ -2,3 +2,4 @@
 build
 lila
 node_modules
+tsc-watch

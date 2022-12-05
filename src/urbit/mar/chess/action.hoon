@@ -48,6 +48,19 @@
         %-  ot:dejs
         :~  [%game-id (se:dejs %da)]
         ==
+      %change-special-draw-preference
+        :-  %change-special-draw-preference
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+            [%setting bo:dejs]
+        ==
+      %claim-special-draw
+        :-  %claim-special-draw
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
       %move
         :-  %move
         =+  ^-  [game-id=@dau head=@tas]
@@ -83,13 +96,6 @@
             %.  jon
             %-  ot:dejs
             :~  [%castle-side so:dejs]
-            ==
-          %end
-            :-  game-id
-            :-  %end
-            %.  jon
-            %-  ot:dejs
-            :~  [%result so:dejs]
             ==
         ==
     ==

@@ -4,7 +4,7 @@ import { Side, GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 
 export function Games () {
-  const { urbit, displayGame, activeGames, setDisplayGame, offeredDraw, practiceBoard, setPracticeBoard } = useChessStore()
+  const { urbit, displayGame, activeGames, setDisplayGame } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
 
   const extractDate = (gameID: GameID) => {
