@@ -2,7 +2,7 @@
 ::
 ::  import libraries and expose namespace
 /-  *historic
-/+  *chess, dbug, default-agent
+/+  *chess, dbug, default-agent, pals
 ::
 ::  define state structures
 |%
@@ -729,6 +729,12 @@
         ?~  archived-game  ~
         ``[%chess-game !>(u.archived-game)]
       ``[%chess-game !>(game.u.active-game)]
+    ::
+    ::  .^(noun %gx /=chess=/friends/noun)
+    ::  .^(json %gx /=chess=/friends/json)
+    ::  read mutual friends
+    [%x %friends ~]
+      ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
     ::
     ::  .^(arch %gy /=chess=/game)
     ::  collect all the game-id keys
