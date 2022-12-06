@@ -237,6 +237,7 @@
       [%change-special-draw-preference game-id=@dau setting=?]
       [%claim-special-draw game-id=@dau]
       [%move game-id=@dau move=chess-move]
+      [%resign game-id=@dau]
   ==
 ::
 ::  chess-update defines the possible values that a

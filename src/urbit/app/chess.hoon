@@ -396,6 +396,36 @@
             games  %+  ~(put by games)  game-id.action
                    u.new.move-result
           ==
+        %resign
+          =/  game-state  (~(get by games) game-id.action)
+          ::  check for valid game
+          ?~  game-state
+            :_  this
+            =/  err
+              "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          =/  result
+            ?:  =(our.bowl +.white.game.u.game-state)
+              %'0-1'
+             %'1-0'
+          :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
+                      %chess-game-result  !>([game-id.action result ~])
+                  ==
+                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                      %chess-update
+                      !>([%result game-id.action result])
+                  ==
+                  :*  %give  %kick  :~  /game/(scot %da game-id.action)/updates
+                                        /game/(scot %da game-id.action)/moves
+                                    ==
+                      ~
+                  ==
+              ==
+          %=  this
+            games    (~(del by games) game-id.action)
+            archive  (~(put by archive) game-id.action game.u.game-state(result `result))
+          ==
       ==
     ::
     ::  handle incoming challenges
@@ -850,6 +880,29 @@
               ==
             %chess-game-result
               =/  result  !<(chess-game-result q.cage.sign)
+              ::  is our opponent resigning or claiming a draw?
+              ?.  =(result.result %'½–½')
+                ?.  .=  result.result
+                    ?:  =(our.bowl +.white.game.u.game-state)
+                      %'1-0'
+                    %'0-1'
+                  [~ this]  ::  nice try, cheater
+                :_  %=  this
+                      games    (~(del by games) u.game-id)
+                      archive  (~(put by archive) u.game-id game.u.game-state(result `result.result))
+                    ==
+                :~  :*  %give
+                        %fact
+                        ~[/game/(scot %da u.game-id)/updates]
+                        %chess-update
+                        !>([%result u.game-id result.result])
+                    ==
+                    :*  %give  %kick  :~  /game/(scot %da u.game-id)/updates
+                                          /game/(scot %da u.game-id)/moves
+                                      ==
+                        ~
+                    ==
+                ==
               =/  result-game-state
                 ?~  move.result
                   u.game-state
