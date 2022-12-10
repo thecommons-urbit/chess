@@ -3,6 +3,8 @@ import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, Game
 
 function emptyFunction (): void {}
 
+// Poke and scry functions
+
 export function pokeAction (urbit: Urbit, action: ChessAction, onError?: () => void, onSuccess?: () => void) {
   const pokeInput = {
     app: 'chess',
@@ -14,6 +16,13 @@ export function pokeAction (urbit: Urbit, action: ChessAction, onError?: () => v
 
   urbit.poke(pokeInput)
 }
+
+export function scry (app: string, path: string) {
+  const urbit = new Urbit('')
+  return urbit.scry({ app: app, path: path })
+}
+
+// Pokes
 
 export function challenge (who: Ship, side: Side, description: string) {
   const action: ChessChallengeAction = {
@@ -132,4 +141,11 @@ export function claimSpecialDraw (gameId: GameID): ClaimSpecialDrawAction {
   }
 
   return action
+}
+
+// Scries
+
+export const findFriends = async (app: string, path: string) => {
+  const scryOutput: { friends: Array<Ship>} = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
+  return scryOutput.friends
 }

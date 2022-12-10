@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Popup from 'reactjs-popup'
-import { pokeAction, challenge, acceptGame, declineGame } from '../ts/helpers/urbitChess'
+import { pokeAction, challenge, acceptGame, declineGame, findFriends } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
 
@@ -12,6 +12,9 @@ export function Challenges () {
   const [description, setDescription] = useState('')
   const [side, setSide] = useState(Side.Random)
   const [modalOpen, setModalOpen] = useState(false)
+  const [friends, setFriends] = useState([])
+  const [challengingFriend, setChallengingFriend] = useState(false)
+  const [showingFriends, setFriendsList] = useState(false)
   const [badChallengeAttempts, setBadChallengeAttempts] = useState(0)
   const { urbit, incomingChallenges, removeChallenge } = useChessStore()
 
@@ -31,6 +34,7 @@ export function Challenges () {
     setWho('')
     setDescription('')
     setSide(Side.Random)
+    setChallengingFriend(false)
     setBadChallengeAttempts(0)
 
     closeModal()
@@ -77,16 +81,21 @@ export function Challenges () {
     await pokeAction(urbit, challenge(who, side, description), onError, onSuccess)
   }
 
+  const openFriends = async () => {
+    setFriendsList(true)
+    setFriends(await findFriends('chess', '/friends'))
+    // XX: set showingIncoming and showingOutgoing to false
+  }
+
   return (
     <div className='challenges-container col'>
       <div id="challenges-header" className="control-panel-container col">
         <button className='option' onClick={openModal}>New Challenge</button>
         {/* XX: see how it looks replacing • with ☙ or ❧ or ❦ or 𐫱 */}
         <p>
-          <span>Incoming</span> ☙ <span>Outgoing</span> ❧ <span>Friends</span>
+          <span>Incoming</span> ☙ <span>Outgoing</span> ❧ <span onClick={openFriends}>Friends</span>
         </p>
       </div>
-      {/* incoming challenges list */}
       <ul id="incoming-challenges" className='game-list'>
         {
           Array.from(incomingChallenges).map(([challenger, challenge], key) => {
@@ -120,16 +129,32 @@ export function Challenges () {
           })
         }
       </ul>
-      {/* outgoing challenges list */}
       <ul id="outgoing-challenges" className='game-list'>
         {/* return outgoing list */}
       </ul>
-      {/* mutual pals list */}
-      <ul id="pals" className="pals-list">
-        {/* return mutual pals list */}
+      <ul id="friends" className='game-list' style={{ display: (showingFriends ? 'flex' : ' none') }}>
+        {
+          Array.from(friends).map((friend: Ship, key: number) => {
+            const colorClass = (key % 2) ? 'odd' : 'even'
+            return (
+              <li className={`game challenge ${colorClass}`} key={key}>
+                <div className='challenge-box'>
+                  <div className='row'>
+                    <div className='col'>
+                      <p className='friend'>~{friend}</p>
+                      {/* XX: win/loss history with this friend */}
+                      <p className='score'>0-0</p>
+                    </div>
+                  </div>
+                  <div className='col'>
+                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); openModal(); }}>Challenge</button>
+                  </div>
+                </div>
+              </li>
+            )
+          })
+        }
       </ul>
-      {/* new challenge pop-up */}
-      {/* XX: should we host the LiChess images locally? */}
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
         <div className='new-challenge-container col'>
           <p className='new-challenge-header'>New Challenge</p>
@@ -139,8 +164,10 @@ export function Challenges () {
               className={(badChallengeAttempts > 0) ? 'rejected' : ''}
               type="text"
               placeholder={'~sampel-palnet'}
+              value={who}
               onChange={(e) => setWho(e.target.value)}
-              key={badChallengeAttempts}/>
+              key={badChallengeAttempts}
+              disabled={ challengingFriend }/>
           </div>
           <div className='challenge-input-container row'>
             <p>Description:</p>
