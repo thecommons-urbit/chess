@@ -45,14 +45,14 @@ export enum Action {
   DeclineDraw = 'decline-draw',
   Move = 'move',
   ChangeSpecialDrawPreference = 'change-special-draw-preference',
-  ClaimSpecialDraw = 'claim-special-draw'
+  ClaimSpecialDraw = 'claim-special-draw',
+  Resign = 'resign'
 }
 
 // Yes, I know how retarded 'MoveActionAction.Move' looks - thank Ray for the types in sur/chess.hoon
 export enum MoveActionAction {
   Move = 'move',
   Castle = 'castle',
-  End = 'end'
 }
 
 //
@@ -188,6 +188,10 @@ export interface ClaimSpecialDrawAction extends ChessGameAction {
   'chess-action': Action.ClaimSpecialDraw
 }
 
+export interface ResignAction extends ChessGameAction {
+  'chess-action': Action.Resign
+}
+
 // Moves
 export interface MoveAction extends ChessGameAction {
   'chess-action': Action.Move
@@ -206,9 +210,4 @@ export interface MoveMoveAction extends MoveAction {
 export interface CastleMoveAction extends MoveAction {
   'chess-move': MoveActionAction.Castle
   'castle-side': CastleSide
-}
-
-export interface EndMoveAction extends MoveAction {
-  'chess-move': MoveActionAction.End,
-  'result': Result
 }

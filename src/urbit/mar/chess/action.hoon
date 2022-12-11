@@ -98,6 +98,12 @@
             :~  [%castle-side so:dejs]
             ==
         ==
+      %resign
+        :-  %resign
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
     ==
   --
 ++  grow

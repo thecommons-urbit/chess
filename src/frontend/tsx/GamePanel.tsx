@@ -9,8 +9,7 @@ export function GamePanel () {
 
   const resignOnClick = async () => {
     const gameID = displayGame.info.gameID
-    const side = (urbit.ship === displayGame.info.white.substring(1)) ? Side.White : Side.Black
-    await pokeAction(urbit, resign(gameID, side))
+    await pokeAction(urbit, resign(gameID))
   }
 
   const offerDrawOnClick = async () => {
