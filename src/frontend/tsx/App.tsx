@@ -8,7 +8,7 @@ import { Menu } from './Menu'
 import { GamePanel } from './GamePanel'
 
 export function App () {
-  const { urbit, setUrbit, receiveChallenge, receiveGame } = useChessStore()
+  const { urbit, setUrbit, receiveChallengeUpdate, receiveGame } = useChessStore()
 
   //
   // Helper functions
@@ -18,12 +18,11 @@ export function App () {
     const newUrbit = new Urbit('', '')
     newUrbit.ship = window.ship
     setUrbit(newUrbit)
-
     await newUrbit.subscribe({
       app: 'chess',
       path: '/challenges',
       err: () => {},
-      event: (data: ChallengeUpdate) => receiveChallenge(data),
+      event: (data: ChallengeUpdate) => receiveChallengeUpdate(data),
       quit: () => {}
     })
     await newUrbit.subscribe({

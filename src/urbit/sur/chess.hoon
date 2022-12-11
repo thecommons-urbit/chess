@@ -243,11 +243,14 @@
 ::  chess-update defines the possible values that a
 ::  subscriber may receive as a %fact from the chess agent
 +$  chess-update
-  $%  [%challenge who=ship challenge=chess-challenge]
+  $%  [%challenge-sent who=ship challenge=chess-challenge]
+      [%challenge-received who=ship challenge=chess-challenge]
+      [%challenge-resolved who=ship]
+      [%challenge-replied who=ship]
       [%position game-id=@dau position=@t special-draw-available=?]
-      [%result game-id=@dau result=chess-result]
       [%draw-offer game-id=@dau]
       [%draw-declined game-id=@dau]
+      [%result game-id=@dau result=chess-result]
       [%special-draw-preference game-id=@dau setting=?]
   ==
 ::
