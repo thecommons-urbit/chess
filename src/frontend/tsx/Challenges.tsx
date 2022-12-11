@@ -8,17 +8,18 @@ const selectedSideButtonClasses = 'side radio-selected'
 const unselectedSideButtonClasses = 'side radio-unselected'
 
 export function Challenges () {
+  // data
   const [who, setWho] = useState('')
   const [description, setDescription] = useState('')
   const [side, setSide] = useState(Side.Random)
+  const { urbit, incomingChallenges, outgoingChallenges, friends } = useChessStore()
+  // interface
   const [modalOpen, setModalOpen] = useState(false)
-  const [friends, setFriends] = useState([])
   const [challengingFriend, setChallengingFriend] = useState(false)
   const [showingFriends, setFriendsList] = useState(false)
-  const [showingIncoming, setIncoming] = useState(true)
-  const [showingOutgoing, setOutgoing] = useState(false)
+  const [showingIncoming, setIncomingList] = useState(true)
+  const [showingOutgoing, setOutgoingList] = useState(false)
   const [badChallengeAttempts, setBadChallengeAttempts] = useState(0)
-  const { urbit, incomingChallenges, outgoingChallenges } = useChessStore()
 
   const openModal = () => {
     setModalOpen(true)
@@ -77,18 +78,20 @@ export function Challenges () {
 
   const openFriends = async () => {
     setFriendsList(true)
-    setFriends(await findFriends('chess', '/friends'))
-    // XX: set showingIncoming and showingOutgoing to false
+    setIncomingList(false)
+    setOutgoingList(false)
   }
 
   const openIncoming = () => {
-    setIncoming(true)
-    setOutgoing(false)
+    setIncomingList(true)
+    setOutgoingList(false)
+    setFriendsList(false)
   }
 
   const openOutgoing = () => {
-    setOutgoing(true)
-    setIncoming(false)
+    setOutgoingList(true)
+    setIncomingList(false)
+    setFriendsList(false)
   }
 
   return (
@@ -97,7 +100,7 @@ export function Challenges () {
         <button className='option' onClick={openModal}>New Challenge</button>
         {/* XX: see how it looks replacing • with ☙ or ❧ or ❦ or 𐫱 */}
         <p>
-          <span onClick={openIncoming}>Incoming</span> ☙ <span onClick={openOutgoing}>Outgoing</span> ❧ <span onClick={openFriends}>Friends</span>
+          <span onClick={openIncoming} style={{ opacity: (showingIncoming ? 1.0 : 0.5) }}>Incoming</span> ☙ <span onClick={openOutgoing} style={{ opacity: (showingOutgoing ? 1.0 : 0.5) }}>Outgoing</span> ❧ <span onClick={openFriends} style={{ opacity: (showingFriends ? 1.0 : 0.5) }}>Friends</span>
         </p>
       </div>
       {/* incoming challenges list */}
@@ -164,6 +167,7 @@ export function Challenges () {
           })
         }
       </ul>
+      {/* friends list */}
       <ul id="friends" className='game-list' style={{ display: (showingFriends ? 'flex' : ' none') }}>
         {
           Array.from(friends).map((friend: Ship, key: number) => {

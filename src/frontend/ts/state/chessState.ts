@@ -8,9 +8,11 @@ interface ChessState {
   activeGames: Map<GameID, ActiveGameInfo>
   incomingChallenges: Map<Ship, Challenge>
   outgoingChallenges: Map<Ship, Challenge>
+  friends: Array<Ship>
   setUrbit: (urbit: Urbit) => void
   setDisplayGame: (displayGame: ActiveGameInfo | null) => void
   setPracticeBoard: (practiceBoard: String | null) => void
+  setFriends: (friends: Array<Ship>) => void
   receiveChallengeUpdate: (data: ChallengeUpdate) => void
   receiveGame: (data: GameInfo) => void
   receiveUpdate: (data: ChessUpdate) => void

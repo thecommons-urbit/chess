@@ -2,6 +2,7 @@ import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
 import { Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
+import { findFriends } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
 const useChessStore = create<ChessState>((set, get) => ({
@@ -11,9 +12,11 @@ const useChessStore = create<ChessState>((set, get) => ({
   activeGames: new Map(),
   incomingChallenges: new Map(),
   outgoingChallenges: new Map(),
+  friends: [],
   setUrbit: (urbit: Urbit) => set({ urbit }),
   setDisplayGame: (displayGame: ActiveGameInfo | null) => set({ displayGame }),
   setPracticeBoard: (practiceBoard: String | null) => set({ practiceBoard }),
+  setFriends: async (friends: Array<Ship>) => set({ friends }),
   receiveChallengeUpdate: (data: ChallengeUpdate) => {
     switch (data.chessUpdate) {
       case Update.ChallengeSent: {
