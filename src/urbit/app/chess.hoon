@@ -19,6 +19,8 @@
       sent-draw-offer=?
       got-draw-offer=?
       auto-claim-special-draws=?
+      sent-undo-request=?
+      got-undo-request=?
   ==
 +$  state-1
   $:  %1
@@ -166,7 +168,7 @@
                                (~(del by challenges-sent) our.bowl)
                              challenges-sent
             ::  put our new game into the map of games
-            games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | |])
+            games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | | | |])
           ==
         %decline-game
           =/  challenge  (~(get by challenges-received) who.action)
@@ -432,6 +434,98 @@
             archive  (~(put by archive) game-id.action game.u.game-state(result `result))
           ==
       ==
+        %request-undo
+          =/  game  (~(get by games) game-id.action)
+          ?~  game
+            :_  this
+            =/  err
+              "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  send undo request to opponent
+          :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
+                      %chess-undo-request  !>(~)
+                  ==
+                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                      %chess-update  !>([%undo-request game-id.action])
+                  ==
+              ==
+          ::  record that undo has been requested
+          %=  this
+            games  (~(put by games) game-id.action u.game(sent-undo-request &))
+          ==
+        %decline-undo
+          =/  game  (~(get by games) game-id.action)
+          ?~  game
+            :_  this
+            =/  err
+              "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  check for open undo request
+          ?.  got-undo-request.u.game
+            :_  this
+            =/  err
+              "no undo request to decline for game {<game-id.action>}"
+              :~  [%give %poke-ack `~[leaf+err]]
+              ==
+          ::  decline undo request
+          :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
+                      %chess-undo-decline  !>(~)
+                  ==
+                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                      %chess-update  !>([%undo-declined game-id.action])
+                  ==
+              ==
+          %=  this
+            ::  record that undo request is gone
+            games  (~(put by games) game-id.action u.game(got-undo-request |))
+          ==
+        %accept-undo
+          =/  game-state  (~(get by games) game-id.action)
+          ::  check for valid game
+          ?~  game-state
+            :_  this
+            =/  err
+              "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          =,  u.game-state
+          ::  check for open undo request
+          ?.  got-undo-request
+            :_  this
+            =/  err
+              "no undo request to decline for game {<game-id.action>}"
+              :~  [%give %poke-ack `~[leaf+err]]
+              ==
+          ::  tell opponent we accept the undo request
+          :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
+                      %chess-undo-accept  !>(~)
+                  ==
+                  ::  update observers that we accept the undo request
+                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                      %chess-update  !>([%undo-accepted game-id.action])
+                  ==
+              ==
+          =/  ship-to-move
+            ?-  player-to-move.position.u.game-state
+              %white  white.game
+              %black  black.game
+            ==
+          ?>  ?=([%ship @p] ship-to-move)
+          =:
+            moves.game.u.game-state  ?:  =(+.ship-to-move our.bowl)
+                                       (snip moves.game)
+                                     (snip (snip moves.game))
+            position.u.game-state  ?:  =(+.ship-to-move our.bowl)
+                                     (fen-to-position (tail (rear (snip moves.game))))
+                                   (fen-to-position (tail (rear (snip (snip moves.game)))))
+            got-undo-request.u.game-state  |
+          ==
+          %=  this
+            games  (~(put by games) game-id.action u.game-state)
+          ==
+      ==
     ::
     ::  handle incoming challenges
     %chess-challenge
@@ -529,7 +623,7 @@
                                  (~(del by challenges-sent) our.bowl)
                                challenges-sent
               rng-state  (~(del by rng-state) src.bowl)
-              games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | |])
+              games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | | | |])
             ==
           ::  we're the challenger
           ?>  ?=(^ her-hash.u.commitment)
@@ -568,7 +662,7 @@
               ==
           ==
       %=  this
-        games  (~(put by games) game-id.action [game.action u.new-position *(map @t @ud) (check-50-move-rule u.new-position) & | | |])
+        games  (~(put by games) game-id.action [game.action u.new-position *(map @t @ud) (check-50-move-rule u.new-position) & | | | | |])
       ==
     ::
     ::  directly inject game subscriptions (for debugging)
@@ -702,7 +796,7 @@
         %=  this
           challenges-sent  (~(del by challenges-sent) src.bowl)
           rng-state  (~(del by rng-state) src.bowl)
-          games  (~(put by games) u.game-id [new-game *chess-position *(map @t @ud) | & | | |])
+          games  (~(put by games) u.game-id [new-game *chess-position *(map @t @ud) | & | | | | |])
         ==
       ::  assign white and black to players if challenger chose
       =+  ^=  [white-player black-player]
@@ -739,7 +833,7 @@
           ==
       %=  this
         challenges-sent  (~(del by challenges-sent) src.bowl)
-        games  (~(put by games) u.game-id [new-game *chess-position *(map @t @ud) | & | | |])
+        games  (~(put by games) u.game-id [new-game *chess-position *(map @t @ud) | & | | | | |])
       ==
     ::
     ::  XX: document this
@@ -831,7 +925,7 @@
         %poke-ack
           ::  if opponent has acked our challenge, add it to the frontned
           ?~  p.sign
-          ::  
+          ::
             :-  :~  :*  %give  %fact   ~[/challenges]
                         %chess-update  !>([%challenge-sent src.bowl (~(got by challenges-sent) src.bowl)])
                     ==
@@ -1000,6 +1094,42 @@
                       ~
                   ==
               ==
+            %chess-undo-request
+              :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
+                          %chess-update  !>([%undo-request u.game-id])
+                      ==
+                  ==
+              %=  this
+                games  (~(put by games) u.game-id u.game-state(got-undo-request &))
+              ==
+            %chess-undo-decline
+              :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
+                          %chess-update  !>([%undo-declined u.game-id])
+                      ==
+                  ==
+              %=  this
+                games    (~(put by games) u.game-id u.game-state(sent-undo-request |))
+              ==
+            %chess-undo-accept
+              ?.  sent-undo-request.u.game-state
+                [~ this]
+              :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
+                          %chess-update  !>([%undo-accepted u.game-id])
+                      ==
+                  ==
+              =,  u.game-state
+              =:
+                moves.game.u.game-state  ?:  =(+.ship-to-move our.bowl)
+                                           (snip (snip moves.game))
+                                         (snip moves.game)
+                position.u.game-state  ?:  =(+.ship-to-move our.bowl)
+                                         (fen-to-position (tail (rear (snip (snip moves.game)))))
+                                       (fen-to-position (tail (rear (snip moves.game))))
+                got-undo-request.u.game-state  |
+              ==
+              %=  this
+                games  (~(put by games) u.game-id u.game-state)
+              ==
           ==
       ==
   ==
@@ -1020,7 +1150,8 @@
   ?~  new-position
     [~ ~]
   =/  updated-game  `chess-game`game.game-state
-  =.  moves.updated-game  (snoc moves.updated-game move)
+  =/  fen  (position-to-fen u.new-position)
+  =.  moves.updated-game  (snoc moves.updated-game [move fen])
   =/  new-fen-repetition  (increment-repetition fen-repetition.game-state u.new-position)
   =/  in-checkmate  ~(in-checkmate with-position u.new-position)
   =/  in-stalemate  ?:  in-checkmate

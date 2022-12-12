@@ -1,5 +1,4 @@
-/-  chess
-=,  chess
+/-  *chess
 |%
 +$  active-game-state-0
   $:  game=chess-game-0

@@ -169,6 +169,9 @@
       [%castle ?(%queenside %kingside)]
   ==
 ::
+::  chess-fen is a FEN position
++$  chess-fen  @t
+::
 ::  chess-game stores metadata for a game
 ::  represented by chess-position
 +$  chess-game
@@ -208,8 +211,8 @@
     black=chess-player
   ::  %'0-1'
     result=(unit chess-result)
-  ::  a list of this round's moves
-    moves=(list chess-move)
+  ::  a list of this round's moves and corresponding fen
+    moves=(list [chess-move chess-fen])
   ==
 ::
 ::  a challenge is the challenger's side,
@@ -238,6 +241,9 @@
       [%claim-special-draw game-id=@dau]
       [%move game-id=@dau move=chess-move]
       [%resign game-id=@dau]
+      [%request-undo game-id=@dau]
+      [%decline-undo game-id=@dau]
+      [%accept-undo game-id=@dau]
   ==
 ::
 ::  chess-update defines the possible values that a
@@ -250,6 +256,8 @@
       [%position game-id=@dau position=@t special-draw-available=?]
       [%draw-offer game-id=@dau]
       [%draw-declined game-id=@dau]
+      [%undo-declined game-id=@dau]
+      [%undo-accepted game-id=@dau]
       [%result game-id=@dau result=chess-result]
       [%special-draw-preference game-id=@dau setting=?]
   ==

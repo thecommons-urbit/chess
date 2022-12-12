@@ -212,7 +212,7 @@
 +|  %rendering
 ::
 ::  render game result,
-::  which may or may not be null 
+::  which may or may not be null
 ++  result-string
   |=  result=(unit chess-result)
   ^-  @t
@@ -404,13 +404,102 @@
       ==
   --
 ::
-::  XX: implement or delete
-::
-::  would read position from fen,
-::  but hasn't been implemented
-++  fen-to-position
-  |=  fen=@t
+::  XX: need to implement
+::  turn fen into chess-position with checks for valid fen
+++  fen-to-position-safe
+  |=  fen=chess-fen
   ~&  %not-implemented  !!
+::
+::  turn fen into chess-position
+++  fen-to-position
+  |=  fen=chess-fen
+  ^-  chess-position
+  %+  rash
+    fen
+  |.
+  ;~  (glue ace)
+      fen-to-board         ::  board
+      fen-to-player        ::  player-to-move
+      fen-to-white-castle  ::  white-can-castle
+      fen-to-black-castle  ::  black-can-castle
+      fen-to-en-passant    ::  en-passant
+      dem                  ::  ply-50-move-rule
+      dem                  ::  move-number
+  ==
+++  fen-to-board
+  %+  cook  board-helper
+  %+  more  (just '/')
+  ::  XX is this actually slower than alf and fail on invalid char?
+  (stun [1 8] (mask "12345678bknpqrBKNPQR"))
+++  fen-to-player
+  ;~  pose
+      (cold %white (just 'w'))
+      (cold %black (just 'b'))
+  ==
+++  fen-to-white-castle
+  ;~  pose
+      (white-castle-helper hep " -" %none)
+      (white-castle-helper (just 'k') " k" %none)
+      (white-castle-helper (just 'q') " q" %none)
+      (white-castle-helper (jest 'KQ') " " %both)
+      (white-castle-helper (just 'K') " " %kingside)
+      (white-castle-helper (just 'Q') " " %queenside)
+  ==
+++  fen-to-black-castle
+  ;~  pose
+      (cold %none hep)
+      (cold %both (jest 'kq'))
+      (cold %kingside (just 'k'))
+      (cold %queenside (just 'q'))
+  ==
+++  fen-to-en-passant
+  ;~  pose
+      (cold ~ hep)
+      %+  cook
+          some
+          ;~  plug
+              (cook chess-file (cook term (shim 'a' 'h')))
+              (cook chess-rank (cook term (mask "36")))
+          ==
+  ==
+++  board-helper
+  |=  brd=(list tape)
+  ?>  =((lent brd) 8)
+  =/  rank=chess-rank  %8
+  =/  file=$?(chess-file %i)  %a
+  =/  board  *chess-board
+  |-
+  ?~  brd
+    board
+  ?-    file
+       %i
+     $(brd t.brd, rank (chess-rank (sub rank 1)), file %a)
+   ::
+       chess-file
+     =*  next  (snag (sub file 97) i.brd)
+     ?:  (lte next 56)
+       $(file (chess-file (add file (sub next 48))))
+     ?:  (gte next 97)
+       ?+  (term next)  !!
+         %b  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %bishop]]))
+         %k  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %king]]))
+         %n  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %knight]]))
+         %p  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %pawn]]))
+         %q  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %queen]]))
+         %r  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %rook]]))
+       ==
+     ?+  (term (add next 32))  !!
+       %b  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %bishop]]))
+       %k  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %king]]))
+       %n  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %knight]]))
+       %p  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %pawn]]))
+       %q  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %queen]]))
+       %r  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %rook]]))
+  ==
+==
+++  white-castle-helper
+  |*  [rul=rule pre=tape res=chess-castle]
+  ;~(pfix rul (funk pre (easy res)))
 --
 |%
 ::
@@ -714,7 +803,7 @@
    ::
    ::  list of possible moves by traversing the board in a straight line
    ::  for rook, bishop, and queen moves
-    ++  traverse-by  
+    ++  traverse-by
       |=  traverser=chess-traverser
       ^-  (list chess-square)
       =/  squares  *(list chess-square)
@@ -733,7 +822,7 @@
     ::
     ::  list of possible moves by jumping directly to square
     ::  for knight, king, and pawn moves
-    ++  jump-to  
+    ++  jump-to
       |=  traverser=chess-traverser
       =/  dest  (traverser square)
       ?~  dest  ~
@@ -1235,7 +1324,7 @@
   %=  $
     position  %+  biff  position
               |=  p=chess-position
-              (~(apply-move with-position p) i.moves.game)
+              (~(apply-move with-position p) -.i.moves.game)
     moves.game  t.moves.game
   ==
 ::
@@ -1247,10 +1336,10 @@
   |=  game=chess-game
   ^-  (list @t)
   %+  spun  moves.game
-  |=  [move=chess-move position=chess-position]
+  |=  [move=[chess-move chess-fen] position=chess-position]
   ^-  [@t chess-position]
-  :-  (~(algebraicize with-position position) move)
-  (need (~(apply-move with-position position) move))
+  :-  (~(algebraicize with-position position) -.move)
+  (need (~(apply-move with-position position) -.move))
 ::
 ::  keep count of every move
 ::  add the move number to chess notation
@@ -1323,8 +1412,12 @@
       black=[%name 'Black']
       result=`%'0-1'
   :~
-    [%move [%f %2] [%f %3] ~]  [%move [%e %7] [%e %5] ~]  ::  1. f3 e5
-    [%move [%g %2] [%g %4] ~]  [%move [%d %8] [%h %4] ~]  ::  2. g4 Qh4#
+    ::  1. f3 e5
+     [[%move [%f %2] [%f %3] ~] 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1']
+     [[%move [%e %7] [%e %5] ~] 'rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 1']
+     ::  2. g4 Qh4#
+     [[%move [%g %2] [%g %4] ~] 'rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 1']
+     [[%move [%d %8] [%h %4] ~] 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1']
   ==
   ==
 --

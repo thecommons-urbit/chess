@@ -104,6 +104,24 @@
         %-  ot:dejs
         :~  [%game-id (se:dejs %da)]
         ==
+      %request-undo
+        :-  %request-undo
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
+      %decline-undo
+        :-  %decline-undo
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
+      %accept-undo
+        :-  %accept-undo
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==      
     ==
   --
 ++  grow
