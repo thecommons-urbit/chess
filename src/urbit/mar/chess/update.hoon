@@ -82,7 +82,7 @@
         ==
       %undo-accepted
         %-  pairs:enjs
-        :~  ['chessUpdate' [%s 'unco-accepted']]
+        :~  ['chessUpdate' [%s 'undo-accepted']]
             ['gameID' [%s (scot %da game-id.upd)]]
         ==
     ==
