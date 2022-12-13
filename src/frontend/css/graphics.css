@@ -4,9 +4,75 @@
 .game-icon {
   height: 60px;
   width: 60px;
+  background-size: cover;
 }
 
 .challenge-box img {
   height: 60px;
   width: 60px;
+}
+
+.theme-icon {
+  position: unset; /* for board icons specifically */
+  border-radius: 0.5rem;
+  height: 60px;
+  width: 60px;
+  background-size: cover;
+}
+
+.theme-icon:hover {
+    transition: all 150ms linear;
+    opacity: .80;
+  }
+
+.theme-icon:active {
+    transition: all 150ms linear;
+    opacity: .65;
+  }
+
+.board-icon {
+  position: unset;
+  border-radius: 0.5rem;
+  background-size: 240px;
+}
+
+ul.theme-list {
+  align-self: center;
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: 60px auto auto;
+  grid-gap: 0.5rem;
+}
+
+li.theme {
+  border: 1px solid black;
+  border-radius: 0.55rem;
+  box-shadow: 2px 2px 5px grey;
+  list-style: none;
+  cursor: pointer;
+  display: grid;
+  width: 60px;
+
+}
+
+li.selected {
+  box-shadow: 0px 0px 5px 2px lightskyblue !important;
+  -webkit-transition: all 150ms ease;
+  -moz-transition: all 150ms ease;
+  -o-transition: all 150ms ease;
+  -ms-transition: all 150ms ease;
+  transition: all 150ms ease;
+}
+
+#red2 {
+  background-size: 500px;
+  height: 15px;
+  width: 15px;
+}
+
+li.red2 {
+  transform: translate(182px, -207px);
+  border: none;
+  box-shadow: none;
+  width: 15px;
 }

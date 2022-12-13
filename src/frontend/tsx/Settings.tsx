@@ -1,9 +1,12 @@
 import React from 'react'
 import { pokeAction, changeSpecialDrawPreference } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
+import usePreferenceStore from '../ts/state/preferenceStore'
+import { pieceThemes, boardThemes } from '../ts/constants/themes'
 
 export function Settings () {
   const { urbit, displayGame, activeGames } = useChessStore()
+  const { setPieceTheme, setBoardTheme } = usePreferenceStore()
   const hasGame: boolean = (displayGame !== null)
 
   const handleCheckboxChange = async () => {
@@ -16,6 +19,54 @@ export function Settings () {
     <div className='settings-container'>
       <div id="visuals-settings" className="control-panel-container col">
         <h4 className="control-panel-header">Visuals</h4>
+        <ul className="theme-list">
+          {
+            pieceThemes.map((theme: string, ind: number) => {
+              let status: string = (theme === localStorage.getItem('pieceTheme'))
+                ? 'selected'
+                : 'unselected'
+
+              const handleClick = () => {
+                setPieceTheme(`${theme}`)
+                localStorage.setItem('pieceTheme', theme)
+              }
+
+              return (
+                <li
+                  key={ind}
+                  className={`theme ${theme} ${status}`}
+                  onClick={() => handleClick()}
+                >
+                  <piece className="theme-icon black knight"/>
+                </li>
+              )
+            })
+          }
+        </ul>
+        <ul className="theme-list">
+          {
+            boardThemes.map((theme: string, ind: number) => {
+              let status = (theme === localStorage.getItem('boardTheme'))
+                ? 'selected'
+                : 'unselected'
+
+              const handleClick = () => {
+                setBoardTheme(`${theme}`)
+                localStorage.setItem('boardTheme', theme)
+              }
+
+              return (
+                <li
+                  key={ind}
+                  className={`theme ${theme} ${status}`}
+                  onClick={() => handleClick()}
+                >
+                  <cg-board id={theme} class="board-icon theme-icon"/>
+                </li>
+              )
+            })
+          }
+        </ul>
       </div>
       <div id="gameplay-settings" className="control-panel-container col">
         <h4 className="control-panel-header">Gameplay</h4>

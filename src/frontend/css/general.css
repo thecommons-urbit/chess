@@ -239,6 +239,10 @@ li.even {
   background-color: #FFFFFF;
 }
 
+li.selected {
+  box-shadow: 0px 0px 5px 2px lightskyblue;
+}
+
 /* Games menu */
 
 div.games-container {
@@ -313,12 +317,13 @@ div.settings-container {
   "gameplay"
   "data"
   "footer";
-  grid-template-rows: 30% 30% 30% 10%;
+  grid-template-rows: 45% auto auto 10%;
 }
 
 div.settings-container #visuals-settings {
   grid-area: visuals;
   border-bottom: 1px black solid;
+  overflow-y: auto;
 }
 
 div.settings-container #gameplay-settings {
