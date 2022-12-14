@@ -433,7 +433,6 @@
             games    (~(del by games) game-id.action)
             archive  (~(put by archive) game-id.action game.u.game-state(result `result))
           ==
-      ==
         %request-undo
           =/  game  (~(get by games) game-id.action)
           ?~  game

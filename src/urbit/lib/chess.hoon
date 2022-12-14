@@ -416,7 +416,6 @@
   ^-  chess-position
   %+  rash
     fen
-  |.
   ;~  (glue ace)
       fen-to-board         ::  board
       fen-to-player        ::  player-to-move
