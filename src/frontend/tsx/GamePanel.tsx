@@ -2,10 +2,12 @@ import React from 'react'
 import useChessStore from '../ts/state/chessStore'
 import { pokeAction, resign, offerDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
 import { Side, GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
+import { CHESS } from '../ts/constants/chess'
 
 export function GamePanel () {
   const { urbit, displayGame, setDisplayGame, offeredDraw, practiceBoard, setPracticeBoard } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
+  const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
 
   const resignOnClick = async () => {
     const gameID = displayGame.info.gameID
@@ -96,7 +98,7 @@ export function GamePanel () {
         ) : (
           <button
             className='option'
-            disabled={hasGame}
+            disabled={hasGame || !practiceHasMoved}
             onClick={() => setPracticeBoard(null)}>
             Reset Practice Board</button>
         )}
