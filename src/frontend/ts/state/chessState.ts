@@ -22,6 +22,8 @@ interface ChessState {
   receiveUpdate: (data: ChessUpdate) => void
   declinedDraw: (gameID: GameID) => void
   offeredDraw: (gameID: GameID) => void
+  declinedUndo: (gameID: GameID) => void
+  requestedUndo: (gameID: GameID) => void
 }
 
 export default ChessState

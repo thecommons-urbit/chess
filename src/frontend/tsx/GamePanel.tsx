@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Chess, ChessInstance } from 'chess.js'
 import useChessStore from '../ts/state/chessStore'
-import { pokeAction, resign, offerDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
+import { pokeAction, resign, offerDraw, claimSpecialDraw, requestUndo } from '../ts/helpers/urbitChess'
 import { CHESS } from '../ts/constants/chess'
 import { Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function GamePanel () {
-  const { urbit, displayGame, setDisplayGame, offeredDraw, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
+  const { urbit, displayGame, setDisplayGame, offeredDraw, requestedUndo, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
   const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
   const opponent = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
@@ -26,6 +26,11 @@ export function GamePanel () {
   const claimSpecialDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
     await pokeAction(urbit, claimSpecialDraw(gameID))
+  }
+
+  const requestUndoOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, requestUndo(gameID), null, () => { requestedUndo(gameID) })
   }
 
   const moveOpacity = (index: number) => {
@@ -60,7 +65,7 @@ export function GamePanel () {
             </span>
             { '\xa0'.repeat(6 - wMove.length) }
             {/* setting opacity to 1.0 offsets a cumulative reduction in opacity on each bIndex ply when displayIndex < this move's wIndex */}
-            <span onClick={ () => setDisplayIndex(bIndex) } style={{ opacity: (moveOpacity(wIndex) == 1.0) ? moveOpacity(bIndex) : 1.0 }}>
+            <span onClick={ () => setDisplayIndex(bIndex) } style={{ opacity: (moveOpacity(wIndex) === 1.0) ? moveOpacity(bIndex) : 1.0 }}>
               { displayMoves[wIndex + 1].san }
             </span>
           </li>
@@ -111,6 +116,15 @@ export function GamePanel () {
             disabled={!displayGame.drawClaimAvailable}
             onClick={claimSpecialDrawOnClick}>
             Claim Special Draw</button>
+        ) : (null)
+        }
+        {/* request undo button */}
+        {hasGame ? (
+          <button
+            className='option'
+            disabled={displayGame.sentUndoRequest}
+            onClick={requestUndoOnClick}>
+            Request to Undo Move</button>
         ) : (null)
         }
         {/* (reset) practice board */}

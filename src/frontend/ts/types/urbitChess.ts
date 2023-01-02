@@ -36,7 +36,10 @@ export enum Update {
   Result = 'result',
   DrawOffer = 'draw-offer',
   DrawDeclined = 'draw-declined',
-  SpecialDrawPreference = 'special-draw-preference'
+  SpecialDrawPreference = 'special-draw-preference',
+  UndoRequest = 'undo-request',
+  UndoDeclined = 'undo-declined',
+  UndoAccepted = 'undo-accepted'
 }
 
 export enum Action {
@@ -49,7 +52,10 @@ export enum Action {
   Move = 'move',
   ChangeSpecialDrawPreference = 'change-special-draw-preference',
   ClaimSpecialDraw = 'claim-special-draw',
-  Resign = 'resign'
+  Resign = 'resign',
+  RequestUndo = 'request-undo',
+  DeclineUndo = 'decline-undo',
+  AcceptUndo = 'accept-undo'
 }
 
 // Yes, I know how retarded 'MoveActionAction.Move' looks - thank Ray for the types in sur/chess.hoon
@@ -95,6 +101,8 @@ export type ActiveGameInfo = {
   sentDrawOffer: boolean,
   drawClaimAvailable: boolean,
   autoClaimSpecialDraws: boolean,
+  gotUndoRequest: boolean,
+  sentUndoRequest: boolean,
   info: GameInfo
 }
 
@@ -166,6 +174,23 @@ export interface SpecialDrawPreferenceUpdate extends ChessUpdate {
   setting: boolean
 }
 
+export interface UndoRequestUpdate extends ChessUpdate {
+  chessUpdate: Update.UndoRequest
+  gameID: GameID
+}
+
+export interface UndoDeclinedUpdate extends ChessUpdate {
+  chessUpdate: Update.UndoDeclined
+  gameID: GameID
+}
+
+export interface UndoAcceptedUpdate extends ChessUpdate {
+  chessUpdate: Update.UndoAccepted
+  gameID: GameID
+  position: FENPosition
+  undoMoves: number
+}
+
 // Actions
 export interface ChessAction {
   'chess-action': Action
@@ -216,6 +241,18 @@ export interface ClaimSpecialDrawAction extends ChessGameAction {
 
 export interface ResignAction extends ChessGameAction {
   'chess-action': Action.Resign
+}
+
+export interface RequestUndoAction extends ChessGameAction {
+  'chess-action': Action.RequestUndo
+}
+
+export interface DeclineUndoAction extends ChessGameAction {
+  'chess-action': Action.DeclineUndo
+}
+
+export interface AcceptUndoAction extends ChessGameAction {
+  'chess-action': Action.AcceptUndo
 }
 
 // Moves

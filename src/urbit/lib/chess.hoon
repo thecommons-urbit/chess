@@ -404,102 +404,106 @@
       ==
   --
 ::
-::  XX: need to implement
-::  turn fen into chess-position with checks for valid fen
-++  fen-to-position-safe
-  |=  fen=chess-fen
-  ~&  %not-implemented  !!
+::
++|  %parsing
 ::
 ::  turn fen into chess-position
 ++  fen-to-position
-  |=  fen=chess-fen
-  ^-  chess-position
-  %+  rash
-    fen
-  ;~  (glue ace)
-      fen-to-board         ::  board
-      fen-to-player        ::  player-to-move
-      fen-to-white-castle  ::  white-can-castle
-      fen-to-black-castle  ::  black-can-castle
-      fen-to-en-passant    ::  en-passant
-      dem                  ::  ply-50-move-rule
-      dem                  ::  move-number
+  |_  fen=chess-fen
+  ++  $
+    ^-  chess-position
+    %+  rash
+      fen
+    ;~  (glue ace)
+        fen-to-board         ::  board
+        fen-to-player        ::  player-to-move
+        fen-to-white-castle  ::  white-can-castle
+        fen-to-black-castle  ::  black-can-castle
+        fen-to-en-passant    ::  en-passant
+        dem                  ::  ply-50-move-rule
+        dem                  ::  move-number
+    ==
+  ::
+  ::  XX: need to implement
+  ::  turn fen into chess-position with checks for valid fen
+  ++  safe
+    ^-  chess-position
+    ~&  %not-implemented  !!
+  ++  fen-to-board
+    %+  cook  board-helper
+    %+  more  (just '/')
+    ::  XX is this actually slower than alf and fail on invalid char?
+    (stun [1 8] (mask "12345678bknpqrBKNPQR"))
+  ++  fen-to-player
+    ;~  pose
+        (cold %white (just 'w'))
+        (cold %black (just 'b'))
+    ==
+  ++  fen-to-white-castle
+    ;~  pose
+        (white-castle-helper hep " -" %none)
+        (white-castle-helper (just 'k') " k" %none)
+        (white-castle-helper (just 'q') " q" %none)
+        (white-castle-helper (jest 'KQ') " " %both)
+        (white-castle-helper (just 'K') " " %kingside)
+        (white-castle-helper (just 'Q') " " %queenside)
+    ==
+  ++  fen-to-black-castle
+    ;~  pose
+        (cold %none hep)
+        (cold %both (jest 'kq'))
+        (cold %kingside (just 'k'))
+        (cold %queenside (just 'q'))
+    ==
+  ++  fen-to-en-passant
+    ;~  pose
+        (cold ~ hep)
+        %+  cook
+            some
+            ;~  plug
+                (cook chess-file (cook term (shim 'a' 'h')))
+                ;~  pose
+                  (cold %3 (just '3'))
+                  (cold %6 (just '6'))
+                ==
+            ==
+    ==
+  ++  board-helper
+    |=  brd=(list tape)
+    ?>  =((lent brd) 8)
+    =/  rank=@  %8
+    =/  file=@  %a
+    =/  pos=@  0
+    =/  board=chess-board  ~
+    |-
+    ?~  brd
+      board
+    ?:  =(file %i)
+      $(brd t.brd, rank (sub rank 1), file %a, pos 0)
+    =*  next  (snag pos i.brd)
+    ?:  (lte next 56)
+      $(file (add file (sub next 48)), pos +(pos))
+    ?:  (gte next 97)
+      ?+  (term next)  !!
+        %b  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%black %bishop]]))
+        %k  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%black %king]]))
+        %n  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%black %knight]]))
+        %p  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%black %pawn]]))
+        %q  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%black %queen]]))
+        %r  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%black %rook]]))
+      ==
+    ?+  (term (add next 32))  !!
+      %b  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%white %bishop]]))
+      %k  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%white %king]]))
+      %n  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%white %knight]]))
+      %p  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%white %pawn]]))
+      %q  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%white %queen]]))
+      %r  $(file +(file), pos +(pos), board (~(put by board) [[(chess-file file) (chess-rank rank)] [%white %rook]]))
   ==
-++  fen-to-board
-  %+  cook  board-helper
-  %+  more  (just '/')
-  ::  XX is this actually slower than alf and fail on invalid char?
-  (stun [1 8] (mask "12345678bknpqrBKNPQR"))
-++  fen-to-player
-  ;~  pose
-      (cold %white (just 'w'))
-      (cold %black (just 'b'))
-  ==
-++  fen-to-white-castle
-  ;~  pose
-      (white-castle-helper hep " -" %none)
-      (white-castle-helper (just 'k') " k" %none)
-      (white-castle-helper (just 'q') " q" %none)
-      (white-castle-helper (jest 'KQ') " " %both)
-      (white-castle-helper (just 'K') " " %kingside)
-      (white-castle-helper (just 'Q') " " %queenside)
-  ==
-++  fen-to-black-castle
-  ;~  pose
-      (cold %none hep)
-      (cold %both (jest 'kq'))
-      (cold %kingside (just 'k'))
-      (cold %queenside (just 'q'))
-  ==
-++  fen-to-en-passant
-  ;~  pose
-      (cold ~ hep)
-      %+  cook
-          some
-          ;~  plug
-              (cook chess-file (cook term (shim 'a' 'h')))
-              (cook chess-rank (cook term (mask "36")))
-          ==
-  ==
-++  board-helper
-  |=  brd=(list tape)
-  ?>  =((lent brd) 8)
-  =/  rank=chess-rank  %8
-  =/  file=$?(chess-file %i)  %a
-  =/  board  *chess-board
-  |-
-  ?~  brd
-    board
-  ?-    file
-       %i
-     $(brd t.brd, rank (chess-rank (sub rank 1)), file %a)
-   ::
-       chess-file
-     =*  next  (snag (sub file 97) i.brd)
-     ?:  (lte next 56)
-       $(file (chess-file (add file (sub next 48))))
-     ?:  (gte next 97)
-       ?+  (term next)  !!
-         %b  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %bishop]]))
-         %k  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %king]]))
-         %n  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %knight]]))
-         %p  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %pawn]]))
-         %q  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %queen]]))
-         %r  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%black %rook]]))
-       ==
-     ?+  (term (add next 32))  !!
-       %b  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %bishop]]))
-       %k  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %king]]))
-       %n  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %knight]]))
-       %p  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %pawn]]))
-       %q  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %queen]]))
-       %r  $(file (chess-file +(file)), board (~(put by board) [[file rank] [%white %rook]]))
-  ==
-==
-++  white-castle-helper
-  |*  [rul=rule pre=tape res=chess-castle]
-  ;~(pfix rul (funk pre (easy res)))
---
+  ++  white-castle-helper
+    |*  [rul=rule pre=tape res=chess-castle]
+    ;~(pfix rul (funk pre (easy res)))
+--  --
 |%
 ::
 ::  miscellaneous game logic
