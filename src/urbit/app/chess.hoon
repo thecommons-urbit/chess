@@ -615,6 +615,9 @@
                     :*  %give  %fact  ~[/active-games]
                         %chess-game  !>(new-game)
                     ==
+                    :*  %give  %fact   ~[/challenges]
+                        %chess-update  !>([%challenge-replied src.bowl])
+                    ==
                 ==
             %=  this
               challenges-received  (~(del by challenges-received) src.bowl)
