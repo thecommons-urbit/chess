@@ -7,14 +7,13 @@ import * as cg from 'chessground/types'
 import Popup from 'reactjs-popup'
 import { CHESS } from '../ts/constants/chess'
 import { CHESSGROUND } from '../ts/constants/chessground'
-import { URBIT_CHESS } from '../ts/constants/urbitChess'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
 import { pokeAction, move, castle, acceptDraw, declineDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { PromotionMove } from '../ts/types/chessground'
-import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
+import { Side, CastleSide, PromotionRole, Rank, File, GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 //
 // Declare custom HTML elements used by Chessground
@@ -41,7 +40,7 @@ export function Chessboard () {
   const [chess, setChess] = useState<ChessInstance>(new Chess())
   const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null)
   const [renderWorkaround, forceRenderWorkaround] = useState<number>(Date.now())
-  const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard } = useChessStore()
+  const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex } = useChessStore()
   const { pieceTheme, boardTheme } = usePreferenceStore()
 
   //
@@ -63,6 +62,12 @@ export function Chessboard () {
       ? `${CHESS.pieceWhiteKnight} ${displayGame.info.white} vs. ${CHESS.pieceBlackKnight} ${displayGame.info.black}`
       : `${CHESS.pieceBlackKnight} ${displayGame.info.black} vs. ${CHESS.pieceWhiteKnight} ${displayGame.info.white}`
     : `~${window.ship}'s practice board`
+  const isViewOnly = (displayIndex == null)
+    ? false
+    : (displayGame.info.moves == null)
+      ? false
+      : (displayIndex < displayGame.info.moves.length - 1)
+  const toShowDests = !isViewOnly
 
   //
   // React hook helper functions
@@ -173,7 +178,9 @@ export function Chessboard () {
               attemptMove(orig, dest)
             }
 
-            forceRenderWorkaround(Date.now())
+            if (displayGame == null) {
+              forceRenderWorkaround(Date.now())
+            }
           }
         }
       }
@@ -183,13 +190,21 @@ export function Chessboard () {
 
   const updateBoard = () => {
     const stateConfig: CgConfig = {
-      fen: chess.fen(),
+      fen: (displayIndex == null || displayGame.info.moves == null)
+        ? chess.fen()
+        : displayGame.info.moves[displayIndex].fen,
+      viewOnly: isViewOnly,
       turnColor: sideToMove as cg.Color,
       check: chess.in_check(),
+      selected: null,
       movable: {
-        dests: getChessDests(chess) as cg.Dests
+        dests: getChessDests(chess) as cg.Dests,
+        showDests: toShowDests
       }
     }
+    // XX move these console logs to 'dev' branch once that exists
+    console.log('updateBoard fen: ' + stateConfig.fen)
+    console.log('updateBoard displayIndex: ' + displayIndex)
     api?.set(stateConfig)
   }
 
@@ -204,7 +219,9 @@ export function Chessboard () {
     if (practiceBoard === null) {
       localStorage.removeItem('practiceBoard')
       chess.load(CHESS.defaultFEN)
-      forceRenderWorkaround(Date.now())
+      if (displayGame == null) {
+        forceRenderWorkaround(Date.now())
+      }
       const config: CgConfig = {
         lastMove: null
       }
@@ -237,6 +254,12 @@ export function Chessboard () {
       updateBoard()
     },
     [displayGame])
+
+  useEffect(
+    () => {
+      updateBoard()
+    },
+    [displayIndex])
 
   useEffect(
     () => {
@@ -375,11 +398,6 @@ export function Chessboard () {
 
   return (
     <div className='game-container'>
-      <div className='title-container'>
-        <p className='title-text' style={{ fontSize: URBIT_CHESS.lengthToFontSize.get(boardTitle.length) }}>
-          {`${boardTitle}`}
-        </p>
-      </div>
       <div className={`board-container ${boardTheme} ${pieceTheme}`}>
         <div ref={boardRef} className='chessboard cg-wrap' />
         { (promotionMove !== null) ? renderPromotionInterface() : <div/> }
