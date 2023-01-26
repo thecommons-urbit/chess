@@ -288,4 +288,5 @@
       result=chess-result
       move=(unit chess-move)
   ==
++$  chess-archive  (map @dau chess-game)
 --

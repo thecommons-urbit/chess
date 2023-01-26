@@ -98,6 +98,15 @@ export type ActiveGameInfo = {
   info: GameInfo
 }
 
+export type ArchiveGameInfo = {
+  position: FENPosition,
+  gotDrawOffer: boolean,
+  sentDrawOffer: boolean,
+  drawClaimAvailable: boolean,
+  autoClaimSpecialDraws: boolean,
+  info: GameInfo
+}
+
 export type Challenge = {
   who: Ship,
   challengerSide: Side,

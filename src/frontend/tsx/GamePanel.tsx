@@ -6,7 +6,7 @@ import { CHESS } from '../ts/constants/chess'
 import { Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function GamePanel () {
-  const { urbit, displayGame, setDisplayGame, offeredDraw, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
+  const { urbit, displayGame, setDisplayGame, offeredDraw, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex, showingArchive } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
   const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
   const opponent = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
@@ -60,7 +60,7 @@ export function GamePanel () {
             </span>
             { '\xa0'.repeat(6 - wMove.length) }
             {/* setting opacity to 1.0 offsets a cumulative reduction in opacity on each bIndex ply when displayIndex < this move's wIndex */}
-            <span onClick={ () => setDisplayIndex(bIndex) } style={{ opacity: (moveOpacity(wIndex) == 1.0) ? moveOpacity(bIndex) : 1.0 }}>
+            <span onClick={ () => setDisplayIndex(bIndex) } style={{ opacity: (moveOpacity(wIndex) === 1.0) ? moveOpacity(bIndex) : 1.0 }}>
               { displayMoves[wIndex + 1].san }
             </span>
           </li>
@@ -93,19 +93,25 @@ export function GamePanel () {
         </div>
         {/* buttons */}
         {/* offer draw button */}
-        <button
-          className='option'
-          disabled={!hasGame || displayGame.sentDrawOffer}
-          onClick={offerDrawOnClick}>
-          Offer Draw</button>
+        {!showingArchive ? (
+          <button
+            className='option'
+            disabled={!hasGame || displayGame.sentDrawOffer}
+            onClick={offerDrawOnClick}>
+            Offer Draw</button>
+        ) : (null)
+        }
         {/* resign button */}
-        <button
-          className='option'
-          disabled={!hasGame}
-          onClick={resignOnClick}>
-          Resign</button>
+        {!showingArchive ? (
+          <button
+            className='option'
+            disabled={!hasGame}
+            onClick={resignOnClick}>
+           Resign</button>
+        ) : (null)
+        }
         {/* claim special draw */}
-        {hasGame ? (
+        {!showingArchive ? (
           <button
             className='option'
             disabled={!displayGame.drawClaimAvailable}

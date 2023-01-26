@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, GameInfo } from '../types/urbitChess'
 
 function emptyFunction (): void {}
 
@@ -146,4 +146,9 @@ export function resign (gameId: GameID): ResignAction {
 export const findFriends = async (app: string, path: string) => {
   const scryOutput: { friends: Array<Ship>} = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
   return scryOutput.friends
+}
+
+export const scryArchive = async (app: string, path: string) => {
+  const scryOutput: { localArchive: Array<GameInfo>} = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
+  return scryOutput.localArchive
 }

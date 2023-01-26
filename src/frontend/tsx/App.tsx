@@ -10,7 +10,7 @@ import { GamePanel } from './GamePanel'
 import { PracticePanel } from './PracticePanel'
 
 export function App () {
-  const { urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends } = useChessStore()
+  const { urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends, setLocalArchive } = useChessStore()
 
   //
   // Helper functions

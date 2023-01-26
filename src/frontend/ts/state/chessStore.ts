@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Update, Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
+import { Update, Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo, ArchiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
 import { findFriends } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
@@ -10,12 +10,15 @@ const useChessStore = create<ChessState>((set, get) => ({
   displayGame: null,
   practiceBoard: '',
   activeGames: new Map(),
+  localArchive: new Map(),
+  showingArchive: false,
+  setShowingArchive: (toggle: boolean) => set({ showingArchive: toggle }),
   incomingChallenges: new Map(),
   outgoingChallenges: new Map(),
   friends: [],
   displayIndex: null,
   setUrbit: (urbit: Urbit) => set({ urbit }),
-  setDisplayGame: (displayGame: ActiveGameInfo | null) => {
+  setDisplayGame: (displayGame: ActiveGameInfo | ArchiveGameInfo | null) => {
     set({ displayGame, displayIndex: null })
   },
   setPracticeBoard: (practiceBoard: String | null) => set({ practiceBoard }),
@@ -75,6 +78,21 @@ const useChessStore = create<ChessState>((set, get) => ({
       event: (data: ChessUpdate) => get().receiveUpdate(data),
       quit: () => {}
     })
+  },
+  setLocalArchive: async (data: Array<GameInfo>) => {
+    for (const game of data) {
+      const archiveGame: ArchiveGameInfo = {
+        //  fen of the last move
+        position: game.moves[game.moves.length -1].fen,
+        gotDrawOffer: false,
+        sentDrawOffer: false,
+        drawClaimAvailable: false,
+        autoClaimSpecialDraws: false,
+        info: game
+      }
+
+      set(state => ({ localArchive: state.localArchive.set(game.gameID, archiveGame) }))
+    }
   },
   receiveUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
