@@ -114,11 +114,8 @@ div.game-panel .moves {
   border: 1px black solid;
 }
 
-div.game-panel .moves-divider {
-  min-height: 275px;
-  width: 1.45em;
-  position: absolute;
-  border-right: 1px black solid;
+div.game-panel .move-item span {
+  cursor: pointer;
 }
 
 div.game-panel .moves p {
@@ -156,15 +153,6 @@ div.game-container {
   align-items: center;
   justify-items: center;
   justify-content: center;
-}
-
-div.title-container {
-  grid-area: top;
-  height: calc(max(10vh, 72px) - max(min(2vh, 2vw), 14px));
-  width: calc(max(75vw, 960px) - calc(2 * max(min(2vh, 2vw), 14px)));
-  display: grid;
-  align-items: center;
-  justify-items: center;
 }
 
 div.turn-container {

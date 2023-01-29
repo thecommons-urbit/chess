@@ -33,3 +33,8 @@
   font-size: 2em;
   font-weight: bold;
 }
+
+/* game panel list */
+.moves ol {
+  list-style-type: decimal-leading-zero;
+}

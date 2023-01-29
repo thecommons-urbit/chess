@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
+import { Update, Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
 import { findFriends } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
@@ -13,10 +13,17 @@ const useChessStore = create<ChessState>((set, get) => ({
   incomingChallenges: new Map(),
   outgoingChallenges: new Map(),
   friends: [],
+  displayIndex: null,
   setUrbit: (urbit: Urbit) => set({ urbit }),
-  setDisplayGame: (displayGame: ActiveGameInfo | null) => set({ displayGame }),
+  setDisplayGame: (displayGame: ActiveGameInfo | null) => {
+    set({ displayGame, displayIndex: null })
+  },
   setPracticeBoard: (practiceBoard: String | null) => set({ practiceBoard }),
   setFriends: async (friends: Array<Ship>) => set({ friends }),
+  setDisplayIndex: (displayIndex: number | null) => {
+    set({ displayIndex })
+    console.log('setDisplayIndex displayIndex: ' + displayIndex)
+  },
   receiveChallengeUpdate: (data: ChallengeUpdate) => {
     switch (data.chessUpdate) {
       case Update.ChallengeSent: {
@@ -71,10 +78,8 @@ const useChessStore = create<ChessState>((set, get) => ({
   },
   receiveUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
-      const displayGame = get().displayGame
-
-      if ((displayGame !== null) && (updatedGame.info.gameID === displayGame.info.gameID)) {
-        get().setDisplayGame(updatedGame)
+      if ((get().displayGame !== null) && (updatedGame.info.gameID === get().displayGame.info.gameID)) {
+        set({ displayGame: updatedGame, displayIndex: null })
       }
     }
 
@@ -82,24 +87,32 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.Position: {
         const positionData = data as PositionUpdate
         const gameID = positionData.gameID
-        const specialDrawAvailable = positionData.specialDrawAvailable
-
+        const move = positionData.move
         const currentGame = get().activeGames.get(gameID)
-        const updatedGame: ActiveGameInfo = {
-          position: positionData.position,
-          gotDrawOffer: currentGame.gotDrawOffer,
-          sentDrawOffer: currentGame.sentDrawOffer,
-          drawClaimAvailable: specialDrawAvailable,
-          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
-          info: currentGame.info
+
+        if (move.san !== null && move.fen !== null) {
+          currentGame.info.moves.push(move)
+
+          const updatedGame: ActiveGameInfo = {
+            position: move.fen,
+            gotDrawOffer: currentGame.gotDrawOffer,
+            sentDrawOffer: currentGame.sentDrawOffer,
+            drawClaimAvailable: positionData.specialDrawAvailable,
+            autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
+            info: currentGame.info
+          }
+
+          set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
+          updateDisplayGame(updatedGame)
+
+          console.log('RECEIVED POSITION UPDATE')
+          console.log('Update.Position displayIndex: ' + (get().displayIndex))
+          console.log('Update.Position fen: ' + move.fen)
         }
 
-        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-        updateDisplayGame(updatedGame)
-
-        console.log('RECEIVED POSITION UPDATE')
         break
       }
+
       case Update.Result: {
         const resultData = data as ResultUpdate
         const gameID = resultData.gameID
@@ -117,6 +130,7 @@ const useChessStore = create<ChessState>((set, get) => ({
         console.log('RECEIVED RESULT UPDATE')
         break
       }
+
       case Update.DrawOffer: {
         const offerData = data as DrawOfferUpdate
         const gameID = offerData.gameID
@@ -137,6 +151,7 @@ const useChessStore = create<ChessState>((set, get) => ({
         console.log('RECEIVED DRAW OFFER UPDATE')
         break
       }
+
       case Update.DrawDeclined: {
         const declineData = data as DrawDeclinedUpdate
         const gameID = declineData.gameID
