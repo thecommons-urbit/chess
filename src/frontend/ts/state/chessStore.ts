@@ -2,7 +2,7 @@ import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
 import { Update, Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo, ArchiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate } from '../types/urbitChess'
-import { findFriends } from '../helpers/urbitChess'
+import { findFriends, scryArchive } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
 const useChessStore = create<ChessState>((set, get) => ({
@@ -80,20 +80,23 @@ const useChessStore = create<ChessState>((set, get) => ({
     })
   },
   setLocalArchive: async (data: Array<GameInfo>) => {
-    for (const game of data) {
-      const archiveGame: ArchiveGameInfo = {
-        //  fen of the last move
-        position: game.moves[game.moves.length -1].fen,
-        gotDrawOffer: false,
-        sentDrawOffer: false,
-        drawClaimAvailable: false,
-        autoClaimSpecialDraws: false,
-        info: game
-      }
+    if (data !== null) {
+      for (const game of data) {
+        const archiveGame: ArchiveGameInfo = {
+          //  fen of the last move
+          position: game.moves[game.moves.length -1].fen,
+          gotDrawOffer: false,
+          sentDrawOffer: false,
+          drawClaimAvailable: false,
+          autoClaimSpecialDraws: false,
+          info: game
+        }
 
-      set(state => ({ localArchive: state.localArchive.set(game.gameID, archiveGame) }))
+        set(state => ({ localArchive: state.localArchive.set(game.gameID, archiveGame) }))
+      }
     }
   },
+  //  XX: will this blow things up?
   receiveUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
       if ((get().displayGame !== null) && (updatedGame.info.gameID === get().displayGame.info.gameID)) {
@@ -134,11 +137,24 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.Result: {
         const resultData = data as ResultUpdate
         const gameID = resultData.gameID
-
         const displayGame = get().displayGame
-        if ((displayGame !== null) && (gameID === displayGame.info.gameID)) {
-          get().setDisplayGame(null)
+
+        const displayLastGame = async () => {
+          //
+          //  XX: make sure setting localArchive doesn't wipe an existing
+          //      archive search result.
+          //      maybe results have their own place in state?
+          //
+          //  get().setLocalArchive(await scryArchive('chess', '/archive/last/8'))
+          get().setLocalArchive(await scryArchive('chess', '/archive/all'))
+
+          const lastGame = get().localArchive.get(gameID)
+          if ((displayGame !== null) && (gameID === displayGame.info.gameID)) {
+            get().setDisplayGame(lastGame)
+          }
         }
+
+        displayLastGame()
 
         var activeGames: Map<GameID, ActiveGameInfo> = get().activeGames
         activeGames.delete(gameID)
