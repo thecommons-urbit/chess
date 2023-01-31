@@ -288,5 +288,7 @@
       result=chess-result
       move=(unit chess-move)
   ==
-+$  chess-archive  (map @dau chess-game)
+::  archive ordered-map helpers
++$  chess-archive  ((mop @dau chess-game) lth)
+++  arch-orm  ((on @dau chess-game) lth)
 --

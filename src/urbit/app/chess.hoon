@@ -25,7 +25,7 @@
 +$  state-1
   $:  %1
       games=(map @dau active-game-state)
-      archive=(map @dau chess-game)
+      archive=((mop @dau chess-game) lth)
       challenges-sent=(map ship chess-challenge)
       challenges-received=(map ship chess-challenge)
       rng-state=(map ship chess-commitment)
@@ -836,95 +836,101 @@
   ?+  path  (on-peek:default path)
     ::
     :: send back a list of chess-games
-    [%x %archive *]
-      ?+  t.t.path  (on-peek:default path)
-      ::
-      ::  =sur -build-file /=chess=/sur/chess/hoon
-      ::  .^((map @dau chess-game:sur) %gx /=chess=/archive/all/noun)
-      ::  .^(json %gx /=chess=/archive/all/json)
-      [%all ~]
+      [%x %archive *]
+    ?+  t.t.path  (on-peek:default path)
+    ::
+    ::  =sur -build-file /=chess=/sur/chess/hoon
+    ::  .^((map @dau chess-game:sur) %gx /=chess=/archive/all/noun)
+    ::  .^(json %gx /=chess=/archive/all/json)
+        [%all ~]
       ``[%chess-archive !>(archive)]
-      ::  XX: include more search criteria encoded in the path
-      ::      ex: opponent    archive/ship
-      ::          date range  archive/@da/@da
-      ::          event/site  archive/@t
-      ::          date area   archive/@da/@dr
-      ::          latest #    archive/last/@ud
-      ::          result      archive/result
-      ::          side      archive/side
-      ::
-      ::      *range, opponent, and side would be better with
-      ::      date range or a limit
-      ::
-      ::  XX:  archive will probably need to be a mop
-      ::  if we want this to be ordered nicely.
-      ::
-      ::  collect only the latest 8 games in archive
-      :: [%last @ud ~]
-      ==
+    ::
+        [%before @ @ ~]
+      =/  before=@  (rash i.t.t.t.path dem)
+      =/  max=@  (rash i.t.t.t.t.path dem)
+    :: XX: this produces a list
+      ``[%chess-archive !>(tab:arch-orm archive `before max)]
+    ::  XX: include more search criteria encoded in the path
+    ::      ex: opponent    archive/ship
+    ::          date range  archive/@da/@da
+    ::          event/site  archive/@t
+    ::          date area   archive/@da/@dr
+    ::          latest #    archive/last/@ud
+    ::          result      archive/result
+    ::          side      archive/side
+    ::
+    ::      *range, opponent, and side would be better with
+    ::      date range or a limit
+    ::
+    ::  XX:  archive will probably need to be a mop
+    ::  if we want this to be ordered nicely.
+    ::
+    ::  collect only the latest 8 games in archive
+    :: [%last @ud ~]
+    ==
     ::
     ::  recieve game info
     ::    either pgn or chess-game form
     ::    or only recieve moves in a wain
-    [%x %game @ta *]
-      =/  game-id  `(unit @dau)`(slaw %da i.t.t.path)
-      ?~  game-id  `~
-      =/  active-game  (~(get by games) u.game-id)
-      =/  archived-game  (~(get by archive) u.game-id)
-      ?+  t.t.t.path  (on-peek:default path)
+      [%x %game @ta *]
+    =/  game-id  `(unit @dau)`(slaw %da i.t.t.path)
+    ?~  game-id  `~
+    =/  active-game  (~(get by games) u.game-id)
+    =/  archived-game  (~(get by archive) u.game-id)
+    ?+  t.t.t.path  (on-peek:default path)
       ::
       :: .^(wain %gx /=chess=/game/~1996.2.16..10.00.00..0000/moves/noun)
-      [%moves ~]
-        ?~  active-game
-          ?~  archived-game  ~
-          ``[%chess-moves !>((algebraicize-and-number u.archived-game))]
-        ``[%chess-moves !>((algebraicize-and-number game.u.active-game))]
+        [%moves ~]
+      ?~  active-game
+        ?~  archived-game  ~
+        ``[%chess-moves !>((algebraicize-and-number u.archived-game))]
+      ``[%chess-moves !>((algebraicize-and-number game.u.active-game))]
       ::
       :: .^(wain %gx /=chess=/game/~1996.2.16..10.00.00..0000/pgn/noun)
       :: .^(mime %gx /=chess=/game/~1996.2.16..10.00.00..0000/pgn/mime)
-      [%pgn ~]
-        ?~  active-game
-          ?~  archived-game  ~
-          ``[%pgn !>((to-pgn u.archived-game))]
-        ``[%pgn !>((to-pgn game.u.active-game))]
+        [%pgn ~]
+      ?~  active-game
+        ?~  archived-game  ~
+        ``[%pgn !>((to-pgn u.archived-game))]
+      ``[%pgn !>((to-pgn game.u.active-game))]
       ::
       :: .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/chess-game/noun)
-      [%chess-game ~]
+        [%chess-game ~]
       ?~  active-game
         ?~  archived-game  ~
         ``[%chess-game !>(u.archived-game)]
       ``[%chess-game !>(game.u.active-game)]
-      ==
+    ==
     ::
     ::  .^(noun %gx /=chess=/challenges/outgoing/noun)
     ::  list challenges sent
-    [%x %challenges %outgoing ~]
-      ``[%chess-challenges !>(~(tap by challenges-sent))]
+      [%x %challenges %outgoing ~]
+    ``[%chess-challenges !>(~(tap by challenges-sent))]
     ::
     ::  .^(noun %gx /=chess=/challenges/incoming/noun)
     ::  list challenges received
-    [%x %challenges %incoming ~]
-      ``[%chess-challenges !>(~(tap by challenges-received))]
+      [%x %challenges %incoming ~]
+    ``[%chess-challenges !>(~(tap by challenges-received))]
     ::
     ::  .^(arch %gy /=chess=/games)
     ::  collect all the game-id keys
-    [%y %games ~]
-      :-  ~  :-  ~
-      :-  %arch
-      !>  ^-  arch
-      :-  ~
-      =/  ids  ~(tap in (~(uni in ~(key by archive)) ~(key by games)))
-      %-  malt
-      ^-  (list [@ta ~])
-      %+  turn  ids
-      |=  a=@dau
-      [(scot %da a) ~]
+      [%y %games ~]
+    :-  ~  :-  ~
+    :-  %arch
+    !>  ^-  arch
+    :-  ~
+    =/  ids  ~(tap in (~(uni in ~(key by archive)) ~(key by games)))
+    %-  malt
+    ^-  (list [@ta ~])
+    %+  turn  ids
+    |=  a=@dau
+    [(scot %da a) ~]
     ::
     ::  .^(noun %gx /=chess=/friends/noun)
     ::  .^(json %gx /=chess=/friends/json)
     ::  read mutual friends
-    [%x %friends ~]
-      ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
+      [%x %friends ~]
+    ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
   ==
 ++  on-agent
   |=  [=wire =sign:agent:gall]

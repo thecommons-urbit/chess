@@ -1397,7 +1397,8 @@
 ::
 ::  helps chess-archive mark
 ++  archive-json
-  |=  game=chess-game
+  |=  archive=[@dau chess-game]
+  =/  game  +.archive
   ^-  json
   %-  pairs:enjs
   :~  ['gameID' [%s (scot %da game-id.game)]]
