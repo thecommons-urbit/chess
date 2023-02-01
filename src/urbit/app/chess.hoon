@@ -845,11 +845,13 @@
         [%all ~]
       ``[%chess-archive !>(archive)]
     ::
-        [%before @ @ ~]
-      =/  before=@  (rash i.t.t.t.path dem)
-      =/  max=@  (rash i.t.t.t.t.path dem)
-    :: XX: this produces a list
-      ``[%chess-archive !>(tab:arch-orm archive `before max)]
+    ::  =sur -build-file /=chess=/sur/chess/hoon
+    ::  .^(chess-archive:sur %gx /=chess=/archive/between/<game id>/<game id>/noun)
+    ::  .^(json %gx /=chess=/archive/between/<game id>/<game id>/json)
+        [%between @ta @ta ~]
+      =/  start=(unit @dau)  `(unit @dau)`(slaw %da i.t.t.path)
+      =/  end=(unit @dau)  `(unit @dau)`(slaw %da i.t.t.path)
+      ``[%chess-archive !>((lot:arch-orm archive start end))]
     ::  XX: include more search criteria encoded in the path
     ::      ex: opponent    archive/ship
     ::          date range  archive/@da/@da
@@ -862,45 +864,22 @@
     ::      *range, opponent, and side would be better with
     ::      date range or a limit
     ::
-    ::  XX:  archive will probably need to be a mop
-    ::  if we want this to be ordered nicely.
-    ::
     ::  collect only the latest 8 games in archive
     :: [%last @ud ~]
     ==
     ::
-    ::  recieve game info
-    ::    either pgn or chess-game form
-    ::    or only recieve moves in a wain
-      [%x %game @ta *]
+    ::  .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/noun)
+    ::  read game info
+    ::  either active or archived
+      [%x %game @ta ~]
     =/  game-id  `(unit @dau)`(slaw %da i.t.t.path)
     ?~  game-id  `~
     =/  active-game  (~(get by games) u.game-id)
-    =/  archived-game  (~(get by archive) u.game-id)
-    ?+  t.t.t.path  (on-peek:default path)
-      ::
-      :: .^(wain %gx /=chess=/game/~1996.2.16..10.00.00..0000/moves/noun)
-        [%moves ~]
-      ?~  active-game
-        ?~  archived-game  ~
-        ``[%chess-moves !>((algebraicize-and-number u.archived-game))]
-      ``[%chess-moves !>((algebraicize-and-number game.u.active-game))]
-      ::
-      :: .^(wain %gx /=chess=/game/~1996.2.16..10.00.00..0000/pgn/noun)
-      :: .^(mime %gx /=chess=/game/~1996.2.16..10.00.00..0000/pgn/mime)
-        [%pgn ~]
-      ?~  active-game
-        ?~  archived-game  ~
-        ``[%pgn !>((to-pgn u.archived-game))]
-      ``[%pgn !>((to-pgn game.u.active-game))]
-      ::
-      :: .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/chess-game/noun)
-        [%chess-game ~]
-      ?~  active-game
-        ?~  archived-game  ~
-        ``[%chess-game !>(u.archived-game)]
-      ``[%chess-game !>(game.u.active-game)]
-    ==
+    ?~  active-game
+      =/  archived-game  (~(get by archive) u.game-id)
+      ?~  archived-game  ~
+      ``[%chess-game !>(u.archived-game)]
+    ``[%chess-game !>(game.u.active-game)]
     ::
     ::  .^(noun %gx /=chess=/challenges/outgoing/noun)
     ::  list challenges sent
