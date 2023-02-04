@@ -1,7 +1,7 @@
 {
   "name": "urbit-chess",
-  "version": "0.9.1",
-  "description": "Experimental chess app for Urbit",
+  "version": "0.9.2",
+  "description": "Chess app for Urbit",
   "keywords": [
     "chess",
     "urbit"
@@ -17,6 +17,15 @@
       "name": "Alex Shelkovnykov",
       "email": "a@ashelkov.com",
       "url": "https://ashelkov.com"
+    },
+    {
+      "name": "~bonbud-macryg"
+    },
+    {
+      "name": "~rovmug-ticfyn"
+    },
+    {
+      "name": "~nordus-mocwyl"
     }
   ],
   "repository": {
@@ -29,41 +38,41 @@
     "lint": "eslint --ext ts --ext tsx ."
   },
   "engines": {
-    "node": ">=10 <19",
-    "npm": "^8.12.1"
+    "node": ">=10",
+    "npm": "^9.4.1"
   },
   "dependencies": {
     "@urbit/http-api": "^2.1.1",
-    "chess.js": "^0.13.3",
-    "chessground": "^8.2.1",
+    "chess.js": "^0.13.4",
+    "chessground": "^8.3.7",
     "react": "^18.2.0",
     "react-beforeunload": "^2.5.3",
     "react-dom": "^18.2.0",
-    "react-tabs": "^5.1.0",
+    "react-tabs": "^6.0.0",
     "reactjs-popup": "^2.0.5",
-    "zustand": "^3.7.2"
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
-    "@types/chess.js": "^0.13.1",
-    "@types/react": "^18.0.14",
+    "@types/chess.js": "^0.13.4",
+    "@types/react": "^18.0.27",
     "@types/react-beforeunload": "^2.1.1",
-    "@types/react-dom": "^18.0.5",
-    "@typescript-eslint/eslint-plugin": "^5.29.0",
-    "@typescript-eslint/parser": "^5.29.0",
-    "css-loader": "^6.7.1",
-    "eslint": "^8.18.0",
+    "@types/react-dom": "^18.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
+    "css-loader": "^6.7.3",
+    "eslint": "^8.33.0",
     "eslint-config-ts-standard": "^1.0.5",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.32.2",
     "html-webpack-plugin": "^5.5.0",
     "style-loader": "^3.3.1",
-    "ts-loader": "^9.3.0",
-    "typescript": "^4.7.4",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5",
     "url-loader": "^4.1.1",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "private": true
 }
