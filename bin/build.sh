@@ -49,7 +49,7 @@ docket() {
   echo "  base+'chess'" >> $DOCKET_FILE
   echo "  version+[$VERSION_MAJOR $VERSION_MINOR $VERSION_PATCH]" >> $DOCKET_FILE
   echo "  license+'GPL3'" >> $DOCKET_FILE
-  echo "  website+'https://github.com/ashelkovnykov/urbit-chess'" >> $DOCKET_FILE
+  echo "  website+'https://github.com/thecommons-urbit/chess'" >> $DOCKET_FILE
   
   if [[ -z $URL ]]; then
     echo "  glob-ames+[~$SHIP 0v0]" >> $DOCKET_FILE
@@ -79,10 +79,10 @@ DOCKER_IMAGE="urbit-chess"
 
 VERSION_MAJOR=0
 VERSION_MINOR=9
-VERSION_PATCH=1
+VERSION_PATCH=2
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
-KELVIN=418
+KELVIN=415
 
 DEFAULT_SHIP="finmep-lanteb"
 SHIP=$DEFAULT_SHIP
