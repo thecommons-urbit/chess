@@ -9,7 +9,7 @@ import { CHESS } from '../ts/constants/chess'
 import { CHESSGROUND } from '../ts/constants/chessground'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
-import { pokeAction, move, castle, acceptDraw, declineDraw, claimSpecialDraw } from '../ts/helpers/urbitChess'
+import { pokeAction, move, castle, acceptDraw, declineDraw, claimSpecialDraw, acceptUndo, declineUndo } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { PromotionMove } from '../ts/types/chessground'
@@ -40,7 +40,7 @@ export function Chessboard () {
   const [chess, setChess] = useState<ChessInstance>(new Chess())
   const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null)
   const [renderWorkaround, forceRenderWorkaround] = useState<number>(Date.now())
-  const { urbit, displayGame, declinedDraw, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex } = useChessStore()
+  const { urbit, displayGame, declinedDraw, declinedUndo, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex } = useChessStore()
   const { pieceTheme, boardTheme } = usePreferenceStore()
 
   //
@@ -139,6 +139,9 @@ export function Chessboard () {
 
         if (displayGame.gotDrawOffer) {
           await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+        }
+        if (displayGame.gotUndoRequest) {
+          await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
         }
       }
 
@@ -292,9 +295,14 @@ export function Chessboard () {
     await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
   }
 
-  const acceptSpecialDrawOnClick = async () => {
+  const acceptUndoOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, claimSpecialDraw(gameID))
+    await pokeAction(urbit, acceptUndo(gameID))
+  }
+
+  const declineUndoOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
   }
 
   //
@@ -342,6 +350,9 @@ export function Chessboard () {
 
           if (displayGame.gotDrawOffer) {
             await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+          }
+          if (displayGame.gotUndoRequest) {
+            await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
           }
         }
 
@@ -396,6 +407,23 @@ export function Chessboard () {
     )
   }
 
+  const renderUndoPopup = (game: ActiveGameInfo) => {
+    const opponent = (orientation === Side.White) ? game.info.black : game.info.white
+
+    return (
+      <Popup open={game.gotUndoRequest}>
+        <div>
+          <p>{`${opponent} has requested to undo a move`}</p>
+          <br/>
+          <div className='draw-resolution row'>
+            <button className="accept" role="button" onClick={acceptUndoOnClick}>Accept</button>
+            <button className="reject" role="button" onClick={declineUndoOnClick}>Decline</button>
+          </div>
+        </div>
+      </Popup>
+    )
+  }
+
   return (
     <div className='game-container'>
       <div className={`board-container ${boardTheme} ${pieceTheme}`}>
@@ -406,6 +434,7 @@ export function Chessboard () {
         <p className='turn-text'>{`${sideToMove} to move...`}</p>
       </div>
       { (displayGame !== null) ? renderDrawPopup(displayGame) : <div/> }
+      { (displayGame !== null) ? renderUndoPopup(displayGame) : <div/> }
     </div>
   )
 }

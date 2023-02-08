@@ -84,6 +84,8 @@
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'undo-accepted']]
             ['gameID' [%s (scot %da game-id.upd)]]
+            ['position' [%s position.upd]]
+            ['undoMoves' [%n undo-moves.upd]]
         ==
     ==
   --

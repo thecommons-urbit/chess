@@ -445,9 +445,6 @@
           :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
                       %chess-undo-request  !>(~)
                   ==
-                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                      %chess-update  !>([%undo-request game-id.action])
-                  ==
               ==
           ::  record that undo has been requested
           %=  this
@@ -472,9 +469,6 @@
           :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
                       %chess-undo-decline  !>(~)
                   ==
-                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                      %chess-update  !>([%undo-declined game-id.action])
-                  ==
               ==
           %=  this
             ::  record that undo request is gone
@@ -494,17 +488,8 @@
           ?.  got-undo-request
             :_  this
             =/  err
-              "no undo request to decline for game {<game-id.action>}"
+              "no undo request to accept for game {<game-id.action>}"
               :~  [%give %poke-ack `~[leaf+err]]
-              ==
-          ::  tell opponent we accept the undo request
-          :-  :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
-                      %chess-undo-accept  !>(~)
-                  ==
-                  ::  update observers that we accept the undo request
-                  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                      %chess-update  !>([%undo-accepted game-id.action])
-                  ==
               ==
           =/  ship-to-move
             ?-  player-to-move.position.u.game-state
@@ -521,8 +506,18 @@
                                    (fen-to-position (head (tail (rear (snip (snip moves.game))))))
             got-undo-request.u.game-state  |
           ==
-          %=  this
-            games  (~(put by games) game-id.action u.game-state)
+          :_  %=  this
+                games  (~(put by games) game-id.action u.game-state)
+              ==
+          ::  tell opponent we accept the undo request
+          :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/moves]
+                  %chess-undo-accept  !>(~)
+              ==
+              ::  update observers that we accept the undo request
+              :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                  %chess-update
+                  !>([%undo-accepted game-id.action (position-to-fen position.u.game-state) ?:(=(+.ship-to-move our.bowl) ~.1 ~.2)])
+              ==
           ==
       ==
     ::
@@ -1079,10 +1074,6 @@
             %chess-undo-accept
               ?.  sent-undo-request.u.game-state
                 [~ this]
-              :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
-                          %chess-update  !>([%undo-accepted u.game-id])
-                      ==
-                  ==
               =,  u.game-state
               =:
                 moves.game.u.game-state  ?:  =(+.ship-to-move our.bowl)
@@ -1093,8 +1084,13 @@
                                        (fen-to-position (head (tail (rear (snip moves.game)))))
                 got-undo-request.u.game-state  |
               ==
-              %=  this
-                games  (~(put by games) u.game-id u.game-state)
+              :_  %=  this
+                    games  (~(put by games) u.game-id u.game-state)
+                  ==
+              :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
+                      %chess-update
+                      !>([%undo-accepted u.game-id (position-to-fen position.u.game-state) ?:(=(+.ship-to-move our.bowl) ~.2 ~.1)])
+                  ==
               ==
           ==
       ==

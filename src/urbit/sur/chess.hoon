@@ -261,7 +261,7 @@
       [%draw-offer game-id=@dau]
       [%draw-declined game-id=@dau]
       [%undo-declined game-id=@dau]
-      [%undo-accepted game-id=@dau]
+      [%undo-accepted game-id=@dau position=@t undo-moves=@ta]
       [%undo-request game-id=@dau]
       [%result game-id=@dau result=chess-result]
       [%special-draw-preference game-id=@dau setting=?]

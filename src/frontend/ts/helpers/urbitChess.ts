@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction } from '../types/urbitChess'
 
 function emptyFunction (): void {}
 
@@ -135,6 +135,33 @@ export function claimSpecialDraw (gameId: GameID): ClaimSpecialDrawAction {
 export function resign (gameId: GameID): ResignAction {
   const action: ResignAction = {
     'chess-action': Action.Resign,
+    'game-id': gameId
+  }
+
+  return action
+}
+
+export function requestUndo (gameId: GameID): RequestUndoAction {
+  const action: RequestUndoAction = {
+    'chess-action': Action.RequestUndo,
+    'game-id': gameId
+  }
+
+  return action
+}
+
+export function declineUndo (gameId: GameID): DeclineUndoAction {
+  const action: DeclineUndoAction = {
+    'chess-action': Action.DeclineUndo,
+    'game-id': gameId
+  }
+
+  return action
+}
+
+export function acceptUndo (gameId: GameID): AcceptUndoAction {
+  const action: AcceptUndoAction = {
+    'chess-action': Action.AcceptUndo,
     'game-id': gameId
   }
 
