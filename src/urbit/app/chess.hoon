@@ -25,12 +25,13 @@
 +$  state-1
   $:  %1
       games=(map @dau active-game-state)
-      archive=((mop @dau chess-game) lth)
+      archive=((mop @dau chess-game) gth)
       challenges-sent=(map ship chess-challenge)
       challenges-received=(map ship chess-challenge)
       rng-state=(map ship chess-commitment)
   ==
 +$  card  card:agent:gall
+++  arch-orm  ((on @dau chess-game) gth)
 --
 %-  agent:dbug
 =|  state-1
@@ -260,7 +261,7 @@
             ::  remove this game from our map of active games
             games    (~(del by games) game-id.action)
             ::  add this game to our archive
-            archive  (~(put by archive) game-id.action updated-game)
+            archive  (put:arch-orm archive game-id.action updated-game)
           ==
         %decline-draw
           =/  game  (~(get by games) game-id.action)
@@ -334,7 +335,7 @@
           =.  result.updated-game  `(unit chess-result)``%'½–½'
           %=  this
             games    (~(del by games) game-id.action)
-            archive  (~(put by archive) game-id.action updated-game)
+            archive  (put:arch-orm archive game-id.action updated-game)
           ==
         %move
           =/  game-state  (~(get by games) game-id.action)
@@ -396,7 +397,7 @@
             ::  if so, archive game
             %=  this
               games    (~(del by games) game-id.action)
-              archive  (~(put by archive) game-id.action game)
+              archive  (put:arch-orm archive game-id.action game)
             ==
           ::  otherwise, update position
           %=  this
@@ -431,7 +432,7 @@
               ==
           %=  this
             games    (~(del by games) game-id.action)
-            archive  (~(put by archive) game-id.action game.u.game-state(result `result))
+            archive  (put:arch-orm archive game-id.action game.u.game-state(result `result))
           ==
         %request-undo
           =/  game  (~(get by games) game-id.action)
@@ -840,7 +841,7 @@
     ?+  t.t.path  (on-peek:default path)
     ::
     ::  =sur -build-file /=chess=/sur/chess/hoon
-    ::  .^((map @dau chess-game:sur) %gx /=chess=/archive/all/noun)
+    ::  .^(((mop @dau chess-game:sur) lth) %gx /=chess=/archive/all/noun)
     ::  .^(json %gx /=chess=/archive/all/json)
         [%all ~]
       ``[%chess-archive !>(archive)]
@@ -1002,7 +1003,7 @@
               =.  result.updated-game  `%'½–½'
               %=  this
                 games    (~(del by games) u.game-id)
-                archive  (~(put by archive) u.game-id updated-game)
+                archive  (put:arch-orm archive u.game-id updated-game)
               ==
             %chess-draw-decline
               :-  :~  :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
@@ -1030,7 +1031,7 @@
               ::  archive games with results
                 %=  this
                   games    (~(del by games) u.game-id)
-                  archive  (~(put by archive) u.game-id game)
+                  archive  (put:arch-orm archive u.game-id game)
                 ==
               ::  add new games to our list
               ::  XX: could this be where position update
@@ -1050,7 +1051,7 @@
                   [~ this]  ::  nice try, cheater
                 :_  %=  this
                       games    (~(del by games) u.game-id)
-                      archive  (~(put by archive) u.game-id game.u.game-state(result `result.result))
+                      archive  (put:arch-orm archive u.game-id game.u.game-state(result `result.result))
                     ==
                 :~  :*  %give
                         %fact
@@ -1079,7 +1080,7 @@
                 [~ this]  ::  nice try, cheater
               :_  %=  this
                     games    (~(del by games) u.game-id)
-                    archive  (~(put by archive) u.game-id game.result-game-state(result `result.result))
+                    archive  (put:arch-orm archive u.game-id game.result-game-state(result `result.result))
                   ==
               :~  :*  %give
                       %fact

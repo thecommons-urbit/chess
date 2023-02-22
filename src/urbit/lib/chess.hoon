@@ -1,6 +1,5 @@
 /-  chess
 =,  chess
-=,  format
 ::
 ::  /lib/chess.hoon chapters:
 ::  %squares
@@ -1394,33 +1393,6 @@
       ~['']
       (algebraicize-and-number game)
     ==
-::
-::  helps chess-archive mark
-++  archive-json
-  |=  archive=[@dau chess-game]
-  =/  game  +.archive
-  ^-  json
-  %-  pairs:enjs
-  :~  ['gameID' [%s (scot %da game-id.game)]]
-      ['event' [%s event.game]]
-      ['site' [%s site.game]]
-      ['round' [%s (round-string round.game)]]
-      ['white' [%s (player-string white.game)]]
-      ['black' [%s (player-string black.game)]]
-      ['result' [%s ?~(result.game '' u.result.game)]]
-      ['moves' [%a (turn moves.game move-json)]]
-  ==
-::
-::  frontend doesn't recieve a full %chess-move
-::  it only expects strings for san and fen
-++  move-json
-  |=  move=[chess-move fen=chess-fen san=chess-san]
-  ^-  json
-  %-  pairs:enjs
-  :~  ['san' [%s san.move]]
-      ['fen' [%s fen.move]]
-  ==
-
 ::
 ::  not used in the code,
 ::  but useful for testing.

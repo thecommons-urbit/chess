@@ -10,6 +10,8 @@
   |%
   ++  noun  game
   ++  json
+    ::  XX: add the +move-json arm in here for scries
+    ::      specific games to work.
     %-  pairs:enjs
     :~  ['gameID' [%s (scot %da game-id.game)]]
         ['event' [%s event.game]]
