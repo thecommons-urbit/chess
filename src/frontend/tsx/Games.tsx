@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Side, GameID } from '../ts/types/urbitChess'
-import { scryArchive } from '../ts/helpers/urbitChess'
+import { scryGame } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 
 export function Games () {
   // data
-  const { urbit, displayGame, activeGames, setDisplayGame, setDisplayIndex, localArchive, setLocalArchive, showingArchive, setShowingArchive } = useChessStore()
+  const { urbit, displayGame, activeGames, setDisplayGame, setDisplayIndex, archivedGames, showingArchive, setShowingArchive, setBrowseGame } = useChessStore()
   const { pieceTheme } = usePreferenceStore()
   const hasGame: boolean = (displayGame !== null)
 
@@ -22,7 +22,10 @@ export function Games () {
 
   const openArchive = async () => {
     setShowingActive(false)
-    setLocalArchive(await scryArchive('chess', '/archive/all'))
+  }
+
+  const browse = async (gameID: string) => {
+    setBrowseGame(await scryGame('chess', '/game/' + gameID))
   }
 
   return (
@@ -70,20 +73,20 @@ export function Games () {
       {/* Archive */}
       <ul id="archive-games" className={`game-list ${pieceTheme} ${status}`} style={{ display: (showingActive ? 'none' : 'flex') }}>
         {
-          Array.from(localArchive).map(([gameID, archiveGame], key) => {
+          Array.from(archivedGames).map(([gameID, archiveGame], key) => {
             const colorClass = (key % 2) ? 'odd' : 'even'
-            const description = archiveGame.info.event
-            const mySide = (urbit.ship === archiveGame.info.white.substring(1)) ? 'white' : 'black'
-            const opponent = (urbit.ship === archiveGame.info.white.substring(1))
-              ? archiveGame.info.black
-              : archiveGame.info.white
+            const description = archiveGame.event
+            const mySide = (urbit.ship === archiveGame.white.substring(1)) ? 'white' : 'black'
+            const opponent = (urbit.ship === archiveGame.white.substring(1))
+              ? archiveGame.black
+              : archiveGame.white
 
             return (
               <li
                 key={key}
                 className={`game active ${colorClass}`}
                 title={gameID}
-                onClick={() => { setDisplayGame(archiveGame); setDisplayIndex(null); setShowingArchive(true) }}>
+                onClick={async () => { browse(gameID); setDisplayIndex(null); setShowingArchive(true) }}>
                 <div className='row'>
                   <piece className={`game-icon ${mySide} knight`}/>
                   <div className='col game-card'>

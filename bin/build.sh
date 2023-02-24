@@ -50,14 +50,14 @@ docket() {
   echo "  version+[$VERSION_MAJOR $VERSION_MINOR $VERSION_PATCH]" >> $DOCKET_FILE
   echo "  license+'GPL3'" >> $DOCKET_FILE
   echo "  website+'https://github.com/ashelkovnykov/urbit-chess'" >> $DOCKET_FILE
-  
+
   if [[ -z $URL ]]; then
     echo "  glob-ames+[~$SHIP 0v0]" >> $DOCKET_FILE
   else
     GLOB=$(echo ${URL} | grep -Eo '0v[0-9a-v]{1,5}(\.[0-9a-v]{5})+')
     echo "  glob-http+['$URL' $GLOB]" >> $DOCKET_FILE
   fi
-  
+
   echo "==" >> $DOCKET_FILE
 }
 
@@ -82,7 +82,7 @@ VERSION_MINOR=9
 VERSION_PATCH=1
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
-KELVIN=417
+KELVIN=415
 
 DEFAULT_SHIP="finmep-lanteb"
 SHIP=$DEFAULT_SHIP

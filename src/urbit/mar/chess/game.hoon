@@ -10,8 +10,7 @@
   |%
   ++  noun  game
   ++  json
-    ::  XX: add the +move-json arm in here for scries
-    ::      specific games to work.
+    |^
     %-  pairs:enjs
     :~  ['gameID' [%s (scot %da game-id.game)]]
         ['event' [%s event.game]]
@@ -20,8 +19,18 @@
         ['white' [%s (player-string:chess white.game)]]
         ['black' [%s (player-string:chess black.game)]]
         ['result' [%s ?~(result.game '' u.result.game)]]
-        ['moves' [%a ~]]
+        ['moves' [%a ?~(moves.game ~ (turn moves.game move-json))]]
     ==
+    ::
+    ::  frontend only expects strings for san and fen
+    ++  move-json
+      |=  move=[chess-move:chess fen=chess-fen:chess san=chess-san:chess]
+      ^-  ^json
+      %-  pairs:enjs
+      :~  ['san' [%s san.move]]
+          ['fen' [%s fen.move]]
+      ==
+    --
   --
 ++  grad  %noun
 --

@@ -836,38 +836,11 @@
   ^-  (unit (unit cage))
   ?+  path  (on-peek:default path)
     ::
-    :: send back a list of chess-games
-      [%x %archive *]
-    ?+  t.t.path  (on-peek:default path)
-    ::
-    ::  =sur -build-file /=chess=/sur/chess/hoon
-    ::  .^(((mop @dau chess-game:sur) lth) %gx /=chess=/archive/all/noun)
-    ::  .^(json %gx /=chess=/archive/all/json)
-        [%all ~]
-      ``[%chess-archive !>(archive)]
-    ::
-    ::  =sur -build-file /=chess=/sur/chess/hoon
-    ::  .^(chess-archive:sur %gx /=chess=/archive/between/<game id>/<game id>/noun)
-    ::  .^(json %gx /=chess=/archive/between/<game id>/<game id>/json)
-        [%between @ta @ta ~]
-      =/  start=(unit @dau)  `(unit @dau)`(slaw %da i.t.t.path)
-      =/  end=(unit @dau)  `(unit @dau)`(slaw %da i.t.t.path)
-      ``[%chess-archive !>((lot:arch-orm archive start end))]
-    ::  XX: include more search criteria encoded in the path
-    ::      ex: opponent    archive/ship
-    ::          date range  archive/@da/@da
-    ::          event/site  archive/@t
-    ::          date area   archive/@da/@dr
-    ::          latest #    archive/last/@ud
-    ::          result      archive/result
-    ::          side      archive/side
-    ::
-    ::      *range, opponent, and side would be better with
-    ::      date range or a limit
-    ::
-    ::  collect only the latest 8 games in archive
-    :: [%last @ud ~]
-    ==
+    ::  .^(noun %gx /=chess=/archive/noun)
+    ::  .^(json %gx /=chess=/archive/json)
+    ::  send back a list of chess-games
+      [%x %archive ~]
+    ``[%chess-archive !>(archive)]
     ::
     ::  .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/noun)
     ::  read game info

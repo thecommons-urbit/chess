@@ -3,14 +3,14 @@ import { Beforeunload } from 'react-beforeunload'
 import Urbit from '@urbit/http-api'
 import useChessStore from '../ts/state/chessStore'
 import { GameInfo, ChallengeUpdate } from '../ts/types/urbitChess'
-import { findFriends } from '../ts/helpers/urbitChess'
+import { findFriends, scryArchive } from '../ts/helpers/urbitChess'
 import { Chessboard } from './Chessboard'
 import { Menu } from './Menu'
 import { GamePanel } from './GamePanel'
 import { PracticePanel } from './PracticePanel'
 
 export function App () {
-  const { urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends, setLocalArchive } = useChessStore()
+  const { activeGames, urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends, setArchivedGames } = useChessStore()
 
   //
   // Helper functions
@@ -36,6 +36,9 @@ export function App () {
     })
 
     setFriends(await findFriends('chess', '/friends'))
+
+    setArchivedGames(await scryArchive('chess', '/archive'))
+    console.log(activeGames)
   }
 
   const teardown = () => {

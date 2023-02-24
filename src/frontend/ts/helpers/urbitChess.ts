@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, GameInfo } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, GameMeta, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, GameInfo } from '../types/urbitChess'
 
 function emptyFunction (): void {}
 
@@ -149,6 +149,11 @@ export const findFriends = async (app: string, path: string) => {
 }
 
 export const scryArchive = async (app: string, path: string) => {
-  const scryOutput: { localArchive: Array<GameInfo>} = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
-  return scryOutput.localArchive
+  const scryOutput: { archivedGames: Array<GameMeta>} = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
+  return scryOutput.archivedGames
+}
+
+export const scryGame = async (app: string, path: string) => {
+  const scryOutput: GameInfo = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
+  return scryOutput
 }

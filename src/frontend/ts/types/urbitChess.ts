@@ -89,16 +89,19 @@ export type GameInfo = {
   moves: Array<Move>
 }
 
-export type ActiveGameInfo = {
-  position: FENPosition,
-  gotDrawOffer: boolean,
-  sentDrawOffer: boolean,
-  drawClaimAvailable: boolean,
-  autoClaimSpecialDraws: boolean,
-  info: GameInfo
+//  XX: GameInfo could be an extension of GameMeta.
+//
+export type GameMeta = {
+  gameID: GameID,
+  event: string,
+  site: string,
+  round: string,
+  white: Ship,
+  black: Ship,
+  result: Result,
 }
 
-export type ArchiveGameInfo = {
+export type ActiveGameInfo = {
   position: FENPosition,
   gotDrawOffer: boolean,
   sentDrawOffer: boolean,
