@@ -1125,12 +1125,13 @@
         (check-50-move-rule u.new-position)
     ==
   =/  special-draw-claim  &(special-draw-available auto-claim-special-draws.game-state)
+  ~&  (get-squares move)
   =/  position-update-card
     :*  %give
         %fact
         ~[/game/(scot %da game-id.game.game-state)/updates]
         %chess-update
-        !>([%position game-id.game.game-state (position-to-fen u.new-position) san special-draw-available])
+        !>([%position game-id.game.game-state (position-to-fen u.new-position) san special-draw-available (get-squares move)])
     ==
   ::  check if game ends by checkmate, stalemate, or special draw
   ?:  ?|  in-checkmate
@@ -1201,4 +1202,24 @@
    |=  position=chess-position
    ^-  ?
    (gte ply-50-move-rule.position 100)
+++  get-squares
+  |=  move=chess-move
+  ^-  [@t @t]
+  ?-  -.move
+    %move
+      [(cat 3 -.from.move (scot %ud +.from.move)) (cat 3 -.to.move (scot %ud +.to.move))]
+    %castle
+      ?-  +.move
+        %queenside
+          ?-  player-to-move.position.game-state
+            %white  ['e1' 'c1']
+            %black  ['e8' 'c8']
+          ==
+        %kingside
+          ?-  player-to-move.position.game-state
+            %white  ['e1' 'g1']
+            %black  ['e8' 'g8']
+          ==
+      ==
+  ==
 --

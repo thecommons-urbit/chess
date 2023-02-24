@@ -196,6 +196,7 @@ export function Chessboard () {
       fen: (displayIndex == null || displayGame.info.moves == null)
         ? chess.fen()
         : displayGame.info.moves[displayIndex].fen,
+      lastMove: displayGame.lastMove as cg.Key[],
       viewOnly: isViewOnly,
       turnColor: sideToMove as cg.Color,
       check: chess.in_check(),

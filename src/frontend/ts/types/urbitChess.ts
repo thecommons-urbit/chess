@@ -103,7 +103,8 @@ export type ActiveGameInfo = {
   autoClaimSpecialDraws: boolean,
   gotUndoRequest: boolean,
   sentUndoRequest: boolean,
-  info: GameInfo
+  info: GameInfo,
+  lastMove: Array<string>
 }
 
 export type Challenge = {
@@ -150,6 +151,7 @@ export interface PositionUpdate extends ChessUpdate {
   position: FENPosition
   specialDrawAvailable: boolean
   move: Move | null
+  lastMove: Array<string>
 }
 
 export interface ResultUpdate extends ChessUpdate {
