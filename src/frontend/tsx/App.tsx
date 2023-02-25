@@ -10,7 +10,7 @@ import { GamePanel } from './GamePanel'
 import { PracticePanel } from './PracticePanel'
 
 export function App () {
-  const { activeGames, urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends, setArchivedGames } = useChessStore()
+  const { urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends, setArchivedGames } = useChessStore()
 
   //
   // Helper functions
@@ -38,7 +38,6 @@ export function App () {
     setFriends(await findFriends('chess', '/friends'))
 
     setArchivedGames(await scryArchive('chess', '/archive'))
-    console.log(activeGames)
   }
 
   const teardown = () => {
