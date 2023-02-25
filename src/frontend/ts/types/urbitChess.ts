@@ -1,3 +1,5 @@
+import * as cg from 'chessground/types'
+
 //
 // Enumerations
 //
@@ -104,7 +106,7 @@ export type ActiveGameInfo = {
   gotUndoRequest: boolean,
   sentUndoRequest: boolean,
   info: GameInfo,
-  lastMove: Array<string>
+  lastMove: Array<cg.Key> | null
 }
 
 export type Challenge = {
@@ -151,7 +153,7 @@ export interface PositionUpdate extends ChessUpdate {
   position: FENPosition
   specialDrawAvailable: boolean
   move: Move | null
-  lastMove: Array<string>
+  lastMove: Array<cg.Key>
 }
 
 export interface ResultUpdate extends ChessUpdate {
