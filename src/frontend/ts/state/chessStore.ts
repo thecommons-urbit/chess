@@ -65,8 +65,7 @@ const useChessStore = create<ChessState>((set, get) => ({
       autoClaimSpecialDraws: false,
       gotUndoRequest: false,
       sentUndoRequest: false,
-      info: data,
-      lastMove: null
+      info: data
     }
 
     set(state => ({ activeGames: state.activeGames.set(data.gameID, activeGame) }))
@@ -104,8 +103,7 @@ const useChessStore = create<ChessState>((set, get) => ({
             autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
             gotUndoRequest: currentGame.gotUndoRequest,
             sentUndoRequest: currentGame.sentUndoRequest,
-            info: currentGame.info,
-            lastMove: positionData.lastMove
+            info: currentGame.info
           }
 
           set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -150,8 +148,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: currentGame.gotUndoRequest,
           sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info,
-          lastMove: currentGame.lastMove
+          info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -174,8 +171,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: currentGame.gotUndoRequest,
           sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info,
-          lastMove: currentGame.lastMove
+          info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -198,8 +194,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           autoClaimSpecialDraws: setting,
           gotUndoRequest: currentGame.gotUndoRequest,
           sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info,
-          lastMove: currentGame.lastMove
+          info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -221,8 +216,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: true,
           sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info,
-          lastMove: currentGame.lastMove
+          info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -244,8 +238,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: currentGame.gotUndoRequest,
           sentUndoRequest: false,
-          info: currentGame.info,
-          lastMove: currentGame.lastMove
+          info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -268,8 +261,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: false,
           sentUndoRequest: false,
-          info: currentGame.info,
-          lastMove: currentGame.lastMove
+          info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))

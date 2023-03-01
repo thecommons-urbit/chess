@@ -45,9 +45,15 @@
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'position']]
             ['gameID' [%s (scot %da game-id.upd)]]
-            ['move' (pairs:enjs ~[['san' [%s san.upd]] ['fen' [%s position.upd]] ['lastMove' [%a ~[[%s -.last-move.upd] [%s +.last-move.upd]]]]])]
             ['specialDrawAvailable' [%b special-draw-available.upd]]
-        ==
+        ::
+            :-  'move'
+            %-  pairs:enjs
+            :~  ['from' [%s p.move.upd]]
+                ['to' [%s q.move.upd]]
+                ['san' [%s san.upd]]
+                ['fen' [%s position.upd]]
+        ==  ==
       %result
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'result']]

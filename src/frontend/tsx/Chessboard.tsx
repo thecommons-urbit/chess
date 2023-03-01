@@ -89,10 +89,6 @@ export function Chessboard () {
 
     if (displayGame !== null) {
       chess.load(displayGame.position)
-      const config: CgConfig = {
-        lastMove: displayGame.lastMove
-      }
-      api?.set(config)
     } else if (practiceBoard !== null) {
       chess.load(practiceBoard)
     } else {
@@ -200,6 +196,12 @@ export function Chessboard () {
       fen: (displayIndex == null || displayGame.info.moves == null)
         ? chess.fen()
         : displayGame.info.moves[displayIndex].fen,
+      lastMove: (displayGame == null || displayGame.info.moves == null)
+        ? null
+        : [
+          displayGame.info.moves[displayIndex].from,
+          displayGame.info.moves[displayIndex].to
+        ],
       viewOnly: isViewOnly,
       turnColor: sideToMove as cg.Color,
       check: chess.in_check(),

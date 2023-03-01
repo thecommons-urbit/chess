@@ -1,4 +1,4 @@
-import * as cg from 'chessground/types'
+import { Key as CgKey } from 'chessground/types'
 
 //
 // Enumerations
@@ -82,6 +82,8 @@ export type SAN = string
 export type FENPosition = string
 
 export type Move = {
+  start: CgKey
+  end: CgKey
   san: SAN
   fen: FENPosition
 }
@@ -105,8 +107,7 @@ export type ActiveGameInfo = {
   autoClaimSpecialDraws: boolean,
   gotUndoRequest: boolean,
   sentUndoRequest: boolean,
-  info: GameInfo,
-  lastMove: Array<cg.Key> | null
+  info: GameInfo
 }
 
 export type Challenge = {
@@ -153,7 +154,6 @@ export interface PositionUpdate extends ChessUpdate {
   position: FENPosition
   specialDrawAvailable: boolean
   move: Move | null
-  lastMove: Array<cg.Key>
 }
 
 export interface ResultUpdate extends ChessUpdate {

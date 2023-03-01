@@ -1425,4 +1425,30 @@
      [[%move [%d %8] [%h %4] ~] 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1' 'Qh4#']
   ==
   ==
+::
+::  return the squares involved in a move
+++  get-squares
+  |=  [move=chess-move player=chess-side]
+  ::  XX: give this type a name
+  ^-  (pair @t @t)
+  ?-  -.move
+      %move
+    :-  (cat 3 -.from.move (scot %ud +.from.move))
+    (cat 3 -.to.move (scot %ud +.to.move))
+  ::
+      %castle
+    ?-  +.move
+        %queenside
+      ?-  player
+        %white  ['e1' 'c1']
+        %black  ['e8' 'c8']
+      ==
+    ::
+        %kingside
+      ?-  player
+        %white  ['e1' 'g1']
+        %black  ['e8' 'g8']
+      ==
+    ==
+  ==
 --
