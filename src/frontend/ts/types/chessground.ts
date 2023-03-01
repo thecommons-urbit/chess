@@ -1,6 +1,6 @@
-import * as cg from 'chessground/types'
+import { Key as CgKey } from 'chessground/types'
 
 export interface PromotionMove {
-  orig: cg.Key;
-  dest: cg.Key;
+  orig: CgKey;
+  dest: CgKey;
 }

@@ -57,11 +57,6 @@ export function Chessboard () {
       ? Side.White
       : Side.Black
     : getCgColor(chess.turn()) as Side
-  const boardTitle = (displayGame !== null)
-    ? (orientation === Side.White)
-      ? `${CHESS.pieceWhiteKnight} ${displayGame.info.white} vs. ${CHESS.pieceBlackKnight} ${displayGame.info.black}`
-      : `${CHESS.pieceBlackKnight} ${displayGame.info.black} vs. ${CHESS.pieceWhiteKnight} ${displayGame.info.white}`
-    : `~${window.ship}'s practice board`
   const isViewOnly = (displayIndex == null)
     ? false
     : (displayGame.info.moves == null)
@@ -198,10 +193,15 @@ export function Chessboard () {
         : displayGame.info.moves[displayIndex].fen,
       lastMove: (displayGame == null || displayGame.info.moves == null)
         ? null
-        : [
-          displayGame.info.moves[displayIndex].from,
-          displayGame.info.moves[displayIndex].to
-        ],
+        : (displayIndex == null)
+          ? [
+            displayGame.info.moves[displayGame.info.moves.length - 1].from,
+            displayGame.info.moves[displayGame.info.moves.length - 1].to
+          ]
+          : [
+            displayGame.info.moves[displayIndex].from,
+            displayGame.info.moves[displayIndex].to
+          ],
       viewOnly: isViewOnly,
       turnColor: sideToMove as cg.Color,
       check: chess.in_check(),

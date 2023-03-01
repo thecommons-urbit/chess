@@ -82,8 +82,8 @@ export type SAN = string
 export type FENPosition = string
 
 export type Move = {
-  start: CgKey
-  end: CgKey
+  from: CgKey
+  to: CgKey
   san: SAN
   fen: FENPosition
 }
