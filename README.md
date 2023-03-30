@@ -4,30 +4,25 @@
 
 ## About
 
-`%chess` is an [Urbit](https://urbit.org) app which allows you to play correspondence chess with other Urbit users. It
-is a fully-decentralized, peer-to-peer chess application.
+`%chess` is an [Urbit](https://urbit.org) app which allows you to play chess with other Urbit users. It is a
+fully-decentralized, peer-to-peer chess application.
 
 The original `%chess` was made by Raymond E. Pasco for several reasons:
 - To practice Hoon
 - As a hobby project
 - As a proof-of-concept that users could share software between ships using Urbit "desks"
-
-Ray paused work on `%chess` in March 2021 due to personal reasons. In August 2021, Tlon released full-fledged software
-distribution in an update to Arvo. I updated `%chess` to work with this update as a broadly-visible example of app
-distribution for Assembly 2021. Since then, I have acted as steward for `%chess`.
-
-In my opinion, `%chess` is an experimental, community sandbox to show what's possible with Urbit. As Urbit evolves, so
-too should `%chess`. Ray may feel differently, and is entitled to do so as the original creator of the app and
-primary author of its Hoon code.
-
 You can find his original repository for Urbit Chess [here](https://git.sr.ht/~ray/urbit-chess) and his Urbit Chess
 Announcements page [here](https://lists.sr.ht/~ray).
 
-— Alex Shelkovnykov, `~finmep-lanteb`
+Ray paused work on `%chess` in March 2021 due to personal reasons. In August 2021, Tlon released full-fledged software
+distribution in an update to Arvo. `~finmep-lanteb` updated `%chess` to work with this update as a broadly-visible
+example of app distribution for Assembly 2021.
+
+`%chess` is a community sandbox for Urbit apps. As Urbit evolves, so too should `%chess`. `%chess` should seek to at all
+times incorporate the most modern Urbit programming techniques. It should also strive to provide well-documented, clear,
+concise code that beginner Hoon coders can use as a reference.
 
 ## News
-
-![aid](https://0x0.st/oVSE.jpg)
 
 The [Chess Improvements Bounty](https://urbit.org/grants/chess-bounty) has been posted and filled.
 
@@ -35,8 +30,6 @@ The [Chess Improvements Bounty](https://urbit.org/grants/chess-bounty) has been 
 
 You can find `%chess` on Urbit using the App Search in Grid. Search for `~finmep-lanteb` and you should see
 `%chess` as an available app.
-
-![Urbit Chess Grid View](https://raw.githubusercontent.com/ashelkovnykov/urbit-chess/master/images/urbit-chess-find.png)
 
 Alternatively, you can install from your ship's Terminal:
 ```

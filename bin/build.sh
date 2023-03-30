@@ -45,7 +45,7 @@ docket() {
   echo "  title+'Chess'" >> $DOCKET_FILE
   echo "  info+'Fully peer-to-peer chess over Urbit'" >> $DOCKET_FILE
   echo "  color+0xea.e4d5" >> $DOCKET_FILE
-  echo "  image+'https://raw.githubusercontent.com/thecommons-urbit/chess/master/images/tile.svg'" >> $DOCKET_FILE
+  echo "  image+'https://raw.githubusercontent.com/thecommons-urbit/chess/develop/images/tile.svg'" >> $DOCKET_FILE
   echo "  base+'chess'" >> $DOCKET_FILE
   echo "  version+[$VERSION_MAJOR $VERSION_MINOR $VERSION_PATCH]" >> $DOCKET_FILE
   echo "  license+'GPL3'" >> $DOCKET_FILE
@@ -79,10 +79,10 @@ DOCKER_IMAGE="urbit-chess"
 
 VERSION_MAJOR=0
 VERSION_MINOR=9
-VERSION_PATCH=2
+VERSION_PATCH=3
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
-KELVIN=415
+KELVIN=414
 
 DEFAULT_SHIP="finmep-lanteb"
 SHIP=$DEFAULT_SHIP
