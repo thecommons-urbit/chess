@@ -79,10 +79,10 @@ DOCKER_IMAGE="urbit-chess"
 
 VERSION_MAJOR=0
 VERSION_MINOR=9
-VERSION_PATCH=2
+VERSION_PATCH=3
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
-KELVIN=415
+KELVIN=414
 
 DEFAULT_SHIP="finmep-lanteb"
 SHIP=$DEFAULT_SHIP
@@ -136,7 +136,10 @@ echo "[%zuse $KELVIN]" > $DESK_DIR/sys.kelvin
 
 # Build frontend
 if [ $DOCKER -eq 1 ]; then
-  sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
+  # Need to use legacy builder ( DOCKER_BUILDKIT=0) so that MacOS builds work until this issue is resolved:
+  #   https://github.com/moby/buildkit/issues/1271
+  # sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
+  sudo DOCKER_BUILDKIT=0 docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
   sudo docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
 
   # Copy additional src files for frontend
