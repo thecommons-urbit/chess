@@ -4,12 +4,11 @@ import { Chessground } from 'chessground'
 import { Api as CgApi } from 'chessground/api'
 import { Config as CgConfig } from 'chessground/config'
 import * as cg from 'chessground/types'
-import Popup from 'reactjs-popup'
 import { CHESS } from '../ts/constants/chess'
 import { CHESSGROUND } from '../ts/constants/chessground'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
-import { pokeAction, move, castle, acceptDraw, declineDraw, claimSpecialDraw, acceptUndo, declineUndo } from '../ts/helpers/urbitChess'
+import { pokeAction, move, castle, declineDraw, claimSpecialDraw, declineUndo } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { PromotionMove } from '../ts/types/chessground'
@@ -285,26 +284,6 @@ export function Chessboard () {
     setPromotionMove(null)
   }
 
-  const acceptDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, acceptDraw(gameID))
-  }
-
-  const declineDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
-  }
-
-  const acceptUndoOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, acceptUndo(gameID))
-  }
-
-  const declineUndoOnClick = async () => {
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
-  }
-
   //
   // HTML element generation functions
   //
@@ -390,40 +369,6 @@ export function Chessboard () {
     )
   }
 
-  const renderDrawPopup = (game: ActiveGameInfo) => {
-    const opponent = (orientation === Side.White) ? game.info.black : game.info.white
-
-    return (
-      <Popup open={game.gotDrawOffer}>
-        <div>
-          <p>{`${opponent} has offered a draw`}</p>
-          <br/>
-          <div className='draw-resolution row'>
-            <button className="accept" role="button" onClick={acceptDrawOnClick}>Accept</button>
-            <button className="reject" role="button" onClick={declineDrawOnClick}>Decline</button>
-          </div>
-        </div>
-      </Popup>
-    )
-  }
-
-  const renderUndoPopup = (game: ActiveGameInfo) => {
-    const opponent = (orientation === Side.White) ? game.info.black : game.info.white
-
-    return (
-      <Popup open={game.gotUndoRequest}>
-        <div>
-          <p>{`${opponent} has requested to undo a move`}</p>
-          <br/>
-          <div className='draw-resolution row'>
-            <button className="accept" role="button" onClick={acceptUndoOnClick}>Accept</button>
-            <button className="reject" role="button" onClick={declineUndoOnClick}>Decline</button>
-          </div>
-        </div>
-      </Popup>
-    )
-  }
-
   return (
     <div className='game-container'>
       <div className={`board-container ${boardTheme} ${pieceTheme}`}>
@@ -433,8 +378,6 @@ export function Chessboard () {
       <div className='turn-container'>
         <p className='turn-text'>{`${sideToMove} to move...`}</p>
       </div>
-      { (displayGame !== null) ? renderDrawPopup(displayGame) : <div/> }
-      { (displayGame !== null) ? renderUndoPopup(displayGame) : <div/> }
     </div>
   )
 }
