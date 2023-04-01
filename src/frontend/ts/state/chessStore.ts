@@ -81,7 +81,7 @@ const useChessStore = create<ChessState>((set, get) => ({
   receiveUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
       if ((get().displayGame !== null) && (updatedGame.info.gameID === get().displayGame.info.gameID)) {
-        set({ displayGame: updatedGame, displayIndex: null })
+        set({ displayGame: updatedGame })
       }
     }
 
@@ -106,7 +106,7 @@ const useChessStore = create<ChessState>((set, get) => ({
             info: currentGame.info
           }
 
-          set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
+          set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: null }))
           updateDisplayGame(updatedGame)
 
           console.log('RECEIVED POSITION UPDATE')
@@ -264,7 +264,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           info: currentGame.info
         }
 
-        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
+        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: null }))
         updateDisplayGame(updatedGame)
 
         console.log('RECEIVED UNDO ACCEPTED UPDATE')
