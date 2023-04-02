@@ -5,6 +5,12 @@ import { Update, Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo,
 import { findFriends } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
+// TODO: should log which function was called with the bad ID
+// TODO: should check if the ID is a valid archived game
+const badGameId = (gameID: GameID) => {
+  console.log('received bad gameId: ' + gameID)
+}
+
 const useChessStore = create<ChessState>((set, get) => ({
   urbit: null,
   displayGame: null,
@@ -92,6 +98,11 @@ const useChessStore = create<ChessState>((set, get) => ({
         const move = positionData.move
         const currentGame = get().activeGames.get(gameID)
 
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         if (move.san !== null && move.fen !== null) {
           currentGame.info.moves.push(move)
 
@@ -138,8 +149,13 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.DrawOffer: {
         const offerData = data as DrawOfferUpdate
         const gameID = offerData.gameID
-
         const currentGame = get().activeGames.get(gameID)
+
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
           gotDrawOffer: true,
@@ -161,8 +177,13 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.DrawDeclined: {
         const declineData = data as DrawDeclinedUpdate
         const gameID = declineData.gameID
-
         const currentGame = get().activeGames.get(gameID)
+
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
           gotDrawOffer: currentGame.gotDrawOffer,
@@ -184,8 +205,13 @@ const useChessStore = create<ChessState>((set, get) => ({
         const preferenceData = data as SpecialDrawPreferenceUpdate
         const gameID = preferenceData.gameID
         const setting = preferenceData.setting
-
         const currentGame = get().activeGames.get(gameID)
+
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
           gotDrawOffer: currentGame.gotDrawOffer,
@@ -206,8 +232,13 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.UndoRequest: {
         const requestData = data as UndoRequestUpdate
         const gameID = requestData.gameID
-
         const currentGame = get().activeGames.get(gameID)
+
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
           gotDrawOffer: currentGame.gotDrawOffer,
@@ -228,8 +259,13 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.UndoDeclined: {
         const declineData = data as UndoDeclinedUpdate
         const gameID = declineData.gameID
-
         const currentGame = get().activeGames.get(gameID)
+
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
           gotDrawOffer: currentGame.gotDrawOffer,
@@ -250,8 +286,13 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.UndoAccepted: {
         const acceptData = data as UndoAcceptedUpdate
         const gameID = acceptData.gameID
-
         const currentGame = get().activeGames.get(gameID)
+
+        if (currentGame === null) {
+          badGameId(gameID)
+          return
+        }
+
         currentGame.info.moves.splice(currentGame.info.moves.length - acceptData.undoMoves, acceptData.undoMoves)
         const updatedGame: ActiveGameInfo = {
           position: acceptData.position,
@@ -280,26 +321,46 @@ const useChessStore = create<ChessState>((set, get) => ({
   },
   declinedDraw: (gameID: GameID) => {
     let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-    updatedGame.gotDrawOffer = false
 
+    if (updatedGame === null) {
+      badGameId(gameID)
+      return
+    }
+
+    updatedGame.gotDrawOffer = false
     set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
   },
   offeredDraw: (gameID: GameID) => {
     let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-    updatedGame.sentDrawOffer = true
 
+    if (updatedGame === null) {
+      badGameId(gameID)
+      return
+    }
+
+    updatedGame.sentDrawOffer = true
     set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
   },
   declinedUndo: (gameID: GameID) => {
     let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-    updatedGame.gotUndoRequest = false
 
+    if (updatedGame === null) {
+      badGameId(gameID)
+      return
+    }
+
+    updatedGame.gotUndoRequest = false
     set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
   },
   requestedUndo: (gameID: GameID) => {
     let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-    updatedGame.sentUndoRequest = true
 
+    if (updatedGame === null) {
+      badGameId(gameID)
+      return
+    }
+
+    updatedGame.sentUndoRequest = true
     set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
   }
 }))
