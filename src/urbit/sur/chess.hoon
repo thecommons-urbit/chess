@@ -257,7 +257,6 @@
       [%challenge-received who=ship challenge=chess-challenge]
       [%challenge-resolved who=ship]
       [%challenge-replied who=ship]
-      [%position game-id=@dau position=@t san=@t special-draw-available=?]
       [%draw-offer game-id=@dau]
       [%draw-declined game-id=@dau]
       [%undo-declined game-id=@dau]
@@ -265,7 +264,14 @@
       [%undo-request game-id=@dau]
       [%result game-id=@dau result=chess-result]
       [%special-draw-preference game-id=@dau setting=?]
-  ==
+  ::
+      $:  %position
+          game-id=@dau
+          move=(pair @t @t)
+          position=@t
+          san=@t
+          special-draw-available=?
+  ==  ==
 ::
 ::  XX: document chess-rng
 ::

@@ -811,12 +811,21 @@
       =/  game-state  (~(got by games) u.game-id)
       =/  fen  (position-to-fen position.game-state)
       =/  cards  ^-  (list card)
-         %+  turn
-           moves.game.game-state
-         |=  move=[move=chess-move fen=chess-fen san=chess-san]
-         :*  %give  %fact   ~[/game/(scot %da u.game-id)/updates]
-             %chess-update  !>([%position u.game-id fen.move san.move special-draw-available.game-state])
-         ==
+        %+  spun
+          moves.game.game-state
+        |=  [move=[move=chess-move fen=chess-fen san=chess-san] player=chess-side]
+        :-  :*  %give
+                %fact
+                ~[/game/(scot %da u.game-id)/updates]
+                %chess-update
+                !>  :*  %position
+                        u.game-id
+                        (get-squares move.move player)
+                        fen.move
+                        san.move
+                        special-draw-available.game-state
+            ==      ==
+            (opposite-side player)
       =?  cards  got-draw-offer.game-state
         :_  cards
         :*  %give  %fact  ~[/game/(scot %da u.game-id)/updates]
@@ -1126,12 +1135,17 @@
     ==
   =/  special-draw-claim  &(special-draw-available auto-claim-special-draws.game-state)
   =/  position-update-card
-    :*  %give
-        %fact
-        ~[/game/(scot %da game-id.game.game-state)/updates]
-        %chess-update
-        !>([%position game-id.game.game-state (position-to-fen u.new-position) san special-draw-available])
-    ==
+  :*  %give
+      %fact
+      ~[/game/(scot %da game-id.game.game-state)/updates]
+      %chess-update
+      !>  :*  %position
+              game-id.game.game-state
+              (get-squares move player-to-move.u.new-position)
+              (position-to-fen u.new-position)
+              san
+              special-draw-available
+  ==      ==
   ::  check if game ends by checkmate, stalemate, or special draw
   ?:  ?|  in-checkmate
           in-stalemate

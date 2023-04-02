@@ -1,3 +1,5 @@
+import { Key as CgKey } from 'chessground/types'
+
 //
 // Enumerations
 //
@@ -80,6 +82,8 @@ export type SAN = string
 export type FENPosition = string
 
 export type Move = {
+  from: CgKey
+  to: CgKey
   san: SAN
   fen: FENPosition
 }
