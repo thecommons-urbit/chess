@@ -1141,7 +1141,7 @@
       %chess-update
       !>  :*  %position
               game-id.game.game-state
-              (get-squares move player-to-move.position.game-state)
+              (get-squares move player-to-move.u.new-position)
               (position-to-fen u.new-position)
               san
               special-draw-available
