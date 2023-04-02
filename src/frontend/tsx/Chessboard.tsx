@@ -191,7 +191,7 @@ export function Chessboard () {
       fen: (displayIndex == null || displayGame.info.moves == null)
         ? chess.fen()
         : displayGame.info.moves[displayIndex].fen,
-      lastMove: (displayGame == null || displayGame.info.moves == null)
+      lastMove: (displayGame == null || displayGame.info.moves == null || (displayGame.info.moves.length === 0))
         ? null
         : (displayIndex == null)
           ? [
