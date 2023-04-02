@@ -1,17 +1,22 @@
 import React, { useState } from 'react'
 import { Chess, ChessInstance } from 'chess.js'
+import Popup from 'reactjs-popup'
 import useChessStore from '../ts/state/chessStore'
-import { pokeAction, resign, offerDraw, claimSpecialDraw, requestUndo } from '../ts/helpers/urbitChess'
+import { pokeAction, offerDraw, acceptDraw, declineDraw, claimSpecialDraw, resign, requestUndo, declineUndo, acceptUndo } from '../ts/helpers/urbitChess'
 import { CHESS } from '../ts/constants/chess'
 import { Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function GamePanel () {
-  const { urbit, displayGame, setDisplayGame, offeredDraw, requestedUndo, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
+  const { urbit, displayGame, setDisplayGame, offeredDraw, declinedDraw, requestedUndo, declinedUndo, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
   const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
   const opponent = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
     ? displayGame.info.black
     : displayGame.info.white
+
+  //
+  // HTML element helper functions
+  //
 
   const resignOnClick = async () => {
     const gameID = displayGame.info.gameID
@@ -21,6 +26,16 @@ export function GamePanel () {
   const offerDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
     await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
+  }
+
+  const acceptDrawOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, acceptDraw(gameID))
+  }
+
+  const declineDrawOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
   }
 
   const claimSpecialDrawOnClick = async () => {
@@ -33,6 +48,16 @@ export function GamePanel () {
     await pokeAction(urbit, requestUndo(gameID), null, () => { requestedUndo(gameID) })
   }
 
+  const acceptUndoOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, acceptUndo(gameID))
+  }
+
+  const declineUndoOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
+  }
+
   const moveOpacity = (index: number) => {
     if (displayIndex == null || index <= displayIndex) {
       return 1.0
@@ -40,6 +65,10 @@ export function GamePanel () {
       return 0.3
     }
   }
+
+  //
+  // HTML element generation functions
+  //
 
   const moveList = () => {
     let displayMoves = (displayGame.info.moves !== null) ? displayGame.info.moves : []
@@ -76,6 +105,40 @@ export function GamePanel () {
     return components
   }
 
+  //
+  // Render HTML
+  //
+
+  const renderDrawPopup = (game: ActiveGameInfo) => {
+    return (
+      <Popup open={game.gotDrawOffer}>
+        <div>
+          <p>{`${opponent} has offered a draw`}</p>
+          <br/>
+          <div className='draw-resolution row'>
+            <button className="accept" role="button" onClick={acceptDrawOnClick}>Accept</button>
+            <button className="reject" role="button" onClick={declineDrawOnClick}>Decline</button>
+          </div>
+        </div>
+      </Popup>
+    )
+  }
+
+  const renderUndoPopup = (game: ActiveGameInfo) => {
+    return (
+      <Popup open={game.gotUndoRequest}>
+        <div>
+          <p>{`${opponent} has requested to undo a move`}</p>
+          <br/>
+          <div className='draw-resolution row'>
+            <button className="accept" role="button" onClick={acceptUndoOnClick}>Accept</button>
+            <button className="reject" role="button" onClick={declineUndoOnClick}>Decline</button>
+          </div>
+        </div>
+      </Popup>
+    )
+  }
+
   return (
     <div className='game-panel-container col' style={{ display: ((displayGame !== null) ? 'flex' : ' none') }}>
       <div className="game-panel col">
@@ -97,51 +160,60 @@ export function GamePanel () {
           <p>00:00</p>
         </div>
         {/* buttons */}
-        {/* offer draw button */}
-        <button
-          className='option'
-          disabled={!hasGame || displayGame.sentDrawOffer}
-          onClick={offerDrawOnClick}>
-          Offer Draw</button>
         {/* resign button */}
         <button
           className='option'
           disabled={!hasGame}
           onClick={resignOnClick}>
           Resign</button>
-        {/* claim special draw */}
-        {hasGame ? (
-          <button
+        {/* offer/accept draw button */}
+        {displayGame.gotDrawOffer
+          ? <button
             className='option'
-            disabled={!displayGame.drawClaimAvailable}
-            onClick={claimSpecialDrawOnClick}>
-            Claim Special Draw</button>
-        ) : (null)
+            disabled={!hasGame}
+            onClick={acceptDrawOnClick}>
+            Accept Draw Offer</button>
+          : <button
+            className='option'
+            disabled={!hasGame || displayGame.sentDrawOffer}
+            onClick={offerDrawOnClick}>
+            Send Draw Offer</button>
         }
-        {/* request undo button */}
-        {hasGame ? (
-          <button
+        {/* claim special draw */}
+        <button
+          className='option'
+          disabled={!hasGame || !displayGame.drawClaimAvailable}
+          onClick={claimSpecialDrawOnClick}>
+          Claim Special Draw</button>
+        {/* request/accept undo button */}
+        {displayGame.gotUndoRequest
+          ? <button
             className='option'
-            disabled={displayGame.sentUndoRequest}
+            disabled={!hasGame}
+            onClick={acceptUndoOnClick}>
+            Accept Undo Request</button>
+          : <button
+            className='option'
+            disabled={!hasGame || displayGame.sentUndoRequest}
             onClick={requestUndoOnClick}>
             Request to Undo Move</button>
-        ) : (null)
         }
         {/* (reset) practice board */}
-        {hasGame ? (
-          <button
+        {hasGame
+          ? <button
             className='option'
             disabled={!hasGame}
             onClick={() => setDisplayGame(null)}>
             Practice Board</button>
-        ) : (
-          <button
+          : <button
             className='option'
             disabled={hasGame || !practiceHasMoved}
             onClick={() => setPracticeBoard(null)}>
             Reset Practice Board</button>
-        )}
+        }
       </div>
+      { (displayGame !== null) ? renderDrawPopup(displayGame) : <div/> }
+      { (displayGame !== null) ? renderUndoPopup(displayGame) : <div/> }
     </div>
   )
 }
