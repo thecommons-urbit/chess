@@ -76,9 +76,39 @@ export function GamePanel () {
     return components
   }
 
+  const materialDifference = (fen: string) => {
+    const board = fen.split(' ')[0]
+    let whiteValue = 0
+    let blackValue = 0
+
+    for (let i = 0; i < board.length; i++) {
+      const piece = board[i]
+      if (piece === '/') {
+        continue
+      }
+      const isWhite = piece === piece.toUpperCase()
+      const value = CHESS.pieceValues[piece.toLowerCase()]
+      if (isWhite) {
+        whiteValue += value
+      } else {
+        blackValue += value
+      }
+    }
+
+    return whiteValue - blackValue
+  }
+
   return (
     <div className='game-panel-container col' style={{ display: ((displayGame !== null) ? 'flex' : ' none') }}>
       <div className="game-panel col">
+        <div id="opp-captured" className={'captured row' + (hasGame ? '' : ' hidden')}>
+          <p>
+            { (displayGame.info.white !== window.ship)
+            ? (materialDifference(displayGame.position) > 0) ? '+' + materialDifference(displayGame.position) : ''
+            : (materialDifference(displayGame.position) < 0) ? '+' + Math.abs(materialDifference(displayGame.position)) : ''
+            }
+          </p>
+        </div>
         <div id="opp-timer" className={'timer row' + (hasGame ? '' : ' hidden')}>
           <p>00:00</p>
         </div>
@@ -95,6 +125,14 @@ export function GamePanel () {
         </div>
         <div id="our-timer" className={'timer row' + (hasGame ? '' : ' hidden')}>
           <p>00:00</p>
+        </div>
+        <div id="our-captured" className={'captured row' + (hasGame ? '' : ' hidden')}>
+          <p>
+          { (displayGame.info.white === window.ship)
+            ? (materialDifference(displayGame.position) > 0) ? '+' + materialDifference(displayGame.position) : ''
+            : (materialDifference(displayGame.position) < 0) ? '+' + Math.abs(materialDifference(displayGame.position))  : ''
+            }
+          </p>
         </div>
         {/* buttons */}
         {/* offer draw button */}

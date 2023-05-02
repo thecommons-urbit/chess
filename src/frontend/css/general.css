@@ -95,6 +95,10 @@ div.game-panel .player {
 /*   border: 1px solid yellow; */
 }
 
+div.game-panel #opp-captured {
+  justify-content: left;
+}
+
 div.game-panel #opp-timer {
   justify-content: left;
 }
@@ -128,6 +132,10 @@ div.game-panel #our-player {
 }
 
 div.game-panel #our-timer {
+  justify-content: right;
+}
+
+div.game-panel #our-captured {
   justify-content: right;
 }
 
