@@ -44,7 +44,8 @@ SCRIPT_NAME=$(basename $0 | cut -d '.' -f 1)
 SCRIPT_DIR=$(dirname $0)
 ROOT_DIR=$(dirname $SCRIPT_DIR)
 DESK_DIR="$ROOT_DIR/build/desk"
-URBIT_DIR="$ROOT_DIR/src/urbit"
+CHESS_DIR="$ROOT_DIR/src/backend/chess"
+DEPS_DIR="$ROOT_DIR/src/backend/dependencies"
 
 DEFAULT_DESK="chess"
 DEFAULT_PIER="/home/$USER/Urbit/piers"
@@ -88,5 +89,6 @@ done
 INSTALL_DIR="$PIER/$SHIP/$DESK"
 echo "Attempting to install to path '$INSTALL_DIR'"
 cp ${DESK_DIR}/* ${INSTALL_DIR}/
-cp -r ${URBIT_DIR}/* ${INSTALL_DIR}/
+cp -rfL ${CHESS_DIR}/* ${INSTALL_DIR}/
+cp -rfL ${DEPS_DIR}/* ${INSTALL_DIR}/
 echo "Successfully installed to path '$INSTALL_DIR'"
