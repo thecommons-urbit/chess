@@ -1,8 +1,17 @@
+::
+::::  /hoon/js/mar
+  ::
+/?    310
+::
 =,  eyre
 |_  mud=@
 ++  grow
   |%
-  ++  mime  [/text/css (as-octs:mimes:html (@t mud))]
+  ++  mime  [/application/javascript (as-octs:mimes:html (@t mud))]
+  ++  elem  ;script
+              ;-  (trip (@t mud))
+            ==
+  ++  hymn  ;html:(head:"+{elem}" body)
   --
 ++  grab
   |%                                                    ::  convert from
