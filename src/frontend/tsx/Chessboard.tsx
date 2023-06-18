@@ -16,14 +16,6 @@ import { PromotionMove } from '../ts/types/chessground'
 import { Side, CastleSide, PromotionRole, Rank, File, GameID, ActiveGameInfo } from '../ts/types/urbitChess'
 
 //
-// Import Chessground style sheets
-//
-
-import 'chessground/assets/chessground.base.css'
-import 'chessground/assets/chessground.brown.css'
-import 'chessground/assets/chessground.cburnett.css'
-
-//
 // Declare custom HTML elements used by Chessground
 //
 
