@@ -10,8 +10,8 @@ import '../css/graphics.css'
 import '../css/textboxes.css'
 import '../css/responsive.css'
 import '../css/chessground.css'
-import 'chessground/assets/chessground.base.css' // Import Chessground style sheets
-import 'chessground/assets/chessground.brown.css' // Handles piece highlighting
+import '../css/dependencies/chessground.base.css'  // Import Chessground style sheets
+import '../css/dependencies/chessground.highlight.css' // Handles piece highlighting
 import { createRoot } from 'react-dom/client'
 import App from './App'
 
