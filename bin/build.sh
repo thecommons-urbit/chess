@@ -22,7 +22,7 @@ usage() {
   fi
 
   echo -e ""
-  echo -e "Usage:\t$SCRIPT_NAME [-h] [-n] [-s SHIP_NAME] [-u URL]"
+  echo -e "Usage:\t$SCRIPT_NAME [-h] [-n] [-s SHIP_NAME] [-u URL] [-k KELVIN]"
   echo -e ""
   echo -e "Build the app frontend and the desk files required to install it in Grid"
   echo -e ""
@@ -31,6 +31,7 @@ usage() {
   echo -e "  -n\tUse npm natively instead of through Docker"
   echo -e "  -s\tSet ship name to use (default: $DEFAULT_SHIP)"
   echo -e "  -u\tUse given URL to distribute glob over HTTP instead of over Ames"
+  echo -e "  -k\tSet kelvin version to build with"
   echo -e ""
   exit $1
 }
@@ -92,7 +93,7 @@ SHIP=$DEFAULT_SHIP
 # --------------------------------------
 
 # Parse arguments
-OPTS=":hs:u:n"
+OPTS=":hns:u:k:"
 while getopts ${OPTS} opt; do
   case ${opt} in
     h)
@@ -106,6 +107,9 @@ while getopts ${OPTS} opt; do
       ;;
     u)
       URL=$OPTARG
+      ;;
+    k)
+      KELVIN=$OPTARG
       ;;
     :)
       echo "$SCRIPT_NAME: Missing argument for '-${OPTARG}'" >&2
