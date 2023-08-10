@@ -22,16 +22,16 @@ usage() {
   fi
 
   echo -e ""
-  echo -e "Usage:\t$SCRIPT_NAME [-h] [-n] [-s SHIP_NAME] [-u URL] [-k KELVIN]"
+  echo -e "Usage:\t$SCRIPT_NAME [-h] [-k KELVIN] [-n] [-s SHIP_NAME] [-u URL]"
   echo -e ""
   echo -e "Build the app frontend and the desk files required to install it in Grid"
   echo -e ""
   echo -e "Options:"
   echo -e "  -h\tPrint script usage info"
+  echo -e "  -k\tSet alternative kelvin version to use (default: $DEFAULT_KELVIN)"
   echo -e "  -n\tUse npm natively instead of through Docker"
   echo -e "  -s\tSet ship name to use (default: $DEFAULT_SHIP)"
   echo -e "  -u\tUse given URL to distribute glob over HTTP instead of over Ames"
-  echo -e "  -k\tSet kelvin version to build with"
   echo -e ""
   exit $1
 }
@@ -83,9 +83,10 @@ VERSION_MINOR=9
 VERSION_PATCH=4
 VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
-KELVIN=413
-
+DEFAULT_KELVIN=413
 DEFAULT_SHIP="finmep-lanteb"
+
+KELVIN=$DEFAULT_KELVIN
 SHIP=$DEFAULT_SHIP
 
 # --------------------------------------
