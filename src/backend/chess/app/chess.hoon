@@ -41,26 +41,7 @@
 +*  this     .
     default  ~(. (default-agent this %|) bowl)
 ++  on-init
-  ^-  (quip card _this)
-  :_  this
-  ::
-  ::  XX: remove these cards
-  ::
-  ::  these are initialization steps from before
-  ::  the software distribution update and should be removed
-  :~  :*  %pass  /srv
-          %agent  [our.bowl %file-server]
-          %poke  %file-server-action
-          !>([%serve-dir /'~chess' /app/chess | &])
-      ==
-      :*  %pass  /chess
-          %agent  [our.bowl %launch]
-          %poke  %launch-action
-          !>  :*  %add  %chess
-                  [[%basic 'chess' '' '/~chess'] &]
-              ==
-      ==
-  ==
+  on-init:default
 ++  on-save
   !>(state)
 ++  on-load
