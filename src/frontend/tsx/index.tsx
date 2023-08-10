@@ -3,9 +3,11 @@ import '../css/tabs.css'
 import '../css/buttons.css'
 import '../css/general.css'
 import '../css/textboxes.css'
-import '../css/chessground.css' 
-import '../css/dependencies/chessground.base.css'  // Import Chessground style sheets
-import '../css/dependencies/chessground.highlight.css' // Handles piece highlighting
+import '../css/chessground.css'
+// Import Chessground style sheets
+import '../css/dependencies/chessground.base.css'
+// Handles piece highlighting
+import '../css/dependencies/chessground.highlight.css'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 
