@@ -91,7 +91,7 @@
               "no challenge to accept from {<who.action>}"
             :~  [%give %poke-ack `~[leaf+err]]
             ==
-          ::  XX: document chess-rng
+          ::  step 1 of assigning random sides
           ?:  ?=(%random challenger-side.u.challenge)
             =/  our-num  (shaf now.bowl eny.bowl)
             =/  our-hash  (shaf %chess-rng our-num)
@@ -525,14 +525,27 @@
       ==
     ::
     ::  randomly assign sides for new games
-    ::  XX further document rng logic
+    ::
+    ::  sides are determined by a game of odds-or-evens using random numbers
+    ::
+    ::  order of ops:
+    ::    1. acceptor pokes challenger w/ %commit
+    ::    2. challenger pokes acceptor w/ %commit
+    ::    3. acceptor pokes challenger w/ %reveal
+    ::    4. challenger pokes acceptor w/ %reveal
+    ::    5. acceptor starts game w/ appropriate side as white
+    ::
+    ::  all above-described pokes use %chess-rng mark
+    ::
+    ::  XX: clean up challenges on failure during this handshake
     %chess-rng
       =/  rng-data  !<(chess-rng vase)
       =/  commitment  (~(get by rng-state) src.bowl)
       ?-  -.rng-data
         %commit
           ?~  commitment
-            ::  we're the challenger
+            ::  step 2
+            ::  choose random number, hash it, and send the hash to the acceptor
             =/  our-num  (shaf now.bowl eny.bowl)
             =/  our-hash  (shaf %chess-rng our-num)
             :-  :~  :*  %pass  /poke/rng  %agent  [src.bowl %chess]
@@ -540,28 +553,36 @@
                     ==
                 ==
             %=  this
+              ::  record our number, our hash, and acceptor's hash
               rng-state  %+  ~(put by rng-state)  src.bowl
                          [our-num our-hash ~ `p.rng-data |]
             ==
-          :: we're the accepter
+          ::  step 3
           =/  updated-commitment
             [our-num.u.commitment our-hash.u.commitment ~ `p.rng-data &]
+          ::  reveal our random number
           :-  :~  :*  %pass  /poke/rng  %agent  [src.bowl %chess]
                       %poke  %chess-rng  !>([%reveal our-num.u.commitment])
                   ==
               ==
           %=  this
+            ::  record the challenger's hash
             rng-state  (~(put by rng-state) src.bowl updated-commitment)
           ==
         %reveal
           ?>  ?=(^ commitment)
           ?:  revealed.u.commitment
-            ::  we're the accepter
+            ::  step 5
             ?>  ?=(^ her-hash.u.commitment)
+            ::  verify that challenger's number results in correct hash
             ?.  =(u.her-hash.u.commitment (shaf %chess-rng p.rng-data))
-              ~|  commitment  !!  ::  cheater
+              ~|  commitment  !!  ::  nice try, cheater
             =/  challenge  (~(get by challenges-received) src.bowl)
+            ::  verify that a challenge from challenger even exists
             ?~  challenge  !!
+            ::  mix numbers and use final bit to assign sides:
+            ::    1 = acceptor is white
+            ::    0 = challenger is white
             =/  random-bit  %-  ?
               (end [0 1] (mix our-num.u.commitment p.rng-data))
             =/  white-player
@@ -603,10 +624,11 @@
               rng-state  (~(del by rng-state) src.bowl)
               games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | | | |])
             ==
-          ::  we're the challenger
+          ::  step 4
           ?>  ?=(^ her-hash.u.commitment)
+          ::  verify that acceptor's number results in correct hash
           ?.  =(u.her-hash.u.commitment (shaf %chess-rng p.rng-data))
-            ~|  commitment  !!::  cheater
+            ~|  commitment  !!  ::  nice try, cheater
           =/  final-commitment
             :*  our-num.u.commitment
                 our-hash.u.commitment
@@ -614,10 +636,12 @@
                 her-hash.u.commitment
                 &
             ==
+          ::  reveal our number
           :-  :~  :*  %pass  /poke/rng  %agent  [src.bowl %chess]
                       %poke  %chess-rng  !>([%reveal our-num.u.commitment])
                   ==
               ==
+          ::  record acceptor's number
           %=  this
             rng-state  (~(put by rng-state) src.bowl final-commitment)
           ==
