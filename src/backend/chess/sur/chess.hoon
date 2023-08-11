@@ -1,4 +1,5 @@
 |%
++$  game-id  @dau
 ::
 ::  a chess player is one of two sides
 +$  chess-side
@@ -179,7 +180,7 @@
 ::  represented by chess-position
 +$  chess-game
   ::  default values
-  $~  :*  game-id=*@dau
+  $~  :*  game-id=*game-id
           event='?'
           site='Urbit Chess'
           date=*@da
@@ -194,7 +195,7 @@
   $:
   ::  type definition
   ::  ~1996.2.16..10.00.00..0000
-    game-id=@dau
+    =game-id
   ::  'Kasparov vs. Deep Blue'
     event=@t
   ::  'Pennsylvania Convention Center'
@@ -238,16 +239,16 @@
   $%  [%challenge who=ship challenge=chess-challenge]
       [%accept-game who=ship]
       [%decline-game who=ship]
-      [%offer-draw game-id=@dau]
-      [%accept-draw game-id=@dau]
-      [%decline-draw game-id=@dau]
-      [%change-special-draw-preference game-id=@dau setting=?]
-      [%claim-special-draw game-id=@dau]
-      [%move game-id=@dau move=chess-move]
-      [%resign game-id=@dau]
-      [%request-undo game-id=@dau]
-      [%decline-undo game-id=@dau]
-      [%accept-undo game-id=@dau]
+      [%offer-draw =game-id]
+      [%accept-draw =game-id]
+      [%decline-draw =game-id]
+      [%change-special-draw-preference =game-id setting=?]
+      [%claim-special-draw =game-id]
+      [%move =game-id move=chess-move]
+      [%resign =game-id]
+      [%request-undo =game-id]
+      [%decline-undo =game-id]
+      [%accept-undo =game-id]
   ==
 ::
 ::  chess-update defines the possible values that a
@@ -257,16 +258,16 @@
       [%challenge-received who=ship challenge=chess-challenge]
       [%challenge-resolved who=ship]
       [%challenge-replied who=ship]
-      [%draw-offer game-id=@dau]
-      [%draw-declined game-id=@dau]
-      [%undo-declined game-id=@dau]
-      [%undo-accepted game-id=@dau position=@t undo-moves=@ta]
-      [%undo-request game-id=@dau]
-      [%result game-id=@dau result=chess-result]
-      [%special-draw-preference game-id=@dau setting=?]
+      [%draw-offer =game-id]
+      [%draw-declined =game-id]
+      [%undo-declined =game-id]
+      [%undo-accepted =game-id position=@t undo-moves=@ta]
+      [%undo-request =game-id]
+      [%result =game-id result=chess-result]
+      [%special-draw-preference =game-id setting=?]
   ::
       $:  %position
-          game-id=@dau
+          =game-id
           move=(pair @t @t)
           position=@t
           san=@t
@@ -290,7 +291,7 @@
       revealed=_|
   ==
 +$  chess-game-result
-  $:  game-id=@dau
+  $:  =game-id
       result=chess-result
       move=(unit chess-move)
   ==
