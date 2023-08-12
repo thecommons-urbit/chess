@@ -237,18 +237,26 @@
 ::  values of a %chess-action poke
 +$  chess-action
   $%  [%challenge who=ship challenge=chess-challenge]
-      [%accept-game who=ship]
       [%decline-game who=ship]
-      [%offer-draw =game-id]
-      [%accept-draw =game-id]
-      [%decline-draw =game-id]
-      [%change-special-draw-preference =game-id setting=?]
-      [%claim-special-draw =game-id]
-      [%move =game-id move=chess-move]
+      [%accept-game who=ship]
+      [%game-accepted =game-id her-side=chess-side]
       [%resign =game-id]
+      [%offer-draw =game-id]
+      [%draw-offered =game-id]
+      [%decline-draw =game-id]
+      [%draw-declined =game-id]
+      [%accept-draw =game-id]
+      [%claim-special-draw =game-id]
       [%request-undo =game-id]
+      [%undo-requested =game-id]
       [%decline-undo =game-id]
+      [%undo-declined =game-id]
       [%accept-undo =game-id]
+      [%undo-accepted =game-id]
+      [%make-move =game-id move=chess-move]
+      [%receive-move =game-id move=chess-move]
+      [%end-game =game-id result=chess-result move=(unit chess-move)]
+      [%change-special-draw-preference =game-id setting=?]
   ==
 ::
 ::  chess-update defines the possible values that a
@@ -274,15 +282,12 @@
           special-draw-available=?
   ==  ==
 ::
-::  XX: document chess-rng
-::
-::  @uvh is an unsigned, 256-bit, base-32 integer
+::  @uvH is an unsigned, 256-bit, base-32 integer
 +$  chess-rng
   $%  [%commit p=@uvH]
       [%reveal p=@uvH]
   ==
 ::
-::  XX: document chess-commitment
 +$  chess-commitment
   $:  our-num=@uvH
       our-hash=@uvH
@@ -290,6 +295,7 @@
       her-hash=(unit @uvH)
       revealed=_|
   ==
+::
 +$  chess-game-result
   $:  =game-id
       result=chess-result
