@@ -155,16 +155,13 @@
           ::  assign ships to white and black
           =+  ^=  [white-player black-player]
               ?:  ?=(%white her-side.action)
-                [[%ship src.bowl] [%ship our.bowl]]
-              [[%ship our.bowl] [%ship src.bowl]]
+                [src.bowl our.bowl]
+              [our.bowl src.bowl]
           ::  initialize new game
           =/  new-game
             ^-  chess-game
             :*  game-id.action
-                event.u.challenge
-                'Urbit Chess'
                 (yule [d:(yell game-id.action) 0 0 0 ~])
-                round.u.challenge
                 white-player
                 black-player
                 ~
@@ -336,7 +333,6 @@
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's our turn
-          ?>  ?=([%ship @p] ship-to-move)
           ?.  =(+.ship-to-move src.bowl)
             :_  this
             =/  err  "cannot claim special draw on opponent's turn"
@@ -503,7 +499,6 @@
             ==
           =/  ship-to-move
             (ship-to-move u.game-state)
-          ?>  ?=([%ship @p] ship-to-move)
           =:
               moves.game
             ?:  =(+.ship-to-move our.bowl)
@@ -539,7 +534,6 @@
             ==
           =/  ship-to-move
             (ship-to-move u.game-state)
-          ?>  ?=([%ship @p] ship-to-move)
           ::  check whether it's our turn
           ?.  =(+.ship-to-move src.bowl)
             :_  this
@@ -600,7 +594,6 @@
             ==
           =/  ship-to-move
             (ship-to-move u.game-state)
-          ?>  ?=([%ship @p] ship-to-move)
           ::  check whether it's opponent's turn
           ?.  =(+.ship-to-move src.bowl)
             :_  this
@@ -1091,16 +1084,13 @@
           ::  assign ships to white and black
           =+  ^=  [white-player black-player]
               ?:  ?=(%white challenger-side.challenge)
-                [[%ship src.bowl] [%ship our.bowl]]
-              [[%ship our.bowl] [%ship src.bowl]]
+                [src.bowl our.bowl]
+              [our.bowl src.bowl]
           ::  initialize new game
-          =/    new-game
+          =/  new-game
             ^-  chess-game
             :*  game-id
-                event.challenge
-                'Urbit Chess'
                 (yule [d:(yell game-id) 0 0 0 ~])
-                round.challenge
                 white-player
                 black-player
                 ~
@@ -1171,7 +1161,6 @@
           =*  game  game.game-state
           =/  ship-to-move
             (ship-to-move game-state)
-          ?>  ?=([%ship @p] ship-to-move)
           =:
               moves.game
             ?:  =(+.ship-to-move our.bowl)

@@ -1287,15 +1287,6 @@
 --
 |%
 ::
-::  produce @t version of player name
-++  player-string
-  |=  player=chess-player
-  ?-  -.player
-    %unknown  'Unknown'
-    %name     +.player
-    %ship     (scot %p +.player)
-  ==
-::
 ::  produce @t version of the round number
 ::  ex: '1.2.3.4.5'
 ++  round-string
@@ -1383,12 +1374,9 @@
     =/  tags
       %+  turn
       :~  "[UrbitGameID \"{<game-id.game>}\"]"
-          "[Event \"{(trip event.game)}\"]"
-          "[Site \"{(trip site.game)}\"]"
           "[Date \"{(tail (scow %da date.game))}\"]"
-          "[Round \"{(trip (round-string round.game))}\"]"
-          "[White \"{(trip (player-string white.game))}\"]"
-          "[Black \"{(trip (player-string black.game))}\"]"
+          "[White \"{(trip (scot %p white.game))}\"]"
+          "[Black \"{(trip (scot %p black.game))}\"]"
           "[Result \"{(trip (result-string result.game))}\"]"
       ==
       crip
@@ -1409,12 +1397,9 @@
 ++  fools-mate
   ^-  chess-game
   :*  game-id=~2021.2.2..11.01.55..e145.92d5.dbbe.aeaa
-      event='?'
-      site='?'
       date=*@da
-      round=~
-      white=[%name 'Fool']
-      black=[%name 'Black']
+      white=~tex
+      black=~mex
       result=`%'0-1'
   :~
     ::  1. f3 e5

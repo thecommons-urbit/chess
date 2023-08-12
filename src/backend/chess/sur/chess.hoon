@@ -1,5 +1,6 @@
 |%
-+$  game-id  @dau
++$  game-id       @dau
++$  chess-player  ship
 ::
 ::  a chess player is one of two sides
 +$  chess-side
@@ -142,15 +143,6 @@
     move-number=@
   ==
 ::
-::  chess-player is a name, a ship,
-::  or an unknown signora
-+$  chess-player
-  $~  [%unknown ~]
-  $%  [%name @t]
-      [%ship @p]
-      [%unknown ~]
-  ==
-::
 ::  the game's result is a win, loss, or draw
 ::  to be recorded in chess-game
 +$  chess-result
@@ -181,12 +173,7 @@
 +$  chess-game
   ::  default values
   $~  :*  game-id=*game-id
-          event='?'
-          site='Urbit Chess'
           date=*@da
-          ::  the round's default value is
-          ::  ~ if unknown, `~ if inappropriate
-          round=~
           white=*chess-player
           black=*chess-player
           result=~
@@ -196,19 +183,8 @@
   ::  type definition
   ::  ~1996.2.16..10.00.00..0000
     =game-id
-  ::  'Kasparov vs. Deep Blue'
-    event=@t
-  ::  'Pennsylvania Convention Center'
-    site=@t
   ::  ~1996.2.16
     date=@da
-  ::
-  ::  XX: why is `round`s type (unit (list @))?
-  ::
-  ::  why can't it be something like (unit @ud)?
-  ::
-  ::  [~ [5 ~]]
-    round=(unit (list @))
   ::  [%name 'Deep Blue']
     white=chess-player
   ::  [%name 'Garry Kasparov']
@@ -225,12 +201,10 @@
 +$  chess-challenge
   $~  :*  challenger-side=%random
           event='Casual Game'
-          round=`~
       ==
   $:
     challenger-side=?(chess-side %random)
     event=@t
-    round=(unit (list @))
   ==
 ::
 ::  chess-action defines the acceptable
