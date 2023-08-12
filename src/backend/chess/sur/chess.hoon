@@ -1,15 +1,34 @@
 |%
-+$  game-id       @dau
+::
+::  types for identification
++|  %id
+::
+::  @dau is a custom type that nests under @da, used as a unique ID for the
+::  game, shared between both players
+::
+::  @dau is now.bowl at time when the poke accepting the game is processed, but
+::  with the lowest 6 bytes filled with random data from eny.bowl (to avoid
+::  possible collisions caused by processing multiple games as part of one
+::  event)
++$  game-id  @dau
+::
+::  types most basic of chess concepts
++|  %basic
+::
+::  only urbit users may play %chess
 +$  chess-player  ship
 ::
-::  a chess player is one of two sides
+::  a chess player plays one of two sides
 +$  chess-side
   $~  %white
   $?  %white
       %black
   ==
 ::
-::  a chess piece is one of six types
+::  types for chess pieces
++|  %piece
+::
+::  a chess piece has one of six types
 +$  chess-piece-type
   $~  %pawn
   $?  %pawn
@@ -18,6 +37,13 @@
       %rook
       %queen
       %king
+  ==
+::
+::  a chess piece is a combination of its side and type
++$  chess-piece
+  $~  [%white %pawn]
+  $:  chess-side
+      chess-piece-type
   ==
 ::
 ::  a pawn can be promoted to...
@@ -29,12 +55,8 @@
       %queen
   ==
 ::
-::  a chess piece is a cell of its side and type
-+$  chess-piece
-  $~  [%white %pawn]
-  $:  chess-side
-      chess-piece-type
-  ==
+::  types for the chess board
++|  %board
 ::
 ::  a chessboard has eight rows called ranks, numbered %1 to %8
 +$  chess-rank
@@ -51,24 +73,13 @@
   $~  [%a %1]
   [chess-file chess-rank]
 ::
-::  chess-traverser is a gate which takes a chess-square
-::  as input, and could return a chess-square or null.
-::  this helps prevent chess-pieces moving off the board.
-+$  chess-traverser
-  $-(chess-square (unit chess-square))
+::  a chessboard maps squares to pieces (though the opposite relationship is
+::  more intuitive when thinking about a physical chessboard)
 ::
-::  XX: Remove chess-transformer from here and /lib/chess.hoon
-+$  chess-transformer
-  $-(chess-piece-on-square *)
-::
-::  XX: `chess-board` should probably be `chessboard`
-::
-::  the chessboard state is a map of square to piece.
-::  this represents what pieces are still in play, and
-::  where they are on the board
+::  this represents what pieces are still in play, and where they are on the
+::  board
 +$  chess-board
-::
-::  the chessboard's default state
+  ::  the chess-board default state
   $~
     %-  my
     :~
@@ -107,14 +118,18 @@
     ==
   (map chess-square chess-piece)
 ::
-::  chess-piece-on-square helps us deal with
-::  key-value pairs from chess-board
+::  a helper type to deal with key-value pairs from chess-board
 +$  chess-piece-on-square
   [square=chess-square piece=chess-piece]
 ::
-::  chess-castle returns the castle options
-::  available to a player: kingside,
-::  queenside, both, or neither
+::  types dealing with chess piece movement on the board
++|  %movement
+::
+::  chess-castle returns the castle options available to a player:
+::    kingside
+::    queenside
+::    both
+::    neither
 +$  chess-castle
   $~  %both
   $?  %both
@@ -123,44 +138,56 @@
       %none
   ==
 ::
-::  the current state of the game
-+$  chess-position
-  $~  [*chess-board %white %both %both ~ 0 1]
-  $:
-  ::  current state of the chessboard
-    board=chess-board
-  ::  whose turn is it?
-    player-to-move=chess-side
-  ::  white castle options
-    white-can-castle=chess-castle
-  ::  black castle options
-    black-can-castle=chess-castle
-  ::  position of en passant pawn, if one exists
-    en-passant=(unit chess-square)
-  ::  how close are we to invoking the 50-move rule?
-    ply-50-move-rule=@
-  ::  how many moves have there been?
-    move-number=@
-  ==
-::
-::  the game's result is a win, loss, or draw
-::  to be recorded in chess-game
-+$  chess-result
-  $~  %'½–½'
-  $?  %'1-0'
-      %'0-1'
-      %'½–½'
-  ==
-::
-::  a chess-move is one of three types:
-::  a regular move from one square to another,
-::  potentially with a promotion;
-::  a queen- or king-side castle;
-::  or a finishing move with a result
+::  a chess piece may move from one square to another, or the king can castle
 +$  chess-move
   $%  [%move from=chess-square to=chess-square into=(unit chess-promotion)]
       [%castle ?(%queenside %kingside)]
   ==
+::
+::  helper for gates moving pieces from one square to another
++$  chess-traverser
+  $-(chess-square (unit chess-square))
+::
+::  helper for generic piece transformations
++$  chess-transformer
+  $-(chess-piece-on-square *)
+::
+::  types for challenging another player
++|  %challenge
+::
+::  a challenge is the side as which the challenger would like to play and
+::  a message or description for the game to be played
++$  chess-challenge
+  $~  :*  challenger-side=%random
+          event='Casual Game'
+      ==
+  $:
+    challenger-side=?(chess-side %random)
+    event=@t
+  ==
+::
+::  message type for the handshake used to randomly assign sides
+::
+::  a user can commit to having picked a random number by sharing its hash, or
+::  he can reveal the random number he picked
+::
+::  @uvH is an unsigned, 256-bit, base-32 integer
++$  chess-rng
+  $%  [%commit p=@uvH]
+      [%reveal p=@uvH]
+  ==
+::
+::  state of the handshake used to randomly assign sides
++$  chess-commitment
+  $:  our-num=@uvH
+      our-hash=@uvH
+      her-num=(unit @uvH)
+      her-hash=(unit @uvH)
+      revealed=_|
+  ==
+::
+::  types for rendering chess moves
++|  %rendering
 ::
 ::  chess-fen is a FEN position
 +$  chess-fen  @t
@@ -168,8 +195,40 @@
 ::  chess-san is one move's SAN
 +$  chess-san  @t
 ::
-::  chess-game stores metadata for a game
-::  represented by chess-position
+::  types for representing a game played between two players
++|  %game
+::
+::  the current state of each player's position on the board
++$  chess-position
+  $~  [*chess-board %white %both %both ~ 0 1]
+  $:
+    ::  current state of the chessboard
+    board=chess-board
+    ::  whose turn is it?
+    player-to-move=chess-side
+    ::  white player's castle options
+    white-can-castle=chess-castle
+    ::  black player's castle options
+    black-can-castle=chess-castle
+    ::  position of en passant pawn, if one exists
+    en-passant=(unit chess-square)
+    ::  how close are we to invoking the 50-move rule?
+    ply-50-move-rule=@
+    ::  how many moves have there been?
+    move-number=@
+  ==
+::
+::  games can result in a win, loss, or draw
+::
+::  notation is "[points earned by white]-[points earned by black]"
++$  chess-result
+  $~  %'½–½'
+  $?  %'1-0'
+      %'0-1'
+      %'½–½'
+  ==
+::
+::  metadata for a chess position
 +$  chess-game
   ::  default values
   $~  :*  game-id=*game-id
@@ -180,35 +239,36 @@
           moves=~
       ==
   $:
-  ::  type definition
-  ::  ~1996.2.16..10.00.00..0000
+    ::  unique identifier for game
+    ::    e.g. ~1996.2.16..10.00.00..0000
     =game-id
-  ::  ~1996.2.16
+    ::  date game was played
+    ::    e.g. ~1996.2.16
     date=@da
-  ::  [%name 'Deep Blue']
+    ::  who played white
+    ::    e.g. Deep Blue
     white=chess-player
-  ::  [%name 'Garry Kasparov']
+    ::  who played black
+    ::    e.g. Gary Kasparov
     black=chess-player
-  ::  %'0-1'
+    ::  result of match (if it's over)
+    ::    e.g. 0-1
     result=(unit chess-result)
-  ::  a list of this round's moves, with
-  ::  corresponding fen and san for each move
+    ::  a list of the moves played, in Urbit, FEN, and SAN notation
     moves=(list [chess-move chess-fen chess-san])
   ==
 ::
-::  a challenge is the challenger's side,
-::  a description, and (optionally) this round's number
-+$  chess-challenge
-  $~  :*  challenger-side=%random
-          event='Casual Game'
-      ==
-  $:
-    challenger-side=?(chess-side %random)
-    event=@t
+::  message type for a game concluding: which game ended, how, and why
++$  chess-game-result
+  $:  =game-id
+      result=chess-result
+      move=(unit chess-move)
   ==
 ::
-::  chess-action defines the acceptable
-::  values of a %chess-action poke
+::  types for controlling game state inside Urbit
++|  %control
+::
+::  acceptable types of update to perform to %chess state
 +$  chess-action
   $%  [%challenge who=ship challenge=chess-challenge]
       [%decline-game who=ship]
@@ -237,8 +297,7 @@
       [%change-special-draw-preference =game-id setting=?]
   ==
 ::
-::  chess-update defines the possible values that a
-::  subscriber may receive as a %fact from the chess agent
+::  types of updates we may send to observers for rendering
 +$  chess-update
   $%  [%challenge-sent who=ship challenge=chess-challenge]
       [%challenge-received who=ship challenge=chess-challenge]
@@ -260,24 +319,4 @@
           san=@t
           special-draw-available=?
   ==  ==
-::
-::  @uvH is an unsigned, 256-bit, base-32 integer
-+$  chess-rng
-  $%  [%commit p=@uvH]
-      [%reveal p=@uvH]
-  ==
-::
-+$  chess-commitment
-  $:  our-num=@uvH
-      our-hash=@uvH
-      her-num=(unit @uvH)
-      her-hash=(unit @uvH)
-      revealed=_|
-  ==
-::
-+$  chess-game-result
-  $:  =game-id
-      result=chess-result
-      move=(unit chess-move)
-  ==
 --

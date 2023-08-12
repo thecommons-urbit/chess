@@ -631,11 +631,11 @@
     ^-  ?
     =/  king  (king side)
     =/  threats
-    %-  zing
-    %+  map-by-side  (opposite-side side)
-    |=  piece=chess-piece-on-square
-    ^-  (list chess-square)
-    ~(threatens with-piece-on-square piece)
+      %-  zing
+      %+  map-by-side  (opposite-side side)
+      |=  piece=chess-piece-on-square
+      ^-  (list chess-square)
+      ~(threatens with-piece-on-square piece)
     ?~  (find ~[king] threats)
       |
     &
