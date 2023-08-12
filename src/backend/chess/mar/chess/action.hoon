@@ -55,6 +55,18 @@
         %-  ot:dejs
         :~  [%game-id (se:dejs %da)]
         ==
+      %revoke-draw
+        :-  %revoke-draw
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
+      %draw-revoked
+        :-  %draw-revoked
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
       %decline-draw
         :-  %decline-draw
         %.  jon

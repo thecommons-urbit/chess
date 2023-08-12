@@ -239,6 +239,62 @@
           %=  this
             games  (~(put by games) game-id.action u.game-state(got-draw-offer &))
           ==
+        %revoke-draw
+          =/  game-state
+            ^-  (unit active-game-state)
+            (~(get by games) game-id.action)
+          ::  check for valid game
+          ?~  game-state
+            :_  this
+            =/  err  "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  check for open draw offer
+          ?.  sent-draw-offer.u.game-state
+            :_  this
+            =/  err  "no draw offer to revoke for game {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          :-
+            ::  revoke draw offer
+            ::  we don't care if opponent acks/nacks
+            :~  :*  %pass
+                    /poke/game/(scot %da game-id.action)/revoke-draw
+                    %agent  [opponent.u.game-state %chess]
+                    %poke
+                    [%chess-action !>([%draw-revoked game-id.action])]
+                ==
+                :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                    %chess-update  !>([%draw-revoked game-id])
+            ==  ==
+          %=  this
+            ::  record that draw offer is gone
+            games  (~(put by games) game-id.action u.game-state(sent-draw-offer |))
+          ==
+        %draw-revoked
+          =/  game-state
+            ^-  (unit active-game-state)
+            (~(get by games) game-id.action)
+          ::  check for valid game
+          ?~  game-state
+            :_  this
+            =/  err  "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  check for open draw offer
+          ?.  got-draw-offer.u.game-state
+            :_  this
+            =/  err  "{<our.bowl>} did not receive draw offer for {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          :-
+            :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                    %chess-update  !>([%draw-revoked game-id.action])
+            ==  ==
+          %=  this
+            ::  record that draw offer is gone
+            games  (~(put by games) game-id.action u.game-state(got-draw-offer |))
+          ==
         %decline-draw
           =/  game-state
             ^-  (unit active-game-state)
@@ -257,13 +313,13 @@
             ==
           :-
             ::  decline draw offer
+            ::  we don't care if opponent acks/nacks
             :~  :*  %pass
                     /poke/game/(scot %da game-id.action)/decline-draw
                     %agent  [opponent.u.game-state %chess]
                     %poke
                     [%chess-action !>([%draw-declined game-id.action])]
                 ==
-                ::  we don't care if opponent acks/nacks
                 :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%draw-declined game-id])
             ==  ==

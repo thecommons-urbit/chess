@@ -63,6 +63,11 @@
         :~  ['chessUpdate' [%s 'draw-offer']]
             ['gameID' [%s (scot %da game-id.upd)]]
         ==
+      %draw-revoked
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'draw-revoked']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
       %draw-declined
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'draw-declined']]
