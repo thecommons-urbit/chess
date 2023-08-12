@@ -71,11 +71,8 @@
         %challenge
           ::  only allow one active challenge per ship
           ?:  (~(has by challenges-sent) who.action)
-            :_  this
-            =/  err
-              "already challenged {<who.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "already challenged {<who.action>}"
           ::
           ::  send new challenge
           :-  :~  :*  %pass  /poke/challenge/send  %agent  [who.action %chess]
@@ -90,11 +87,8 @@
           =/  challenge  (~(get by challenges-received) who.action)
           ::  check if challenge exists
           ?~  challenge
-            :_  this
-            =/  err
-              "no challenge to decline from {<who.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no challenge to decline from {<who.action>}"
           ::  tell our challenger we decline
           :-  :~  :*  %pass  /poke/challenge/reply  %agent  [who.action %chess]
                       %poke  %chess-decline-challenge  !>(~)
@@ -107,10 +101,8 @@
           =/  challenge  (~(get by challenges-received) who.action)
           ::  check if challenge exists
           ?~  challenge
-            :_  this
-            =/  err  "no challenge to accept from {<who.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no challenge to accept from {<who.action>}"
           ::  step 1 of assigning random sides
           ?:  ?=(%random challenger-side.u.challenge)
             =/  our-num  (shaf now.bowl eny.bowl)
@@ -141,17 +133,11 @@
         %game-accepted
           =/  challenge  (~(get by challenges-sent) src.bowl)
           ?~  challenge
-            :_  this
-            =/  err
-              "{<our.bowl>} hasn't challenged you"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} hasn't challenged you"
           ?:  =(her-side.action challenger-side.u.challenge)
-            :_  this
-            =/  err
-              "{<our.bowl>} expects to be {<her-side.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} expects to be {<her-side.action>}"
           ::  assign ships to white and black
           =+  ^=  [white-player black-player]
               ?:  ?=(%white her-side.action)
@@ -188,10 +174,8 @@
             ^-  (unit active-game-state)
             (~(get by games) game-id.action)
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           =/  result
             ?:  =(our.bowl +.white.game.u.game-state)
               %'0-1'
@@ -210,10 +194,8 @@
             ^-  (unit active-game-state)
             (~(get by games) game-id.action)
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  send draw offer to opponent
           ::  handle our end on ack
           :_  this
@@ -228,10 +210,8 @@
             ^-  (unit active-game-state)
             (~(get by games) game-id.action)
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%draw-offer game-id.action])
@@ -245,16 +225,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open draw offer
           ?.  sent-draw-offer.u.game-state
-            :_  this
-            =/  err  "no draw offer to revoke for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no draw offer to revoke for game {<game-id.action>}"
           :-
             ::  revoke draw offer
             ::  we don't care if opponent acks/nacks
@@ -277,16 +253,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open draw offer
           ?.  got-draw-offer.u.game-state
-            :_  this
-            =/  err  "{<our.bowl>} did not receive draw offer for {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} did not receive draw offer for {<game-id.action>}"
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%draw-revoked game-id.action])
@@ -301,16 +273,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open draw offer
           ?.  got-draw-offer.u.game-state
-            :_  this
-            =/  err  "no draw offer to decline for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no draw offer to decline for game {<game-id.action>}"
           :-
             ::  decline draw offer
             ::  we don't care if opponent acks/nacks
@@ -333,16 +301,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for sent draw offer
           ?.  sent-draw-offer.u.game-state
-            :_  this
-            =/  err  "{<our.bowl>} did not send draw offer for {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} did not send draw offer for {<game-id.action>}"
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%draw-declined game-id.action])
@@ -357,16 +321,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open draw offer
           ?.  got-draw-offer.u.game-state
-            :_  this
-            =/  err  "no draw offer to accept for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no draw offer to accept for game {<game-id.action>}"
           ::  tell opponent we accept the draw
           ::  handle our end on ack
           :_  this
@@ -382,24 +342,18 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's our turn
           ?.  =(+.ship-to-move src.bowl)
-            :_  this
-            =/  err  "cannot claim special draw on opponent's turn"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "cannot claim special draw on opponent's turn"
           ::  check if a special draw claim is available
           ?.  special-draw-available.u.game-state
-            :_  this
-            =/  err  "no special draw available for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no special draw available for game {<game-id.action>}"
           ::  tell opponent we claim a special conditions draw
           ::  handle our end on ack
           :_  this
@@ -415,16 +369,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check that undo request doesn't already exist
           ?:  sent-undo-request.u.game-state
-            :_  this
-            =/  err  "undo request already exists for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "undo request already exists for game {<game-id.action>}"
           ::  check that we have made at least one move
           ?.  ?|  ?&  =(our.bowl white.game.u.game-state)
                       (gth (lent moves.game.u.game-state) 1)
@@ -432,10 +382,8 @@
                   ?&  =(our.bowl black.game.u.game-state)
                       (gth (lent moves.game.u.game-state) 2)
               ==  ==
-            :_  this
-            =/  err  "no move to undo for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no move to undo for game {<game-id.action>}"
           ::  send undo request to opponent
           ::  handle our end on ack
           :_  this
@@ -451,16 +399,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check that undo request doesn't already exist
           ?:  got-undo-request.u.game-state
-            :_  this
-            =/  err  "undo request already exists for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "undo request already exists for game {<game-id.action>}"
           ::  check that opponent has made at least one move
           ?.  ?|  ?&  =(src.bowl white.game.u.game-state)
                       (gth (lent moves.game.u.game-state) 1)
@@ -468,10 +412,8 @@
                   ?&  =(src.bowl black.game.u.game-state)
                       (gth (lent moves.game.u.game-state) 2)
               ==  ==
-            :_  this
-            =/  err  "no move to undo for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no move to undo for game {<game-id.action>}"
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%undo-request game-id.action])
@@ -485,16 +427,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open undo request
           ?.  sent-undo-request.u.game-state
-            :_  this
-            =/  err  "no undo request to revoke for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no undo request to revoke for game {<game-id.action>}"
           :-
             ::  decline undo request
             ::  we don't care if opponent acks/nacks
@@ -514,16 +452,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open undo request
           ?.  got-undo-request.u.game-state
-            :_  this
-            =/  err  "{<our.bowl>} did not receive undo request for {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} did not receive undo request for {<game-id.action>}"
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%undo-revoked game-id.action])
@@ -537,16 +471,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open undo request
           ?.  got-undo-request.u.game-state
-            :_  this
-            =/  err  "no undo request to decline for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no undo request to decline for game {<game-id.action>}"
           :-
             ::  decline undo request
             ::  we don't care if opponent acks/nacks
@@ -566,16 +496,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open undo request
           ?.  sent-undo-request.u.game-state
-            :_  this
-            =/  err  "{<our.bowl>} did not send undo request for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} did not send undo request for game {<game-id.action>}"
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%undo-declined game-id.action])
@@ -589,16 +515,12 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           ::  check for open undo request
           ?.  got-undo-request.u.game-state
-            :_  this
-            =/  err  "no undo request to decline for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no undo request to decline for game {<game-id.action>}"
           ::  accept undo request
           ::  handle our end on ack
           :_  this
@@ -614,17 +536,13 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           =*  game  game.u.game-state
           ::  check for open undo request
           ?.  sent-undo-request.u.game-state
-            :_  this
-            =/  err  "{<our.bowl>} did not send undo request for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} did not send undo request for game {<game-id.action>}"
           =/  ship-to-move
             (ship-to-move u.game-state)
           =:
@@ -656,26 +574,20 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's our turn
           ?.  =(+.ship-to-move src.bowl)
-            :_  this
-            =/  err  "not our move"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "not our move"
           ::  check if the move is legal
           =/  move-result  (try-move u.game-state move.action)
           ::  reject invalid moves
           ?~  new.move-result
-            :_  this
-            =/  err  "invalid move for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "invalid move for game {<game-id.action>}"
           =*  new-game-state  u.new.move-result
           ::  handle our end on ack
           :_
@@ -716,33 +628,25 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's opponent's turn
           ?.  =(+.ship-to-move src.bowl)
-            :_  this
-            =/  err  "not our move"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "not our move"
           ::  check if the move is legal
           =/  move-result  (try-move u.game-state move.action)
           ::  reject invalid moves
           ?~  new.move-result
-            :_  this
-            =/  err  "invalid move for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "invalid move for game {<game-id.action>}"
           =*  new-game-state  u.new.move-result
           ?.  =(~ result.game.new-game-state)
             =/  san  (~(algebraicize with-position position.u.game-state) move.action)
-            :_  this
-            =/  err  "unexpected result for game {<game-id.action>} after move {<san>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "unexpected result for game {<game-id.action>} after move {<san>}"
           :-  cards.move-result
           %=  this
             games  (~(put by games) game-id.action new-game-state)
@@ -754,10 +658,8 @@
               (~(get by games) game-id.action)
             ::  check for valid game
             ?~  game-state
-              :_  this
-              =/  err  "no active game with id {<game-id.action>}"
-              :~  [%give %poke-ack `~[leaf+err]]
-              ==
+              %+  poke-nack  this
+              "no active game with id {<game-id.action>}"
             ::  is there a move associated with the result?
             ?~  move.action
               ::  is opponent claiming a draw?
@@ -767,28 +669,22 @@
                         special-draw-available.u.game-state
                     ==
                   (output-quip game.u.game-state(result `result.action))
-                :_  this
-                =/  err  "{<our.bowl>} did not send draw offer for {<game-id.action>}"
-                :~  [%give %poke-ack `~[leaf+err]]
-                ==
+                %+  poke-nack  this
+                "{<our.bowl>} did not send draw offer for {<game-id.action>}"
               ::  is opponent resigning?
               ?:  .=  result.action
                   ?:  =(our.bowl +.white.game.u.game-state)
                     %'1-0'
                   %'0-1'
                 (output-quip game.u.game-state(result `result.action))
-              :_  this
-              =/  err  "{<our.bowl>} does not resign game {<game-id.action>}"
-              :~  [%give %poke-ack `~[leaf+err]]
-              ==
+              %+  poke-nack  this
+              "{<our.bowl>} does not resign game {<game-id.action>}"
             ::  apply move
             =/  move-result  (try-move u.game-state (need move.action))
             ::  reject invalid moves
             ?~  new.move-result
-              :_  this
-              =/  err  "invalid move for game {<game-id.action>}"
-              :~  [%give %poke-ack `~[leaf+err]]
-              ==
+              %+  poke-nack  this
+              "invalid move for game {<game-id.action>}"
             =*  result-game-state  u.new.move-result
             ::  is opponent claiming a special draw?
             ?:  =(result.action %'½–½')
@@ -796,24 +692,18 @@
               ?:  special-draw-available.result-game-state
                 (output-quip game.result-game-state(result `result.action))
               =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
-              :_  this
-              =/  err  "no special draw available for game {<game-id.action>} after {<san>}"
-              :~  [%give %poke-ack `~[leaf+err]]
-              ==
+              %+  poke-nack  this
+              "no special draw available for game {<game-id.action>} after {<san>}"
             ::  is there a result?
             ?~  result.game.result-game-state
               =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
-              :_  this
-              =/  err  "move {<san>} does not end game {<game-id.action>}"
-              :~  [%give %poke-ack `~[leaf+err]]
-              ==
+              %+  poke-nack  this
+              "move {<san>} does not end game {<game-id.action>}"
             ::  has opponent won?
             ?.  =(result.action u.result.game.result-game-state)
               (output-quip game.result-game-state)
-            :_  this
-            =/  err  "{<src.bowl>} does not win game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<src.bowl>} does not win game {<game-id.action>}"
           ++  output-quip
             |=  archived-game=chess-game
             :-
@@ -839,10 +729,8 @@
             (~(get by games) game-id.action)
           ::  check for valid game
           ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "no active game with id {<game-id.action>}"
           :-
             :~  :*  %give
                     %fact
@@ -901,10 +789,8 @@
           =/  challenge  (~(get by challenges-sent) src.bowl)
           ::  check if challenge exists
           ?~  challenge
-            :_  this
-            =/  err  "{<our.bowl>} has not challenged us"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "{<our.bowl>} has not challenged us"
           ::  choose random number, hash it, and send the hash to the acceptor
           =/  our-num  (shaf now.bowl eny.bowl)
           =/  our-hash  (shaf %chess-rng our-num)
@@ -939,10 +825,8 @@
           ::  verify that challenger's number results in correct hash
           ?.  =(her-hash (shaf %chess-rng her-num))
             =/  bad-hash  (shaf %chess-rng her-num)
-            :_  this
-            =/  err  "hash mismatch for revealed commitment {<her-num>}: {<bad-hash>} vs. {<her-hash>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
+            %+  poke-nack  this
+            "hash mismatch for revealed commitment {<her-num>}: {<bad-hash>} vs. {<her-hash>}"
           ::  mix numbers and use final bit to assign sides:
           ::    1 = acceptor is white
           ::    0 = challenger is white
@@ -976,10 +860,8 @@
         ::  verify that acceptor's number results in correct hash
         ?.  =(her-hash (shaf %chess-rng her-num))
           =/  bad-hash  (shaf %chess-rng her-num)
-          :_  this
-          =/  err  "hash mismatch for revealed commitment {<her-num>}: {<bad-hash>} vs. {<her-hash>}"
-          :~  [%give %poke-ack `~[leaf+err]]
-          ==
+            %+  poke-nack  this
+            "hash mismatch for revealed commitment {<her-num>}: {<bad-hash>} vs. {<her-hash>}"
         =/  final-commitment
           :*  our-num.u.commitment
               our-hash.u.commitment
@@ -1364,7 +1246,8 @@
 --
 |%
 ::
-::  helper core for moves
+::  helper core
++|  %game-logic
 ::
 ::  test if a given move is legal
 ++  try-move
@@ -1425,13 +1308,6 @@
   :-  `[updated-game u.new-position ~ new-fen-repetition special-draw-available |5.game-state]
   :~  position-update-card
   ==
-++  ship-to-move
-  |=  state=active-game-state
-  ^-  chess-player
-  ?-  player-to-move.position.state
-    %white  white.game.state
-    %black  black.game.state
-  ==
 ++  increment-repetition
   |=  [fen-repetition=(map @t @ud) position=chess-position]
   ^-  (map @t @ud)
@@ -1452,4 +1328,18 @@
    |=  position=chess-position
    ^-  ?
    (gte ply-50-move-rule.position 100)
++|  %convenience
+++  ship-to-move
+  |=  state=active-game-state
+  ^-  chess-player
+  ?-  player-to-move.position.state
+    %white  white.game.state
+    %black  black.game.state
+  ==
+++  poke-nack
+  |*  [this=agent:gall msg=tape]
+  ^-  (quip card _this)
+  :_  this
+  :~  [%give %poke-ack `~[leaf+msg]]
+  ==
 --
