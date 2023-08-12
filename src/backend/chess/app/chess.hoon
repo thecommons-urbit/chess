@@ -369,7 +369,17 @@
             =/  err  "undo request already exists for game {<game-id.action>}"
             :~  [%give %poke-ack `~[leaf+err]]
             ==
-          ::  XX: check that we have made at least one move
+          ::  check that we have made at least one move
+          ?.  ?|  ?&  =(our.bowl white.game.u.game-state)
+                      (gth (lent moves.game.u.game-state) 1)
+                  ==
+                  ?&  =(our.bowl black.game.u.game-state)
+                      (gth (lent moves.game.u.game-state) 2)
+              ==  ==
+            :_  this
+            =/  err  "no move to undo for game {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
           ::  send undo request to opponent
           ::  handle our end on ack
           :_  this
@@ -395,7 +405,17 @@
             =/  err  "undo request already exists for game {<game-id.action>}"
             :~  [%give %poke-ack `~[leaf+err]]
             ==
-          ::  XX: check that opponent has made at least one move
+          ::  check that opponent has made at least one move
+          ?.  ?|  ?&  =(src.bowl white.game.u.game-state)
+                      (gth (lent moves.game.u.game-state) 1)
+                  ==
+                  ?&  =(src.bowl black.game.u.game-state)
+                      (gth (lent moves.game.u.game-state) 2)
+              ==  ==
+            :_  this
+            =/  err  "no move to undo for game {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
           :-
             :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
                     %chess-update  !>([%undo-request game-id.action])
