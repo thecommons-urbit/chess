@@ -84,6 +84,11 @@
         :~  ['chessUpdate' [%s 'undo-request']]
             ['gameID' [%s (scot %da game-id.upd)]]
         ==
+      %undo-revoked
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'undo-revoked']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
       %undo-declined
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'undo-declined']]

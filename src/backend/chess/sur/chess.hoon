@@ -225,6 +225,8 @@
       [%claim-special-draw =game-id]
       [%request-undo =game-id]
       [%undo-requested =game-id]
+      [%revoke-undo =game-id]
+      [%undo-revoked =game-id]
       [%decline-undo =game-id]
       [%undo-declined =game-id]
       [%accept-undo =game-id]

@@ -479,6 +479,58 @@
           %=  this
             games  (~(put by games) game-id.action u.game-state(got-undo-request &))
           ==
+        %revoke-undo
+          =/  game-state
+            ^-  (unit active-game-state)
+            (~(get by games) game-id.action)
+          ::  check for valid game
+          ?~  game-state
+            :_  this
+            =/  err  "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  check for open undo request
+          ?.  sent-undo-request.u.game-state
+            :_  this
+            =/  err  "no undo request to revoke for game {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          :-
+            ::  decline undo request
+            ::  we don't care if opponent acks/nacks
+            :~  :*  %pass
+                    /poke/game/(scot %da game-id.action)/revoke-undo
+                    %agent  [opponent.u.game-state %chess]
+                    %poke
+                    [%chess-action !>([%undo-revoked game-id.action])]
+            ==  ==
+          ::  record that undo request is gone
+          %=  this
+            games  (~(put by games) game-id.action u.game-state(sent-undo-request |))
+          ==
+        %undo-revoked
+          =/  game-state
+            ^-  (unit active-game-state)
+            (~(get by games) game-id.action)
+          ::  check for valid game
+          ?~  game-state
+            :_  this
+            =/  err  "no active game with id {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          ::  check for open undo request
+          ?.  got-undo-request.u.game-state
+            :_  this
+            =/  err  "{<our.bowl>} did not receive undo request for {<game-id.action>}"
+            :~  [%give %poke-ack `~[leaf+err]]
+            ==
+          :-
+            :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                    %chess-update  !>([%undo-revoked game-id.action])
+            ==  ==
+          %=  this
+            games  (~(put by games) game-id.action u.game-state(sent-undo-request |))
+          ==
         %decline-undo
           =/  game-state
             ^-  (unit active-game-state)

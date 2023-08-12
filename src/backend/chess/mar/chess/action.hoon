@@ -103,6 +103,18 @@
         %-  ot:dejs
         :~  [%game-id (se:dejs %da)]
         ==
+      %revoke-undo
+        :-  %revoke-undo
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
+      %undo-revoked
+        :-  %undo-revoked
+        %.  jon
+        %-  ot:dejs
+        :~  [%game-id (se:dejs %da)]
+        ==
       %decline-undo
         :-  %decline-undo
         %.  jon
