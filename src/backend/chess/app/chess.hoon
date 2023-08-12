@@ -16,7 +16,6 @@
 +$  active-game-state
   $:  game=chess-game
       position=chess-position
-      move-in-progress=(unit chess-move)
       fen-repetition=(map @t @ud)
       special-draw-available=?
       auto-claim-special-draws=?
@@ -29,6 +28,7 @@
 +$  state-1
   $:  %1
       games=(map game-id active-game-state)
+      potential-states=(map game-id (list (pair active-game-state card)))
       archive=(map game-id chess-game)
       challenges-sent=(map ship chess-challenge)
       challenges-received=(map ship chess-challenge)
@@ -167,7 +167,7 @@
             ::  remove our challenge from challenges-sent
             challenges-sent  (~(del by challenges-sent) src.bowl)
             ::  put our new game into the map of games
-            games  (~(put by games) game-id.action [new-game *chess-position ~ *(map @t @ud) | | | | | | src.bowl])
+            games  (~(put by games) game-id.action [new-game *chess-position *(map @t @ud) | | | | | | src.bowl])
           ==
         %resign
           =/  game-state
@@ -583,16 +583,17 @@
             %+  poke-nack  this
             "not our move"
           ::  check if the move is legal
-          =/  move-result  (try-move u.game-state move.action)
+          =/  move-result  (do-move u.game-state move.action)
           ::  reject invalid moves
-          ?~  new.move-result
+          ?~  move-result
             %+  poke-nack  this
             "invalid move for game {<game-id.action>}"
-          =*  new-game-state  u.new.move-result
+          =*  new-game-state  new.u.move-result
           ::  handle our end on ack
+          =/  future-states  (~(gut by potential-states) game-id.action ~)
           :_
             %=  this
-              games  (~(put by games) game-id.action u.game-state(move-in-progress `move.action))
+              potential-states  (~(put by potential-states) game-id.action (snoc future-states u.move-result))
             ==
           ::  did we win?
           ?~  result.game.new-game-state
@@ -637,17 +638,17 @@
             %+  poke-nack  this
             "not our move"
           ::  check if the move is legal
-          =/  move-result  (try-move u.game-state move.action)
+          =/  move-result  (do-move u.game-state move.action)
           ::  reject invalid moves
-          ?~  new.move-result
+          ?~  move-result
             %+  poke-nack  this
             "invalid move for game {<game-id.action>}"
-          =*  new-game-state  u.new.move-result
+          =*  new-game-state  new.u.move-result
           ?.  =(~ result.game.new-game-state)
             =/  san  (~(algebraicize with-position position.u.game-state) move.action)
             %+  poke-nack  this
             "unexpected result for game {<game-id.action>} after move {<san>}"
-          :-  cards.move-result
+          :-  [card.u.move-result ~]
           %=  this
             games  (~(put by games) game-id.action new-game-state)
           ==
@@ -680,12 +681,12 @@
               %+  poke-nack  this
               "{<our.bowl>} does not resign game {<game-id.action>}"
             ::  apply move
-            =/  move-result  (try-move u.game-state (need move.action))
+            =/  move-result  (do-move u.game-state (need move.action))
             ::  reject invalid moves
-            ?~  new.move-result
+            ?~  move-result
               %+  poke-nack  this
               "invalid move for game {<game-id.action>}"
-            =*  result-game-state  u.new.move-result
+            =*  result-game-state  new.u.move-result
             ::  is opponent claiming a special draw?
             ?:  =(result.action %'½–½')
               ::  is a draw now available?
@@ -1080,7 +1081,7 @@
             ::  remove our challenger from challenges-received
             challenges-received  (~(del by challenges-received) src.bowl)
             ::  put our new game into the map of games
-            games  (~(put by games) game-id [new-game *chess-position ~ *(map @t @ud) | | | | | | src.bowl])
+            games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | | | src.bowl])
           ==
         ::  if nacked, print error
         %-  (slog u.p.sign)
@@ -1168,11 +1169,18 @@
           ^-  active-game-state
           (~(got by games) game-id)
         ?~  p.sign
-          =/  move-result  (try-move game-state (need move-in-progress.game-state))
+          =/  future-states
+            ^-  (list (pair active-game-state card))
+            (~(got by potential-states) game-id)
+          ?<  ?=(~ future-states)
+          =*  next-state  i.future-states
           ::  update position
-          :-  cards.move-result
+          :-  [q.next-state ~]
           %=  this
-            games  (~(put by games) game-id (need new.move-result))
+            ::  move game forward one state
+            games             (~(put by games) game-id p.next-state)
+            ::  move potential states one state forward
+            potential-states  (~(put by potential-states) game-id t.future-states)
           ==
         ::  if nacked, print error
         ::  XX: what if this is nacked?
@@ -1180,7 +1188,8 @@
         %-  (slog u.p.sign)
         :-  ~
         %=  this
-          games  (~(put by games) game-id game-state(move-in-progress ~))
+          ::  reset potential states
+          potential-states  (~(put by potential-states) game-id ~)
         ==
       ==
     [%poke %game game-id %ended chess-result ~]
@@ -1249,65 +1258,71 @@
 ::  helper core
 +|  %game-logic
 ::
-::  test if a given move is legal
-++  try-move
+::  try to apply a move
+++  do-move
   |=  [game-state=active-game-state move=chess-move]
-  ^-  [new=(unit active-game-state) cards=(list card)]
+  ^-  (unit [new=active-game-state =card])
   ?.  ?=(~ result.game.game-state)
-    [~ ~]
-  =/  new-position
+    ~
+  %+  bind
     (~(apply-move with-position position.game-state) move)
-  ?~  new-position
-    [~ ~]
-  =/  updated-game  `chess-game`game.game-state
-  =/  fen  (position-to-fen u.new-position)
-  =/  san  (~(algebraicize with-position position.game-state) move)
-  =.  moves.updated-game  (snoc moves.updated-game [move fen san])
-  =/  new-fen-repetition  (increment-repetition fen-repetition.game-state u.new-position)
-  =/  in-checkmate  ~(in-checkmate with-position u.new-position)
-  =/  in-stalemate  ?:  in-checkmate
-                      |
-                    ~(in-stalemate with-position u.new-position)
+  |=  new-position=chess-position
+  ^-  [new=active-game-state =card]
+  =/  fen
+    (position-to-fen new-position)
+  =/  new-fen-repetition
+    (increment-repetition fen-repetition.game-state new-position)
+  =/  san
+    (~(algebraicize with-position position.game-state) move)
+  =/  in-checkmate
+    ~(in-checkmate with-position new-position)
+  =/  in-stalemate
+    ?:  in-checkmate
+      |
+    ~(in-stalemate with-position new-position)
   =/  special-draw-available
-    ?|  (check-threefold new-fen-repetition u.new-position)
-        (check-50-move-rule u.new-position)
+    ?|  (check-threefold new-fen-repetition new-position)
+        (check-50-move-rule new-position)
     ==
-  =/  special-draw-claim  &(special-draw-available auto-claim-special-draws.game-state)
-  =/  position-update-card
-    :*  %give
-        %fact
-        ~[/game/(scot %da game-id.game.game-state)/updates]
-        %chess-update
-        !>  :*  %position
-                game-id.game.game-state
-                (get-squares move player-to-move.u.new-position)
-                (position-to-fen u.new-position)
-                san
-                special-draw-available
-    ==      ==
-  ::  check if game ends by checkmate, stalemate, or special draw
-  ?:  ?|  in-checkmate
-          in-stalemate
-          special-draw-claim
-      ==
-      ::  update result with score
-      =.  result.updated-game
-        %-  some
-        ?:  in-stalemate  %'½–½'
-        ?:  special-draw-claim  %'½–½'
-        ?:  in-checkmate
-          ?-  player-to-move.u.new-position
-            %white  %'0-1'
-            %black  %'1-0'
-          ==
-        !!
-      ::  give a card of the game result to opponent ship
-      :-  `[updated-game u.new-position ~ new-fen-repetition special-draw-available |5.game-state]
-      :~  position-update-card
-      ==
-  :-  `[updated-game u.new-position ~ new-fen-repetition special-draw-available |5.game-state]
-  :~  position-update-card
-  ==
+  =/  special-draw-claim
+    &(special-draw-available auto-claim-special-draws.game-state)
+  =/  result
+    ^-  (unit chess-result)
+    ?.  ?|  in-checkmate
+            in-stalemate
+            special-draw-claim
+        ==
+      ~
+    %-  some
+    ?.  in-checkmate
+      %'½–½'
+    ?-  player-to-move.new-position
+      %white  %'0-1'
+      %black  %'1-0'
+    ==
+  =/  updated-game
+    %=  game.game-state
+      result  result
+      moves   (snoc moves.game.game-state [move fen san])
+    ==
+  :-
+    :*  updated-game
+        new-position
+        new-fen-repetition
+        special-draw-available
+        |4.game-state
+    ==
+  :*  %give
+      %fact
+      ~[/game/(scot %da game-id.game.game-state)/updates]
+      %chess-update
+      !>  :*  %position
+              game-id.game.game-state
+              (get-squares move player-to-move.new-position)
+              (position-to-fen new-position)
+              san
+              special-draw-available
+  ==      ==
 ++  increment-repetition
   |=  [fen-repetition=(map @t @ud) position=chess-position]
   ^-  (map @t @ud)
