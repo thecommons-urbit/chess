@@ -640,131 +640,91 @@
             games  (~(put by games) game-id.action new-game-state)
           ==
         %end-game
-          =/  game-state
-            ^-  (unit active-game-state)
-            (~(get by games) game-id.action)
-          ::  check for valid game
-          ?~  game-state
-            :_  this
-            =/  err  "no active game with id {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
-          ::  is there a move associated with the result?
-          ?~  move.action
-            ::  is opponent claiming a draw?
-            ?:  =(result.action %'½–½')
-              ::  is there an open draw offer?
-              ?.  ?|  sent-draw-offer.u.game-state
-                      special-draw-available.u.game-state
-                  ==
+          |^
+            =/  game-state
+              ^-  (unit active-game-state)
+              (~(get by games) game-id.action)
+            ::  check for valid game
+            ?~  game-state
+              :_  this
+              =/  err  "no active game with id {<game-id.action>}"
+              :~  [%give %poke-ack `~[leaf+err]]
+              ==
+            ::  is there a move associated with the result?
+            ?~  move.action
+              ::  is opponent claiming a draw?
+              ?:  =(result.action %'½–½')
+                ::  is there an open draw offer?
+                ?:  ?|  sent-draw-offer.u.game-state
+                        special-draw-available.u.game-state
+                    ==
+                  (output-quip game.u.game-state(result `result.action))
                 :_  this
                 =/  err  "{<our.bowl>} did not send draw offer for {<game-id.action>}"
                 :~  [%give %poke-ack `~[leaf+err]]
                 ==
-              :-
-                ::  update observers that game ended in a draw
-                :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                        %chess-update
-                        !>([%result game-id.action result.action])
-                    ==
-                    ::  and kick subscribers who are listening to this agent
-                    :*  %give  %kick  [/game/(scot %da game-id.action)/updates ~]
-                        ~
-                ==  ==
-              %=  this
-                ::  remove this game from our map of active games
-                games    (~(del by games) game-id.action)
-                ::  add this game to our archive
-                archive  (~(put by archive) game-id.action game.u.game-state(result `result.action))
-              ==
-            ::  is opponent resigning?
-            ?.  .=  result.action
-                ?:  =(our.bowl +.white.game.u.game-state)
-                  %'1-0'
-                %'0-1'
+              ::  is opponent resigning?
+              ?:  .=  result.action
+                  ?:  =(our.bowl +.white.game.u.game-state)
+                    %'1-0'
+                  %'0-1'
+                (output-quip game.u.game-state(result `result.action))
               :_  this
               =/  err  "{<our.bowl>} does not resign game {<game-id.action>}"
               :~  [%give %poke-ack `~[leaf+err]]
               ==
-            :-
-              ::  update observers that we won
-              :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                      %chess-update
-                      !>([%result game-id.action result.action])
-                  ==
-                  ::  and kick subscribers who are listening to this agent
-                  :*  %give  %kick  [/game/(scot %da game-id.action)/updates ~]
-                      ~
-              ==  ==
-            %=  this
-              ::  remove this game from our map of active games
-              games    (~(del by games) game-id.action)
-              ::  add this game to our archive
-              archive  (~(put by archive) game-id.action game.u.game-state(result `result.action))
-            ==
-          ::  apply move
-          =/  move-result  (try-move u.game-state (need move.action))
-          ::  reject invalid moves
-          ?~  new.move-result
-            :_  this
-            =/  err  "invalid move for game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
-          =*  result-game-state  u.new.move-result
-          ::  is opponent claiming a special draw?
-          ?:  =(result.action %'½–½')
-            ::  is a draw now available?
-            ?.  special-draw-available.result-game-state
+            ::  apply move
+            =/  move-result  (try-move u.game-state (need move.action))
+            ::  reject invalid moves
+            ?~  new.move-result
+              :_  this
+              =/  err  "invalid move for game {<game-id.action>}"
+              :~  [%give %poke-ack `~[leaf+err]]
+              ==
+            =*  result-game-state  u.new.move-result
+            ::  is opponent claiming a special draw?
+            ?:  =(result.action %'½–½')
+              ::  is a draw now available?
+              ?:  special-draw-available.result-game-state
+                (output-quip game.result-game-state(result `result.action))
               =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
               :_  this
               =/  err  "no special draw available for game {<game-id.action>} after {<san>}"
               :~  [%give %poke-ack `~[leaf+err]]
               ==
-            :-
-              ::  update observers that game ended in a draw
-              :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                      %chess-update
-                      !>([%result game-id.action result.action])
-                  ==
-                  ::  and kick subscribers who are listening to this agent
-                  :*  %give  %kick  [/game/(scot %da game-id.action)/updates ~]
-                      ~
-              ==  ==
-            %=  this
-              ::  remove this game from our map of active games
-              games    (~(del by games) game-id.action)
-              ::  add this game to our archive
-              archive  (~(put by archive) game-id.action game.result-game-state(result `result.action))
-            ==
-          ::  is there a result?
-          ?~  result.game.result-game-state
-            =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
-            :_  this
-            =/  err  "move {<san>} does not end game {<game-id.action>}"
-            :~  [%give %poke-ack `~[leaf+err]]
-            ==
-          ::  has opponent won?
-          ?.  =(result.action u.result.game.result-game-state)
+            ::  is there a result?
+            ?~  result.game.result-game-state
+              =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
+              :_  this
+              =/  err  "move {<san>} does not end game {<game-id.action>}"
+              :~  [%give %poke-ack `~[leaf+err]]
+              ==
+            ::  has opponent won?
+            ?.  =(result.action u.result.game.result-game-state)
+              (output-quip game.result-game-state)
             :_  this
             =/  err  "{<src.bowl>} does not win game {<game-id.action>}"
             :~  [%give %poke-ack `~[leaf+err]]
             ==
-          :-
-            ::  update observers that we lost
-            :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
-                    %chess-update
-                    !>([%result game-id.action result.action])
-                ==
-                ::  and kick subscribers who are listening to this agent
-                :*  %give  %kick  [/game/(scot %da game-id.action)/updates ~]
-                    ~
-            ==  ==
-          %=  this
-            ::  remove this game from our map of active games
-            games    (~(del by games) game-id.action)
-            ::  add this game to our archive
-            archive  (~(put by archive) game-id.action game.result-game-state)
-          ==
+          ++  output-quip
+            |=  archived-game=chess-game
+            :-
+              ::  Update observers with game result
+              :~  :*  %give  %fact  ~[/game/(scot %da game-id.action)/updates]
+                      %chess-update
+                      !>([%result game-id.action result.action])
+                  ==
+                  ::  kick subscribers who are listening to this agent
+                  :*  %give  %kick  [/game/(scot %da game-id.action)/updates ~]
+                      ~
+              ==  ==
+            %=  this
+              ::  remove game from our map of active games
+              games    (~(del by games) game-id.action)
+              ::  add game to our archive
+              archive  (~(put by archive) game-id.action archived-game)
+            ==
+          --
         %change-special-draw-preference
           =/  game-state
             ^-  (unit active-game-state)
