@@ -268,36 +268,42 @@
 ::  types for controlling game state inside Urbit
 +|  %control
 ::
-::  acceptable types of update to perform to %chess state
-+$  chess-action
-  $%  [%challenge who=ship challenge=chess-challenge]
-      [%decline-game who=ship]
-      [%accept-game who=ship]
-      [%game-accepted =game-id her-side=chess-side]
+::  actions users may send to the agent to update game state
++$  chess-user-action
+  $%  [%send-challenge who=ship challenge=chess-challenge]
+      [%decline-challenge who=ship]
+      [%accept-challenge who=ship]
       [%resign =game-id]
       [%offer-draw =game-id]
-      [%draw-offered =game-id]
       [%revoke-draw =game-id]
-      [%draw-revoked =game-id]
       [%decline-draw =game-id]
-      [%draw-declined =game-id]
       [%accept-draw =game-id]
       [%claim-special-draw =game-id]
       [%request-undo =game-id]
-      [%undo-requested =game-id]
       [%revoke-undo =game-id]
-      [%undo-revoked =game-id]
       [%decline-undo =game-id]
-      [%undo-declined =game-id]
       [%accept-undo =game-id]
-      [%undo-accepted =game-id]
       [%make-move =game-id move=chess-move]
-      [%receive-move =game-id move=chess-move]
-      [%end-game =game-id result=chess-result move=(unit chess-move)]
       [%change-special-draw-preference =game-id setting=?]
   ==
 ::
-::  types of updates we may send to observers for rendering
+::  actions agents may send to other agents to update game state
++$  chess-agent-action
+  $%  [%challenge-received challenge=chess-challenge]
+      [%challenge-declined ~]
+      [%challenge-accepted =game-id her-side=chess-side]
+      [%draw-offered =game-id]
+      [%draw-revoked =game-id]
+      [%draw-declined =game-id]
+      [%undo-requested =game-id]
+      [%undo-revoked =game-id]
+      [%undo-declined =game-id]
+      [%undo-accepted =game-id]
+      [%receive-move =game-id move=chess-move]
+      [%end-game =game-id result=chess-result move=(unit chess-move)]
+  ==
+::
+::  updates to game state agent may send to observers
 +$  chess-update
   $%  [%challenge-sent who=ship challenge=chess-challenge]
       [%challenge-received who=ship challenge=chess-challenge]
@@ -306,9 +312,10 @@
       [%draw-offer =game-id]
       [%draw-revoked =game-id]
       [%draw-declined =game-id]
+      [%undo-request =game-id]
+      [%undo-revoked =game-id]
       [%undo-declined =game-id]
       [%undo-accepted =game-id position=@t undo-moves=@ta]
-      [%undo-request =game-id]
       [%result =game-id result=chess-result]
       [%special-draw-preference =game-id setting=?]
   ::
