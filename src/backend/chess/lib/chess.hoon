@@ -290,10 +290,10 @@
             ==
   ==
 ::
-::  XX: delete or support this
-::
 ::  render board as list of files and ranks
 ::  (maybe a leftover from before app had a frontend)
+::
+::  XX: unused, but worth keeping around
 ++  render-board
   |_  board=chess-board
   ++  $
@@ -1287,25 +1287,9 @@
 --
 |%
 ::
-::  produce @t version of the round number
-::  ex: '1.2.3.4.5'
-++  round-string
-  |=  round=(unit (list @))
-  ^-  @t
-  ?~  round  '?'
-  %-  crip  %+  join  '.'
-  %+  turn  u.round
-  (cury scot %ud)
-::
-::  convert a sting of rounds back into a list
-++  string-to-round
-  |=  round=@t
-  ^-  (unit (list @))
-  ?:  =(round '?')
-    ~
-  (rush round (more dot dem))
-::
 ::  play out all moves of an in-complete game
+::
+::  XX: unused, but worth keeping
 ++  play
   |=  game=chess-game
   ^-  (unit chess-position)
@@ -1337,8 +1321,6 @@
 ::
 ::  keep count of every move
 ::  add the move number to chess notation
-::  XX: should we remove this if we're not only not using
-::      it, but won't use it due to undo functionality?
 ++  algebraicize-and-number
   |=  game=chess-game
   ^-  (list @t)
