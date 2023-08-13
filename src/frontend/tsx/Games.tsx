@@ -21,7 +21,7 @@ export function Games () {
         {
           Array.from(activeGames).map(([gameID, activeGame], key) => {
             const colorClass = (key % 2) ? 'odd' : 'even'
-            const description = activeGame.info.event
+            const description = 'XX add `event` from challenge'
             const mySide = (urbit.ship === activeGame.info.white.substring(1)) ? 'white' : 'black'
             const opponent = (urbit.ship === activeGame.info.white.substring(1))
               ? activeGame.info.black

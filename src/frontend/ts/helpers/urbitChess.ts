@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessSendChallengeAction, ChessAcceptChallengeAction, ChessDeclineChallengeAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction } from '../types/urbitChess'
 
 function emptyFunction (): void {}
 
@@ -26,20 +26,19 @@ export function scry (app: string, path: string) {
 // XX rename to sendChallenge
 export function challenge (who: Ship, side: Side, description: string) {
   // XX rename to SendChallengeAction?
-  const action: ChessChallengeAction = {
-    'chess-action': Action.Challenge,
-    'who': who,  //  XX remove
+  const action: ChessSendChallengeAction = {
+    'chess-action': Action.SendChallenge,
+    'who': who,
     'challenger-side': side,
-    'event': description,
-    'round': ''  // XX remove
+    'event': description
   }
 
   return action
 }
 //  XX rename to acceptChallenge
 export function acceptGame (who: Ship) {
-  const action: ChessAcceptAction = {
-    'chess-action': Action.AcceptGame,
+  const action: ChessAcceptChallengeAction = {
+    'chess-action': Action.AcceptChallenge,
     'who': who
   }
 
@@ -49,8 +48,8 @@ export function acceptGame (who: Ship) {
 // XX rename to declineChallenge?
 export function declineGame (who: Ship) {
   // XX rename to ChessDeclineChallengeActions?
-  const action: ChessDeclineAction = {
-    'chess-action': Action.DeclineGame,
+  const action: ChessDeclineChallengeAction = {
+    'chess-action': Action.DeclineChallenge,
     'who': who
   }
 
@@ -75,7 +74,7 @@ export function move (
   destFile: File,
   promotion: PromotionRole): MoveMoveAction {
   const move: MoveMoveAction = {
-    'chess-action': Action.Move,
+    'chess-action': Action.MakeMove,
     'chess-move': MoveActionAction.Move,
     'game-id': gameId,
     'from-rank': srcRank,
@@ -90,7 +89,7 @@ export function move (
 
 export function castle (gameId: GameID, side: CastleSide): CastleMoveAction {
   const move: CastleMoveAction = {
-    'chess-action': Action.Move,
+    'chess-action': Action.MakeMove,
     'chess-move': MoveActionAction.Castle,
     'game-id': gameId,
     'castle-side': side
