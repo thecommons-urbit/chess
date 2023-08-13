@@ -23,19 +23,20 @@ export function scry (app: string, path: string) {
 }
 
 // Pokes
-
+// XX rename to sendChallenge
 export function challenge (who: Ship, side: Side, description: string) {
+  // XX rename to SendChallengeAction?
   const action: ChessChallengeAction = {
     'chess-action': Action.Challenge,
-    'who': who,
+    'who': who,  //  XX remove
     'challenger-side': side,
     'event': description,
-    'round': ''
+    'round': ''  // XX remove
   }
 
   return action
 }
-
+//  XX rename to acceptChallenge
 export function acceptGame (who: Ship) {
   const action: ChessAcceptAction = {
     'chess-action': Action.AcceptGame,
@@ -45,7 +46,9 @@ export function acceptGame (who: Ship) {
   return action
 }
 
+// XX rename to declineChallenge?
 export function declineGame (who: Ship) {
+  // XX rename to ChessDeclineChallengeActions?
   const action: ChessDeclineAction = {
     'chess-action': Action.DeclineGame,
     'who': who
@@ -63,7 +66,7 @@ export function changeSpecialDrawPreference (gameId: GameID, setting: boolean): 
 
   return action
 }
-
+// XX rename to makeMove?
 export function move (
   gameId: GameID,
   srcRank: Rank,
@@ -104,6 +107,8 @@ export function offerDraw (gameId: GameID): OfferDrawAction {
 
   return move
 }
+
+// XX add revokeDraw
 
 export function acceptDraw (gameId: GameID): AcceptDrawAction {
   const move = {
@@ -149,6 +154,8 @@ export function requestUndo (gameId: GameID): RequestUndoAction {
 
   return action
 }
+
+// XX add revokeUndo
 
 export function declineUndo (gameId: GameID): DeclineUndoAction {
   const action: DeclineUndoAction = {

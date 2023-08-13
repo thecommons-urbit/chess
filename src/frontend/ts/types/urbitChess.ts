@@ -37,20 +37,27 @@ export enum Update {
   Position = 'position',
   Result = 'result',
   DrawOffer = 'draw-offer',
+  // DrawRevoked = 'draw-revoked',
   DrawDeclined = 'draw-declined',
   SpecialDrawPreference = 'special-draw-preference',
   UndoRequest = 'undo-request',
+  // UndoRevoked = 'undo-revoked',
   UndoDeclined = 'undo-declined',
   UndoAccepted = 'undo-accepted'
 }
 
 export enum Action {
+  // XX SendChallenge
   Challenge = 'challenge',
+  // XX AcceptChallenge
   AcceptGame = 'accept-game',
+  // XX DeclineChallenge
   DeclineGame = 'decline-game',
   OfferDraw = 'offer-draw',
   AcceptDraw = 'accept-draw',
   DeclineDraw = 'decline-draw',
+  // RevokeDraw = 'revoke-draw',
+  // XX rename to MakeMove?
   Move = 'move',
   ChangeSpecialDrawPreference = 'change-special-draw-preference',
   ClaimSpecialDraw = 'claim-special-draw',
@@ -58,6 +65,7 @@ export enum Action {
   RequestUndo = 'request-undo',
   DeclineUndo = 'decline-undo',
   AcceptUndo = 'accept-undo'
+  // RevokeUndo = 'revoke-undo'
 }
 
 // Yes, I know how retarded 'MoveActionAction.Move' looks - thank Ray for the types in sur/chess.hoon
@@ -90,9 +98,9 @@ export type Move = {
 
 export type GameInfo = {
   gameID: GameID,
-  event: string,
-  site: string,
-  round: string,
+  event: string, // XX remove
+  site: string,  // XX remove
+  round: string, // XX remove
   white: Ship,
   black: Ship,
   result: Result,
@@ -100,6 +108,7 @@ export type GameInfo = {
 }
 
 export type ActiveGameInfo = {
+  // XX game: GameInfo
   position: FENPosition,
   gotDrawOffer: boolean,
   sentDrawOffer: boolean,
@@ -108,13 +117,14 @@ export type ActiveGameInfo = {
   gotUndoRequest: boolean,
   sentUndoRequest: boolean,
   info: GameInfo
+  // XX Opponent: Ship
 }
 
 export type Challenge = {
   who: Ship,
   challengerSide: Side,
   event: string,
-  round: string
+  round: string  // XX remove
 }
 
 //
@@ -167,6 +177,8 @@ export interface DrawOfferUpdate extends ChessUpdate {
   gameID: GameID
 }
 
+// %draw-revoked
+
 export interface DrawDeclinedUpdate extends ChessUpdate {
   chessUpdate: Update.DrawDeclined
   gameID: GameID
@@ -182,6 +194,8 @@ export interface UndoRequestUpdate extends ChessUpdate {
   chessUpdate: Update.UndoRequest
   gameID: GameID
 }
+
+// %undo-revoked
 
 export interface UndoDeclinedUpdate extends ChessUpdate {
   chessUpdate: Update.UndoDeclined
@@ -200,6 +214,8 @@ export interface ChessAction {
   'chess-action': Action
 }
 
+// XX rename to ChessSendChallengeAction?
+
 export interface ChessChallengeAction extends ChessAction {
   'chess-action': Action.Challenge
   'who': Ship
@@ -208,10 +224,14 @@ export interface ChessChallengeAction extends ChessAction {
   'round': string
 }
 
+// XX rename to ChessAcceptChallengeAction?
+
 export interface ChessAcceptAction extends ChessAction {
   'chess-action': Action.AcceptGame
   'who': Ship
 }
+
+// XX rename to ChessDeclineChallengeAction?
 
 export interface ChessDeclineAction extends ChessAction {
   'chess-action': Action.DeclineGame
@@ -233,6 +253,8 @@ export interface AcceptDrawAction extends ChessGameAction {
 export interface DeclineDrawAction extends ChessGameAction {
   'chess-action': Action.DeclineDraw
 }
+
+//  XX %revoke-draw
 
 export interface ChangeSpecialDrawPreferenceAction extends ChessGameAction {
   'chess-action': Action.ChangeSpecialDrawPreference
@@ -259,11 +281,15 @@ export interface AcceptUndoAction extends ChessGameAction {
   'chess-action': Action.AcceptUndo
 }
 
+// %revoke-undo
+
 // Moves
 export interface MoveAction extends ChessGameAction {
   'chess-action': Action.Move
   'chess-move': MoveActionAction
 }
+
+// XX rename to MakeMoveAction?
 
 export interface MoveMoveAction extends MoveAction {
   'chess-move': MoveActionAction.Move

@@ -173,7 +173,7 @@ const useChessStore = create<ChessState>((set, get) => ({
         console.log('RECEIVED DRAW OFFER UPDATE')
         break
       }
-
+      // XX Update.DrawRevoked
       case Update.DrawDeclined: {
         const declineData = data as DrawDeclinedUpdate
         const gameID = declineData.gameID
@@ -283,6 +283,7 @@ const useChessStore = create<ChessState>((set, get) => ({
         console.log('RECEIVED UNDO DECLINED UPDATE')
         break
       }
+      // XX UndoRevoked
       case Update.UndoAccepted: {
         const acceptData = data as UndoAcceptedUpdate
         const gameID = acceptData.gameID
