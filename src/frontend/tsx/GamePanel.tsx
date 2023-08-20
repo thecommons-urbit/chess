@@ -79,6 +79,57 @@ export function GamePanel () {
     }
   }
 
+  const materialDifference = (fen: string) => {
+    let board = fen.split(' ')[0]
+    if (displayIndex !== null) {
+      board = displayGame.info.moves[displayIndex].fen.split(' ')[0]
+    }
+    const whitePieces: { [key: string]: number } = { 'q': 0, 'r': 0, 'b': 0, 'n': 0, 'p': 0 }
+    const blackPieces: { [key: string]: number } = { 'q': 0, 'r': 0, 'b': 0, 'n': 0, 'p': 0 }
+    let whiteDisplay = ''
+    let blackDisplay = ''
+
+    for (let i = 0; i < board.length; i++) {
+      const piece = board.charAt(i)
+      if (piece === '/') {
+        continue
+      }
+      if (isNaN(parseInt(piece))) {
+        if (piece === piece.toUpperCase()) {
+          whitePieces[piece.toLowerCase()] += 1
+        } else {
+          blackPieces[piece] += 1
+        }
+      } else {
+        continue
+      }
+    }
+
+    for (let key in whitePieces) {
+      if (whitePieces[key] > blackPieces[key]) {
+        whiteDisplay += Array(whitePieces[key] - blackPieces[key]).fill(CHESS.pieceIconsBlack[key]).join('')
+      } else if (blackPieces[key] > whitePieces[key]) {
+        blackDisplay += Array(blackPieces[key] - whitePieces[key]).fill(CHESS.pieceIconsWhite[key]).join('')
+      }
+    }
+
+    const materialDifference = Object.keys(CHESS.pieceValues).reduce(
+      (diff, key) => diff + (whitePieces[key] - blackPieces[key]) * CHESS.pieceValues[key],
+      0
+    )
+
+    if (materialDifference > 0) {
+      whiteDisplay += '+' + materialDifference
+    } else if (materialDifference < 0) {
+      blackDisplay += '+' + Math.abs(materialDifference)
+    }
+
+    return {
+      white: whiteDisplay,
+      black: blackDisplay
+    }
+  }
+
   //
   // HTML element generation functions
   //
@@ -155,6 +206,14 @@ export function GamePanel () {
   return (
     <div className='game-panel-container col' style={{ display: ((displayGame !== null) ? 'flex' : ' none') }}>
       <div className="game-panel col">
+        <div id="opp-captured" className={'captured row' + (hasGame ? '' : ' hidden')}>
+          <p>
+            { (displayGame.info.white === '~' + window.ship)
+              ? (materialDifference(displayGame.position)).black
+              : (materialDifference(displayGame.position)).white
+            }
+          </p>
+        </div>
         <div id="opp-timer" className={'timer row' + (hasGame ? '' : ' hidden')}>
           <p>00:00</p>
         </div>
@@ -171,6 +230,14 @@ export function GamePanel () {
         </div>
         <div id="our-timer" className={'timer row' + (hasGame ? '' : ' hidden')}>
           <p>00:00</p>
+        </div>
+        <div id="our-captured" className={'captured row' + (hasGame ? '' : ' hidden')}>
+          <p>
+            { (displayGame.info.white === '~' + window.ship)
+              ? (materialDifference(displayGame.position)).white
+              : (materialDifference(displayGame.position)).black
+            }
+          </p>
         </div>
         {/* buttons */}
         {/* resign button */}
