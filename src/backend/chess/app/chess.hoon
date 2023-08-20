@@ -89,7 +89,7 @@
           ==  ==
         %decline-challenge
           ::  check if challenge exists
-          ?~  (~(has by challenges-received) who.action)
+          ?.  (~(has by challenges-received) who.action)
             %+  poke-nack  this
             "no challenge to decline from {<who.action>}"
           :_
