@@ -534,9 +534,8 @@
                   !>([%challenge-received src.bowl challenge.action])
           ==  ==
         %challenge-declined
-          =/  challenge  (~(get by challenges-sent) src.bowl)
           :: check that challenge exists
-          ?~  challenge
+          ?.  (~(has by challenges-sent) src.bowl)
             %+  poke-nack  this
             "{<our.bowl>} hasn't challenged you"
           :-
@@ -1398,7 +1397,7 @@
             ?.  random-bit
               %white
             %black
-          =/  challenge  (~(got by challenges-received) src.bowl)
+          =/  challenge  (~(got by challenges-sent) src.bowl)
           :-  ~
           %=  this
             challenges-sent  (~(put by challenges-sent) src.bowl challenge(challenger-side our-side))
