@@ -969,7 +969,8 @@
             (mix now.bowl (end [3 6] eny.bowl))
           :_
             %=  this
-              challenges-received  (~(put by challenges-received) src.bowl challenge(challenger-side her-side))
+              challenges-received   (~(put by challenges-received) src.bowl challenge(challenger-side her-side))
+              rng-state             (~(del by rng-state) src.bowl)
             ==
           ::  attempt to accept game
           ::  handle our end on ack
@@ -1400,7 +1401,8 @@
           =/  challenge  (~(got by challenges-sent) src.bowl)
           :-  ~
           %=  this
-            challenges-sent  (~(put by challenges-sent) src.bowl challenge(challenger-side our-side))
+            challenges-sent   (~(put by challenges-sent) src.bowl challenge(challenger-side our-side))
+            rng-state         (~(del by rng-state) src.bowl)
           ==
         ::  if nacked, print error
         %-  (slog u.p.sign)
