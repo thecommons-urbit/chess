@@ -325,11 +325,13 @@
             %+  poke-nack  this
             "undo request already exists for game {<game-id.action>}"
           ::  check that we have made at least one move
-          ?.  ?|  ?&  =(our.bowl white.game.u.game-state)
-                      (gth (lent moves.game.u.game-state) 1)
+          =/  ship-to-move
+            (ship-to-move u.game-state)
+          ?.  ?|  ?&  =(our.bowl ship-to-move)
+                      (gte (lent moves.game.u.game-state) 2)
                   ==
-                  ?&  =(our.bowl black.game.u.game-state)
-                      (gth (lent moves.game.u.game-state) 2)
+                  ?&  !=(our.bowl ship-to-move)
+                      (gte (lent moves.game.u.game-state) 1)
               ==  ==
             %+  poke-nack  this
             "no move to undo for game {<game-id.action>}"
@@ -672,11 +674,13 @@
             %+  poke-nack  this
             "undo request already exists for game {<game-id.action>}"
           ::  check that opponent has made at least one move
-          ?.  ?|  ?&  =(src.bowl white.game.u.game-state)
-                      (gth (lent moves.game.u.game-state) 1)
+          =/  ship-to-move
+            (ship-to-move u.game-state)
+          ?.  ?|  ?&  =(our.bowl ship-to-move)
+                      (gte (lent moves.game.u.game-state) 1)
                   ==
-                  ?&  =(src.bowl black.game.u.game-state)
-                      (gth (lent moves.game.u.game-state) 2)
+                  ?&  !=(our.bowl ship-to-move)
+                      (gte (lent moves.game.u.game-state) 2)
               ==  ==
             %+  poke-nack  this
             "no move to undo for game {<game-id.action>}"
@@ -749,13 +753,17 @@
             "{<our.bowl>} did not send undo request for game {<game-id.action>}"
           =/  ship-to-move
             (ship-to-move u.game-state)
-          =:
-              moves.game
+          =/  updated-moves
             ?:  =(ship-to-move our.bowl)
               (snip (snip moves.game))
             (snip moves.game)
+          =:
+              moves.game
+            updated-moves
           ::
               position.u.game-state
+            ?~  updated-moves
+              *chess-position
             ?:  =(ship-to-move our.bowl)
               (fen-to-position (head (tail (rear (snip (snip moves.game))))))
             (fen-to-position (head (tail (rear (snip moves.game)))))
@@ -1267,7 +1275,7 @@
                   %fact
                   ~[/game/(scot %da game-id)/updates]
                   %chess-update
-                  !>([%requested-draw game-id])
+                  !>([%requested-undo game-id])
           ==  ==
         ::  if nacked, print error
         %-  (slog u.p.sign)
@@ -1284,13 +1292,21 @@
           =*  game  game.game-state
           =/  ship-to-move
             (ship-to-move game-state)
+          =/  updated-moves
+            ?:  =(ship-to-move our.bowl)
+              (snip moves.game)
+            (snip (snip moves.game))
           =:
               moves.game
             ?:  =(ship-to-move our.bowl)
               (snip moves.game)
             (snip (snip moves.game))
+              moves.game
+            updated-moves
           ::
               position.game-state
+            ?~  updated-moves
+              *chess-position
             ?:  =(ship-to-move our.bowl)
               (fen-to-position (head (tail (rear (snip moves.game)))))
             (fen-to-position (head (tail (rear (snip (snip moves.game))))))
