@@ -112,7 +112,7 @@
                   %fact
                   ~[/challenges]
                   %chess-update
-                  !>([%challenge-replied src.bowl])
+                  !>([%challenge-replied who.action])
           ==  ==
         %accept-challenge
           =/  challenge  (~(get by challenges-received) who.action)
