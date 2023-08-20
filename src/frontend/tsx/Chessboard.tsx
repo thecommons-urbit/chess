@@ -8,7 +8,7 @@ import { CHESS } from '../ts/constants/chess'
 import { CHESSGROUND } from '../ts/constants/chessground'
 import { getChessDests, isChessPromotion } from '../ts/helpers/chess'
 import { getCgColor } from '../ts/helpers/chessground'
-import { pokeAction, move, castle, declineDraw, claimSpecialDraw, declineUndo } from '../ts/helpers/urbitChess'
+import { pokeAction, movePoke, castlePoke, declineDrawPoke, claimSpecialDrawPoke, declineUndoPoke } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { PromotionMove } from '../ts/types/chessground'
@@ -39,7 +39,7 @@ export function Chessboard () {
   const [chess, setChess] = useState<ChessInstance>(new Chess())
   const [promotionMove, setPromotionMove] = useState<PromotionMove | null>(null)
   const [renderWorkaround, forceRenderWorkaround] = useState<number>(Date.now())
-  const { urbit, displayGame, declinedDraw, declinedUndo, offeredDraw, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex } = useChessStore()
+  const { urbit, displayGame, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex } = useChessStore()
   const { pieceTheme, boardTheme } = usePreferenceStore()
 
   //
@@ -115,13 +115,13 @@ export function Chessboard () {
         const gameID: GameID = displayGame.info.gameID
 
         if (flag === FLAGS.KSIDE_CASTLE) {
-          await pokeAction(urbit, castle(gameID, CastleSide.King), onError)
+          await pokeAction(urbit, castlePoke(gameID, CastleSide.King), onError)
         } else if (flag === FLAGS.QSIDE_CASTLE) {
-          await pokeAction(urbit, castle(gameID, CastleSide.Queen), onError)
+          await pokeAction(urbit, castlePoke(gameID, CastleSide.Queen), onError)
         } else {
           await pokeAction(
             urbit,
-            move(
+            movePoke(
               gameID,
               orig.charAt(1) as Rank,
               orig.charAt(0) as File,
@@ -131,11 +131,13 @@ export function Chessboard () {
             onError)
         }
 
+        //  XX: should moving decline draw offer in backend instead?
         if (displayGame.gotDrawOffer) {
-          await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+          await pokeAction(urbit, declineDrawPoke(gameID))
         }
+        //  XX: should moving decline undo request in backend instead?
         if (displayGame.gotUndoRequest) {
-          await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
+          await pokeAction(urbit, declineUndoPoke(gameID))
         }
       }
 
@@ -324,7 +326,7 @@ export function Chessboard () {
 
           await pokeAction(
             urbit,
-            move(
+            movePoke(
               gameID,
               orig.charAt(1) as Rank,
               orig.charAt(0) as File,
@@ -333,11 +335,13 @@ export function Chessboard () {
               piece.urbitRole),
             onError)
 
+          //  XX: should moving decline draw offer in backend instead?
           if (displayGame.gotDrawOffer) {
-            await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+            await pokeAction(urbit, declineDrawPoke(gameID))
           }
+          //  XX: should moving decline undo request in backend instead?
           if (displayGame.gotUndoRequest) {
-            await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
+            await pokeAction(urbit, declineUndoPoke(gameID))
           }
         }
 

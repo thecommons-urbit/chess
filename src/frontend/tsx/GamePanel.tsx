@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Chess, ChessInstance } from 'chess.js'
 import Popup from 'reactjs-popup'
 import useChessStore from '../ts/state/chessStore'
-import { pokeAction, offerDraw, acceptDraw, declineDraw, claimSpecialDraw, resign, requestUndo, declineUndo, acceptUndo } from '../ts/helpers/urbitChess'
+import { pokeAction, offerDrawPoke, revokeDrawPoke, declineDrawPoke, acceptDrawPoke, claimSpecialDrawPoke, resignPoke, requestUndoPoke, revokeUndoPoke, declineUndoPoke, acceptUndoPoke } from '../ts/helpers/urbitChess'
 import { CHESS } from '../ts/constants/chess'
 import { Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function GamePanel () {
-  const { urbit, displayGame, setDisplayGame, offeredDraw, declinedDraw, requestedUndo, declinedUndo, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
+  const { urbit, displayGame, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
   const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
   const opponent = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
@@ -20,42 +20,42 @@ export function GamePanel () {
 
   const resignOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, resign(gameID))
+    await pokeAction(urbit, resignPoke(gameID))
   }
 
   const offerDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
+    await pokeAction(urbit, offerDrawPoke(gameID))
   }
 
   const acceptDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, acceptDraw(gameID))
+    await pokeAction(urbit, acceptDrawPoke(gameID))
   }
 
   const declineDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
+    await pokeAction(urbit, declineDrawPoke(gameID))
   }
 
   const claimSpecialDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, claimSpecialDraw(gameID))
+    await pokeAction(urbit, claimSpecialDrawPoke(gameID))
   }
 
   const requestUndoOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, requestUndo(gameID), null, () => { requestedUndo(gameID) })
+    await pokeAction(urbit, requestUndoPoke(gameID))
   }
 
   const acceptUndoOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, acceptUndo(gameID))
+    await pokeAction(urbit, acceptUndoPoke(gameID))
   }
 
   const declineUndoOnClick = async () => {
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
+    await pokeAction(urbit, declineUndoPoke(gameID))
   }
 
   const moveOpacity = (index: number) => {

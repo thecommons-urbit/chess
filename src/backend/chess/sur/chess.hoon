@@ -159,7 +159,7 @@
 ::  a message or description for the game to be played
 +$  chess-challenge
   $~  :*  challenger-side=%random
-          event='Casual Game'
+          event=''
       ==
   $:
     challenger-side=?(chess-side %random)
@@ -232,6 +232,7 @@
 +$  chess-game
   ::  default values
   $~  :*  game-id=*game-id
+          event=''
           date=*@da
           white=*chess-player
           black=*chess-player
@@ -242,6 +243,9 @@
     ::  unique identifier for game
     ::    e.g. ~1996.2.16..10.00.00..0000
     =game-id
+    ::  description of game
+    ::    e.g. 'Kasparov vs. Deep Blue: Game 5
+    event=@t
     ::  date game was played
     ::    e.g. ~1996.2.16
     date=@da
@@ -309,12 +313,19 @@
       [%challenge-received who=ship challenge=chess-challenge]
       [%challenge-resolved who=ship]
       [%challenge-replied who=ship]
-      [%draw-offer =game-id]
+      [%offered-draw =game-id]
+      [%draw-offered =game-id]
+      [%revoked-draw =game-id]
       [%draw-revoked =game-id]
+      [%declined-draw =game-id]
       [%draw-declined =game-id]
-      [%undo-request =game-id]
+      [%requested-undo =game-id]
+      [%undo-requested =game-id]
+      [%revoked-undo =game-id]
       [%undo-revoked =game-id]
+      [%declined-undo =game-id]
       [%undo-declined =game-id]
+      [%accepted-undo =game-id position=@t undo-moves=@ta]
       [%undo-accepted =game-id position=@t undo-moves=@ta]
       [%result =game-id result=chess-result]
       [%special-draw-preference =game-id setting=?]

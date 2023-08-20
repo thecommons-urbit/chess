@@ -11,19 +11,16 @@ interface ChessState {
   incomingChallenges: Map<Ship, Challenge>
   outgoingChallenges: Map<Ship, Challenge>
   friends: Array<Ship>
-  // functions
+  // frontend state functions
   setUrbit: (urbit: Urbit) => void
   setDisplayGame: (displayGame: ActiveGameInfo | null) => void
   setDisplayIndex: (displayIndex: number | null) => void
   setPracticeBoard: (practiceBoard: String | null) => void
   setFriends: (friends: Array<Ship>) => void
+  // backend update functions
   receiveChallengeUpdate: (data: ChallengeUpdate) => void
   receiveGame: (data: GameInfo) => void
-  receiveUpdate: (data: ChessUpdate) => void
-  declinedDraw: (gameID: GameID) => void
-  offeredDraw: (gameID: GameID) => void
-  declinedUndo: (gameID: GameID) => void
-  requestedUndo: (gameID: GameID) => void
+  receiveGameUpdate: (data: ChessUpdate) => void
 }
 
 export default ChessState

@@ -88,7 +88,9 @@ done
 # Copy files
 INSTALL_DIR="$PIER/$SHIP/$DESK"
 echo "Attempting to install to path '$INSTALL_DIR'"
+
 cp ${DESK_DIR}/* ${INSTALL_DIR}/
 cp -rfL ${CHESS_DIR}/* ${INSTALL_DIR}/
 cp -rfL ${DEPS_DIR}/* ${INSTALL_DIR}/
+
 echo "Successfully installed to path '$INSTALL_DIR'"

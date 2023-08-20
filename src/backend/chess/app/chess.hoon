@@ -84,8 +84,8 @@
                   %agent
                   [who.action %chess]
                   %poke
-                  %chess-challenge
-                  !>(challenge.action)
+                  %chess-agent-action
+                  !>([%challenge-received challenge.action])
           ==  ==
         %decline-challenge
           ::  check if challenge exists
@@ -104,8 +104,8 @@
                   %agent
                   [who.action %chess]
                   %poke
-                  %chess-decline-challenge
-                  !>(~)
+                  %chess-agent-action
+                  !>([%challenge-declined ~])
               ==
               ::  update observers that we replied to the challenge
               :*  %give
@@ -151,8 +151,8 @@
                   %agent
                   [who.action %chess]
                   %poke
-                  %chess-action
-                  !>([%game-accepted game-id our-side])
+                  %chess-agent-action
+                  !>([%challenge-accepted game-id our-side])
           ==  ==
         %resign
           =/  game-state
@@ -162,7 +162,7 @@
             %+  poke-nack  this
             "no active game with id {<game-id.action>}"
           =/  result
-            ?:  =(our.bowl +.white.game.u.game-state)
+            ?:  =(our.bowl white.game.u.game-state)
               %'0-1'
             %'1-0'
           :_  this
@@ -173,7 +173,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%end-game game-id.action result ~])
           ==  ==
         %offer-draw
@@ -191,7 +191,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%draw-offered game-id.action])
           ==  ==
         %revoke-draw
@@ -214,14 +214,14 @@
                     %agent
                     [opponent.u.game-state %chess]
                     %poke
-                    %chess-action
+                    %chess-agent-action
                     !>([%draw-revoked game-id.action])
                 ==
                 :*  %give
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%draw-revoked game-id])
+                    !>([%revoked-draw game-id])
             ==  ==
           %=  this
             ::  record that draw offer is gone
@@ -247,14 +247,14 @@
                     %agent
                     [opponent.u.game-state %chess]
                     %poke
-                    %chess-action
+                    %chess-agent-action
                     !>([%draw-declined game-id.action])
                 ==
                 :*  %give
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%draw-declined game-id])
+                    !>([%declined-draw game-id])
             ==  ==
           %=  this
             ::  record that draw offer is gone
@@ -280,7 +280,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%end-game game-id.action %'½–½' ~])
           ==  ==
         %claim-special-draw
@@ -294,7 +294,7 @@
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's our turn
-          ?.  =(+.ship-to-move src.bowl)
+          ?.  =(ship-to-move src.bowl)
             %+  poke-nack  this
             "cannot claim special draw on opponent's turn"
           ::  check if a special draw claim is available
@@ -309,7 +309,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%end-game game-id.action %'½–½' ~])
           ==  ==
         %request-undo
@@ -341,7 +341,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%undo-requested game-id.action])
           ==  ==
         %revoke-undo
@@ -364,8 +364,14 @@
                     %agent
                     [opponent.u.game-state %chess]
                     %poke
-                    %chess-action
+                    %chess-agent-action
                     !>([%undo-revoked game-id.action])
+                ==
+                :*  %give
+                    %fact
+                    ~[/game/(scot %da game-id.action)/updates]
+                    %chess-update
+                    !>([%revoked-undo game-id])
             ==  ==
           ::  record that undo request is gone
           %=  this
@@ -391,8 +397,14 @@
                     %agent
                     [opponent.u.game-state %chess]
                     %poke
-                    %chess-action
+                    %chess-agent-action
                     !>([%undo-declined game-id.action])
+                ==
+                :*  %give
+                    %fact
+                    ~[/game/(scot %da game-id.action)/updates]
+                    %chess-update
+                    !>([%declined-undo game-id])
             ==  ==
           ::  record that undo request is gone
           %=  this
@@ -418,7 +430,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%undo-accepted game-id.action])
           ==  ==
         %make-move
@@ -432,7 +444,7 @@
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's our turn
-          ?.  =(+.ship-to-move src.bowl)
+          ?.  =(ship-to-move src.bowl)
             %+  poke-nack  this
             "not our move"
           ::  check if the move is legal
@@ -460,7 +472,7 @@
                       %agent
                       [opponent.u.game-state %chess]
                       %poke
-                      %chess-action
+                      %chess-agent-action
                       !>([%end-game game-id.action %'½–½' `move.action])
               ==  ==
             ::  regular move
@@ -469,7 +481,7 @@
                     %agent
                     [opponent.u.game-state %chess]
                     %poke
-                    %chess-action
+                    %chess-agent-action
                     !>([%receive-move game-id.action move.action])
             ==  ==
           ::  tell opponent we won
@@ -478,7 +490,7 @@
                   %agent
                   [opponent.u.game-state %chess]
                   %poke
-                  %chess-action
+                  %chess-agent-action
                   !>([%end-game game-id.action (need result.game.new-game-state) `move.action])
           ==  ==
         %change-special-draw-preference
@@ -503,8 +515,6 @@
     ::
     ::  pokes managing active game state and challenges sent by another chess agent
     %chess-agent-action
-      ::  only allow chess actions from our ship or our moons
-      ?>  =(our.bowl src.bowl)
       =/  action  !<(chess-agent-action vase)
       ?-  -.action
         %challenge-received
@@ -521,7 +531,7 @@
                   %fact
                   ~[/challenges]
                   %chess-update
-                  !>([%challenge-replied src.bowl])
+                  !>([%challenge-received src.bowl challenge.action])
           ==  ==
         %challenge-declined
           =/  challenge  (~(get by challenges-sent) src.bowl)
@@ -559,6 +569,7 @@
           =/  new-game
             ^-  chess-game
             :*  game-id.action
+                event.u.challenge
                 (yule [d:(yell game-id.action) 0 0 0 ~])
                 white-player
                 black-player
@@ -598,7 +609,7 @@
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%draw-offer game-id.action])
+                    !>([%draw-offered game-id.action])
             ==  ==
           %=  this
             games  (~(put by games) game-id.action u.game-state(got-draw-offer &))
@@ -675,7 +686,7 @@
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%undo-request game-id.action])
+                    !>([%undo-requested game-id.action])
             ==  ==
           %=  this
             games  (~(put by games) game-id.action u.game-state(got-undo-request &))
@@ -741,12 +752,12 @@
             (ship-to-move u.game-state)
           =:
               moves.game
-            ?:  =(+.ship-to-move our.bowl)
+            ?:  =(ship-to-move our.bowl)
               (snip (snip moves.game))
             (snip moves.game)
           ::
               position.u.game-state
-            ?:  =(+.ship-to-move our.bowl)
+            ?:  =(ship-to-move our.bowl)
               (fen-to-position (head (tail (rear (snip (snip moves.game))))))
             (fen-to-position (head (tail (rear (snip moves.game)))))
           ::
@@ -762,7 +773,7 @@
                   %fact
                   ~[/game/(scot %da game-id.action)/updates]
                   %chess-update
-                  !>([%undo-accepted game-id.action (position-to-fen position.u.game-state) ?:(=(+.ship-to-move our.bowl) ~.2 ~.1)])
+                  !>([%undo-accepted game-id.action (position-to-fen position.u.game-state) ?:(=(ship-to-move our.bowl) ~.2 ~.1)])
           ==  ==
         %receive-move
           ::  XX: opponent's move means draw declined
@@ -776,7 +787,7 @@
           =/  ship-to-move
             (ship-to-move u.game-state)
           ::  check whether it's opponent's turn
-          ?.  =(+.ship-to-move src.bowl)
+          ?.  =(ship-to-move src.bowl)
             %+  poke-nack  this
             "not our move"
           ::  check if the move is legal
@@ -816,7 +827,7 @@
                 "{<our.bowl>} did not send draw offer for {<game-id.action>}"
               ::  is opponent resigning?
               ?:  .=  result.action
-                  ?:  =(our.bowl +.white.game.u.game-state)
+                  ?:  =(our.bowl white.game.u.game-state)
                     %'1-0'
                   %'0-1'
                 (output-quip game.u.game-state(result `result.action))
@@ -968,8 +979,8 @@
                   %agent
                   [src.bowl %chess]
                   %poke
-                  %chess-action
-                  !>([%game-accepted game-id our-side])
+                  %chess-agent-action
+                  !>([%challenge-accepted game-id our-side])
           ==  ==
         ::  step 4 of assigning random sides
         ?>  ?=(^ her-hash.u.commitment)
@@ -1139,6 +1150,9 @@
     ::  .^(noun %gx /=chess=/friends/noun)
     ::  .^(json %gx /=chess=/friends/json)
     ::  read friends
+    ::
+    ::  XX: peek-bad-result if %pals not installed
+    ::      should check %pals exists on this ship first
     [%x %friends ~]
       ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
   ==
@@ -1180,6 +1194,7 @@
           =/  new-game
             ^-  chess-game
             :*  game-id
+                event.challenge
                 (yule [d:(yell game-id) 0 0 0 ~])
                 white-player
                 black-player
@@ -1220,11 +1235,17 @@
           =/  game-state
             ^-  active-game-state
             (~(got by games) game-id)
-          :-  ~
-          ::  record that draw has been offered
-          %=  this
-            games  (~(put by games) game-id game-state(sent-draw-offer &))
-          ==
+          :_
+            ::  record that draw has been offered
+            %=  this
+              games  (~(put by games) game-id game-state(sent-draw-offer &))
+            ==
+          :~  :*  %give
+                  %fact
+                  ~[/game/(scot %da game-id)/updates]
+                  %chess-update
+                  !>([%offered-draw game-id])
+          ==  ==
         ::  if nacked, print error
         %-  (slog u.p.sign)
         [~ this]
@@ -1237,11 +1258,17 @@
           =/  game-state
             ^-  active-game-state
             (~(got by games) game-id)
-          :-  ~
-          ::  record that undo has been requested
-          %=  this
-            games  (~(put by games) game-id game-state(sent-undo-request &))
-          ==
+          :_
+            ::  record that undo has been requested
+            %=  this
+              games  (~(put by games) game-id game-state(sent-undo-request &))
+            ==
+          :~  :*  %give
+                  %fact
+                  ~[/game/(scot %da game-id)/updates]
+                  %chess-update
+                  !>([%requested-draw game-id])
+          ==  ==
         ::  if nacked, print error
         %-  (slog u.p.sign)
         [~ this]
@@ -1259,12 +1286,12 @@
             (ship-to-move game-state)
           =:
               moves.game
-            ?:  =(+.ship-to-move our.bowl)
+            ?:  =(ship-to-move our.bowl)
               (snip moves.game)
             (snip (snip moves.game))
           ::
               position.game-state
-            ?:  =(+.ship-to-move our.bowl)
+            ?:  =(ship-to-move our.bowl)
               (fen-to-position (head (tail (rear (snip moves.game)))))
             (fen-to-position (head (tail (rear (snip (snip moves.game))))))
           ::
@@ -1280,7 +1307,7 @@
                   %fact
                   ~[/game/(scot %da game-id)/updates]
                   %chess-update
-                  !>([%undo-accepted game-id (position-to-fen position.game-state) ?:(=(+.ship-to-move our.bowl) ~.1 ~.2)])
+                  !>([%accepted-undo game-id (position-to-fen position.game-state) ?:(=(ship-to-move our.bowl) ~.1 ~.2)])
           ==  ==
         ::  if nacked, print error
         ::  XX: maybe move this into %accept-undo?

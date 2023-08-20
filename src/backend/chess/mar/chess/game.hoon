@@ -12,8 +12,9 @@
   ++  json
     %-  pairs:enjs
     :~  ['gameID' [%s (scot %da game-id.game)]]
-        ['white' [%s (player-string:chess white.game)]]
-        ['black' [%s (player-string:chess black.game)]]
+        ['event' [%s event.game]]
+        ['white' [%s (scot %p white.game)]]
+        ['black' [%s (scot %p black.game)]]
         ['result' [%s ?~(result.game '' u.result.game)]]
         ['moves' [%a ~]]
     ==

@@ -1,5 +1,5 @@
 import React from 'react'
-import { pokeAction, changeSpecialDrawPreference } from '../ts/helpers/urbitChess'
+import { pokeAction, changeSpecialDrawPreferencePoke } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { pieceThemes, boardThemes } from '../ts/constants/themes'
@@ -12,7 +12,7 @@ export function Settings () {
   const handleCheckboxChange = async () => {
     const newAutoClaimPreference = !displayGame.autoClaimSpecialDraws
     const gameID = displayGame.info.gameID
-    await pokeAction(urbit, changeSpecialDrawPreference(gameID, newAutoClaimPreference))
+    await pokeAction(urbit, changeSpecialDrawPreferencePoke(gameID, newAutoClaimPreference))
   }
 
   return (

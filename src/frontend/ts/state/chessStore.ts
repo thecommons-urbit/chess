@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Update, Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawOfferUpdate, DrawDeclinedUpdate, SpecialDrawPreferenceUpdate, UndoRequestUpdate, UndoDeclinedUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
+import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
 import { findFriends } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
@@ -20,6 +20,7 @@ const useChessStore = create<ChessState>((set, get) => ({
   outgoingChallenges: new Map(),
   friends: [],
   displayIndex: null,
+  //
   setUrbit: (urbit: Urbit) => set({ urbit }),
   setDisplayGame: (displayGame: ActiveGameInfo | null) => {
     set({ displayGame, displayIndex: null })
@@ -30,6 +31,7 @@ const useChessStore = create<ChessState>((set, get) => ({
     set({ displayIndex })
     console.log('setDisplayIndex displayIndex: ' + displayIndex)
   },
+  //
   receiveChallengeUpdate: (data: ChallengeUpdate) => {
     switch (data.chessUpdate) {
       case Update.ChallengeSent: {
@@ -40,13 +42,6 @@ const useChessStore = create<ChessState>((set, get) => ({
         set(state => ({ incomingChallenges: state.incomingChallenges.set(data.who, data as ChallengeReceivedUpdate) }))
         break
       }
-      case Update.ChallengeResolved: {
-        let outgoingChallenges: Map<Ship, Challenge> = get().outgoingChallenges
-        outgoingChallenges.delete(data.who)
-
-        set({ outgoingChallenges })
-        break
-      }
       case Update.ChallengeReplied: {
         let incomingChallenges: Map<Ship, Challenge> = get().incomingChallenges
         incomingChallenges.delete(data.who)
@@ -54,11 +49,17 @@ const useChessStore = create<ChessState>((set, get) => ({
         set({ incomingChallenges })
         break
       }
+      case Update.ChallengeResolved: {
+        let outgoingChallenges: Map<Ship, Challenge> = get().outgoingChallenges
+        outgoingChallenges.delete(data.who)
+
+        set({ outgoingChallenges })
+        break
+      }
       default: {
-        console.log('RECEIVED BAD UPDATE')
+        console.log('RECEIVED BAD CHALLENGE UPDATE')
         console.log(data.chessUpdate)
-        console.log((data as ChallengeUpdate).chessUpdate)
-        console.log((data as ChallengeUpdate).who)
+        console.log(data.who)
       }
     }
   },
@@ -80,13 +81,14 @@ const useChessStore = create<ChessState>((set, get) => ({
       app: 'chess',
       path: `/game/${data.gameID}/updates`,
       err: () => {},
-      event: (data: ChessUpdate) => get().receiveUpdate(data),
+      event: (data: ChessUpdate) => get().receiveGameUpdate(data),
       quit: () => {}
     })
   },
-  receiveUpdate: (data: ChessUpdate) => {
+  receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
-      if ((get().displayGame !== null) && (updatedGame.info.gameID === get().displayGame.info.gameID)) {
+      const displayGame = get().displayGame
+      if ((displayGame !== null) && (updatedGame.info.gameID === displayGame.info.gameID)) {
         set({ displayGame: updatedGame })
       }
     }
@@ -120,7 +122,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: null }))
           updateDisplayGame(updatedGame)
 
-          console.log('RECEIVED POSITION UPDATE')
+          console.log('RECEIVED POSITION UPDATE FOR ' + gameID)
           console.log('Update.Position displayIndex: ' + (get().displayIndex))
           console.log('Update.Position fen: ' + move.fen)
         }
@@ -142,41 +144,18 @@ const useChessStore = create<ChessState>((set, get) => ({
 
         set({ activeGames })
 
-        console.log('RECEIVED RESULT UPDATE')
+        console.log('RECEIVED RESULT UPDATE ' + resultData.result + ' FOR ' + gameID)
         break
       }
 
-      case Update.DrawOffer: {
-        const offerData = data as DrawOfferUpdate
-        const gameID = offerData.gameID
-        const currentGame = get().activeGames.get(gameID)
-
-        if (currentGame === null) {
-          badGameId(gameID)
-          return
-        }
-
-        const updatedGame: ActiveGameInfo = {
-          position: currentGame.position,
-          gotDrawOffer: true,
-          sentDrawOffer: currentGame.sentDrawOffer,
-          drawClaimAvailable: currentGame.drawClaimAvailable,
-          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
-          gotUndoRequest: currentGame.gotUndoRequest,
-          sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info
-        }
-
-        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-        updateDisplayGame(updatedGame)
-
-        console.log('RECEIVED DRAW OFFER UPDATE')
-        break
-      }
-
+      case Update.OfferedDraw:
+      case Update.DrawOffered:
+      case Update.RevokedDraw:
+      case Update.DrawRevoked:
+      case Update.DeclinedDraw:
       case Update.DrawDeclined: {
-        const declineData = data as DrawDeclinedUpdate
-        const gameID = declineData.gameID
+        const drawData = data as DrawUpdate
+        const gameID = drawData.gameID
         const currentGame = get().activeGames.get(gameID)
 
         if (currentGame === null) {
@@ -184,10 +163,27 @@ const useChessStore = create<ChessState>((set, get) => ({
           return
         }
 
+        const gotDrawOffer = (() => {
+          switch (drawData.chessUpdate) {
+            case Update.DrawOffered: { return true }
+            case Update.DrawRevoked: { return false }
+            case Update.DeclinedDraw: { return false }
+            default: { return currentGame.gotDrawOffer }
+          }
+        })()
+        const sentDrawOffer = (() => {
+          switch (drawData.chessUpdate) {
+            case Update.OfferedDraw: { return true }
+            case Update.RevokedDraw: { return false }
+            case Update.DrawDeclined: { return false }
+            default: { return currentGame.sentDrawOffer }
+          }
+        })()
+
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
-          gotDrawOffer: currentGame.gotDrawOffer,
-          sentDrawOffer: false,
+          gotDrawOffer: gotDrawOffer,
+          sentDrawOffer: sentDrawOffer,
           drawClaimAvailable: currentGame.drawClaimAvailable,
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: currentGame.gotUndoRequest,
@@ -198,9 +194,10 @@ const useChessStore = create<ChessState>((set, get) => ({
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
         updateDisplayGame(updatedGame)
 
-        console.log('RECEIVED DRAW DECLINE UPDATE')
+        console.log('RECEIVED DRAW UPDATE ' + data.chessUpdate + ' FOR ' + gameID)
         break
       }
+
       case Update.SpecialDrawPreference: {
         const preferenceData = data as SpecialDrawPreferenceUpdate
         const gameID = preferenceData.gameID
@@ -226,45 +223,41 @@ const useChessStore = create<ChessState>((set, get) => ({
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
         updateDisplayGame(updatedGame)
 
-        console.log('RECEIVED SPECIAL DRAW PREFERENCE UPDATE')
+        console.log('RECEIVED SPECIAL DRAW PREFERENCE UPDATE ' + setting + ' FOR ' + gameID)
         break
       }
-      case Update.UndoRequest: {
-        const requestData = data as UndoRequestUpdate
-        const gameID = requestData.gameID
-        const currentGame = get().activeGames.get(gameID)
 
-        if (currentGame === null) {
-          badGameId(gameID)
-          return
-        }
-
-        const updatedGame: ActiveGameInfo = {
-          position: currentGame.position,
-          gotDrawOffer: currentGame.gotDrawOffer,
-          sentDrawOffer: currentGame.sentDrawOffer,
-          drawClaimAvailable: currentGame.drawClaimAvailable,
-          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
-          gotUndoRequest: true,
-          sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info
-        }
-
-        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-        updateDisplayGame(updatedGame)
-
-        console.log('RECEIVED UNDO REQUEST UPDATE')
-        break
-      }
+      case Update.RequestedUndo:
+      case Update.UndoRequested:
+      case Update.RevokedUndo:
+      case Update.UndoRevoked:
+      case Update.DeclinedUndo:
       case Update.UndoDeclined: {
-        const declineData = data as UndoDeclinedUpdate
-        const gameID = declineData.gameID
+        const undoData = data as UndoUpdate
+        const gameID = undoData.gameID
         const currentGame = get().activeGames.get(gameID)
 
         if (currentGame === null) {
           badGameId(gameID)
           return
         }
+
+        const gotUndoRequest = (() => {
+          switch (undoData.chessUpdate) {
+            case Update.UndoRequested: { return true }
+            case Update.UndoRevoked: { return false }
+            case Update.DeclinedUndo: { return false }
+            default: { return currentGame.gotUndoRequest }
+          }
+        })()
+        const sentUndoRequest = (() => {
+          switch (undoData.chessUpdate) {
+            case Update.RequestedUndo: { return true }
+            case Update.RevokedUndo: { return false }
+            case Update.UndoDeclined: { return false }
+            default: { return currentGame.sentUndoRequest }
+          }
+        })()
 
         const updatedGame: ActiveGameInfo = {
           position: currentGame.position,
@@ -272,20 +265,22 @@ const useChessStore = create<ChessState>((set, get) => ({
           sentDrawOffer: currentGame.sentDrawOffer,
           drawClaimAvailable: currentGame.drawClaimAvailable,
           autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
-          gotUndoRequest: currentGame.gotUndoRequest,
-          sentUndoRequest: false,
+          gotUndoRequest: gotUndoRequest,
+          sentUndoRequest: sentUndoRequest,
           info: currentGame.info
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
         updateDisplayGame(updatedGame)
 
-        console.log('RECEIVED UNDO DECLINED UPDATE')
+        console.log('RECEIVED UNDO UPDATE ' + data.chessUpdate + ' FOR ' + gameID)
         break
       }
+
+      case Update.AcceptedUndo:
       case Update.UndoAccepted: {
-        const acceptData = data as UndoAcceptedUpdate
-        const gameID = acceptData.gameID
+        const undoData = data as UndoAcceptedUpdate
+        const gameID = undoData.gameID
         const currentGame = get().activeGames.get(gameID)
 
         if (currentGame === null) {
@@ -293,9 +288,9 @@ const useChessStore = create<ChessState>((set, get) => ({
           return
         }
 
-        currentGame.info.moves.splice(currentGame.info.moves.length - acceptData.undoMoves, acceptData.undoMoves)
+        currentGame.info.moves.splice(currentGame.info.moves.length - undoData.undoMoves, undoData.undoMoves)
         const updatedGame: ActiveGameInfo = {
-          position: acceptData.position,
+          position: undoData.position,
           gotDrawOffer: currentGame.gotDrawOffer,
           sentDrawOffer: currentGame.sentDrawOffer,
           drawClaimAvailable: currentGame.drawClaimAvailable,
@@ -308,60 +303,15 @@ const useChessStore = create<ChessState>((set, get) => ({
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: null }))
         updateDisplayGame(updatedGame)
 
-        console.log('RECEIVED UNDO ACCEPTED UPDATE')
+        console.log('RECEIVED ACCEPTED UNDO UPDATE FOR ' + gameID)
         break
       }
+
       default: {
         console.log('RECEIVED BAD UPDATE')
         console.log(data.chessUpdate)
-        console.log((data as PositionUpdate).gameID)
-        console.log((data as PositionUpdate).position)
       }
     }
-  },
-  declinedDraw: (gameID: GameID) => {
-    let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-
-    if (updatedGame === null) {
-      badGameId(gameID)
-      return
-    }
-
-    updatedGame.gotDrawOffer = false
-    set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-  },
-  offeredDraw: (gameID: GameID) => {
-    let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-
-    if (updatedGame === null) {
-      badGameId(gameID)
-      return
-    }
-
-    updatedGame.sentDrawOffer = true
-    set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-  },
-  declinedUndo: (gameID: GameID) => {
-    let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-
-    if (updatedGame === null) {
-      badGameId(gameID)
-      return
-    }
-
-    updatedGame.gotUndoRequest = false
-    set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
-  },
-  requestedUndo: (gameID: GameID) => {
-    let updatedGame: ActiveGameInfo = get().activeGames.get(gameID)
-
-    if (updatedGame === null) {
-      badGameId(gameID)
-      return
-    }
-
-    updatedGame.sentUndoRequest = true
-    set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
   }
 }))
 

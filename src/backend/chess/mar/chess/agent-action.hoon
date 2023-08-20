@@ -1,11 +1,12 @@
-|_  ~
+/-  chess
+|_  act=chess-agent-action:chess
 ++  grab
   |%
-  ++  noun  ,~
+  ++  noun  chess-agent-action:chess
   --
 ++  grow
   |%
-  ++  noun  ~
+  ++  noun  act
   --
 ++  grad  %noun
 --

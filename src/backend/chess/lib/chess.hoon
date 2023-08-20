@@ -24,7 +24,8 @@
 ::  a game that ends in four moves with black side winning
 ++  fools-mate
   ^-  chess-game
-  :*  game-id=~2021.2.2..11.01.55
+  :*  game-id=~2021.2.2..11.01.55..e145.92d5.dbbe.aeaa
+      event=''
       date=*@da
       white=~tex
       black=~mex

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Popup from 'reactjs-popup'
-import { pokeAction, challenge, acceptGame, declineGame, findFriends } from '../ts/helpers/urbitChess'
+import { pokeAction, sendChallengePoke, acceptChallengePoke, declineChallengePoke, findFriends } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
 
@@ -57,11 +57,11 @@ export function Challenges () {
   }
 
   const acceptChallenge = async (who: Ship) => {
-    await pokeAction(urbit, acceptGame(who), () => {})
+    await pokeAction(urbit, acceptChallengePoke(who))
   }
 
   const declineChallenge = async (who: Ship) => {
-    await pokeAction(urbit, declineGame(who), () => {})
+    await pokeAction(urbit, declineChallengePoke(who))
   }
 
   const sendChallenge = async () => {
@@ -73,7 +73,7 @@ export function Challenges () {
       resetChallengeInterface()
     }
 
-    await pokeAction(urbit, challenge(who, side, description), onError, onSuccess)
+    await pokeAction(urbit, sendChallengePoke(who, side, description), onError, onSuccess)
   }
 
   const openFriends = async () => {
