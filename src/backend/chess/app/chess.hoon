@@ -254,7 +254,7 @@
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%declined-draw game-id])
+                    !>([%declined-draw game-id.action])
             ==  ==
           %=  this
             ::  record that draw offer is gone
@@ -371,7 +371,7 @@
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%revoked-undo game-id])
+                    !>([%revoked-undo game-id.action])
             ==  ==
           ::  record that undo request is gone
           %=  this
@@ -404,7 +404,7 @@
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%declined-undo game-id])
+                    !>([%declined-undo game-id.action])
             ==  ==
           ::  record that undo request is gone
           %=  this
