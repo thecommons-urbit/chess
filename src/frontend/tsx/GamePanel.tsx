@@ -58,6 +58,11 @@ export function GamePanel () {
     await pokeAction(urbit, declineUndoPoke(gameID))
   }
 
+  const revokeUndoOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, revokeUndoPoke(gameID))
+  }
+
   const moveOpacity = (index: number) => {
     if (displayIndex == null || index <= displayIndex) {
       return 1.0
@@ -185,18 +190,24 @@ export function GamePanel () {
           disabled={!hasGame || !displayGame.drawClaimAvailable}
           onClick={claimSpecialDrawOnClick}>
           Claim Special Draw</button>
-        {/* request/accept undo button */}
+        {/* request/revoke/accept undo button */}
         {displayGame.gotUndoRequest
           ? <button
             className='option'
             disabled={!hasGame}
             onClick={acceptUndoOnClick}>
             Accept Undo Request</button>
-          : <button
-            className='option'
-            disabled={!hasGame || displayGame.sentUndoRequest}
-            onClick={requestUndoOnClick}>
-            Request to Undo Move</button>
+          : (displayGame.sentUndoRequest
+            ? <button
+              className='option'
+              onClick={revokeUndoOnClick}>
+              Revoke Undo Request</button>
+            : <button
+              className='option'
+              disabled={!hasGame} // XX should be disabled until enough plys are made
+              onClick={requestUndoOnClick}>
+              Request to Undo Move</button>
+          )
         }
         {/* (reset) practice board */}
         {hasGame
