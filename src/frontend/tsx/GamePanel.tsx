@@ -41,6 +41,11 @@ export function GamePanel () {
     await pokeAction(urbit, declineDrawPoke(gameID))
   }
 
+  const revokeDrawOnClick = async () => {
+    const gameID = displayGame.info.gameID
+    await pokeAction(urbit, revokeDrawPoke(gameID))
+  }
+
   const claimSpecialDrawOnClick = async () => {
     const gameID = displayGame.info.gameID
     await pokeAction(urbit, claimSpecialDrawPoke(gameID))
@@ -174,18 +179,23 @@ export function GamePanel () {
           disabled={!hasGame}
           onClick={resignOnClick}>
           Resign</button>
-        {/* offer/accept draw button */}
-        {displayGame.gotDrawOffer
+        {/* offer/revoke/accept draw button */}
+        {(!displayGame.gotDrawOffer && !displayGame.sentDrawOffer)
           ? <button
             className='option'
             disabled={!hasGame}
-            onClick={acceptDrawOnClick}>
-            Accept Draw Offer</button>
-          : <button
-            className='option'
-            disabled={!hasGame || displayGame.sentDrawOffer}
             onClick={offerDrawOnClick}>
             Send Draw Offer</button>
+          : (displayGame.gotDrawOffer
+            ? <button
+              className='option'
+              onClick={acceptDrawOnClick}>
+              Accept Draw Offer</button> // accept
+            : <button
+              className='option'
+              onClick={revokeDrawOnClick}>
+              Revoke Draw Offer</button> // revoke
+          )
         }
         {/* claim special draw */}
         <button
