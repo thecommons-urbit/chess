@@ -221,7 +221,7 @@
                     %fact
                     ~[/game/(scot %da game-id.action)/updates]
                     %chess-update
-                    !>([%revoked-draw game-id])
+                    !>([%revoked-draw game-id.action])
             ==  ==
           %=  this
             ::  record that draw offer is gone
