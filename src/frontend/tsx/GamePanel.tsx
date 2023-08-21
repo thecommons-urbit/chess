@@ -4,15 +4,18 @@ import Popup from 'reactjs-popup'
 import useChessStore from '../ts/state/chessStore'
 import { pokeAction, offerDrawPoke, revokeDrawPoke, declineDrawPoke, acceptDrawPoke, claimSpecialDrawPoke, resignPoke, requestUndoPoke, revokeUndoPoke, declineUndoPoke, acceptUndoPoke } from '../ts/helpers/urbitChess'
 import { CHESS } from '../ts/constants/chess'
-import { Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
+import { Ship, Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function GamePanel () {
   const { urbit, displayGame, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
-  const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
-  const opponent = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
+  const practiceHasMoved: boolean = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
+  const opponent: Ship = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
     ? displayGame.info.black
     : displayGame.info.white
+  const canWeUndo: boolean = (displayGame.info.moves.length >= 2)
+    ? true
+    : (urbit.ship === displayGame.info.white.substring(1) && displayGame.info.moves.length >= 1)
 
   //
   // HTML element helper functions
@@ -204,7 +207,7 @@ export function GamePanel () {
               Revoke Undo Request</button>
             : <button
               className='option'
-              disabled={!hasGame} // XX should be disabled until enough plys are made
+              disabled={!hasGame || !canWeUndo}
               onClick={requestUndoOnClick}>
               Request to Undo Move</button>
           )
