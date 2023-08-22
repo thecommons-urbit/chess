@@ -861,7 +861,7 @@
               %+  poke-nack  this
               "move {<san>} does not end game {<game-id.action>}"
             ::  has opponent won?
-            ?.  =(result.action u.result.game.result-game-state)
+            ?:  =(result.action u.result.game.result-game-state)
               (output-quip game.result-game-state)
             %+  poke-nack  this
             "{<src.bowl>} does not win game {<game-id.action>}"
