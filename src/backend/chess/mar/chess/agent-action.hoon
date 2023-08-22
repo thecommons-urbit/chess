@@ -1,8 +1,8 @@
 /-  chess
-|_  act=chess-game-result:chess
+|_  act=chess-agent-action:chess
 ++  grab
   |%
-  ++  noun  chess-game-result:chess
+  ++  noun  chess-agent-action:chess
   --
 ++  grow
   |%

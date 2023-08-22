@@ -2,13 +2,42 @@
 =,  chess
 ::
 ::  /lib/chess.hoon chapters:
+::  %constants
 ::  %squares
 ::  %knight-moves
 ::  %rendering
+::  %parsing
 ::  %game-logic
-::  XX: create chapters for rest of lib
 ::
 |%
+::
+::
++|  %constants
+::
+::  not used in the code,
+::  but useful for testing.
+++  empty-board
+  ^-  chess-board
+  ~
+::
+::  a test game
+::  a game that ends in four moves with black side winning
+++  fools-mate
+  ^-  chess-game
+  :*  game-id=~2021.2.2..11.01.55..e145.92d5.dbbe.aeaa
+      event=''
+      date=*@da
+      white=~tex
+      black=~mex
+      result=`%'0-1'
+      :~
+        ::  1. f3 e5
+         [[%move [%f %2] [%f %3] ~] 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1' 'f3']
+         [[%move [%e %7] [%e %5] ~] 'rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 1' 'e5']
+         ::  2. g4 Qh4#
+         [[%move [%g %2] [%g %4] ~] 'rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 1' 'g4']
+         [[%move [%d %8] [%h %4] ~] 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1' 'Qh4#']
+  ==  ==
 ::
 ::  return info about ranks,
 ::  files, adjacent squares, etc.
@@ -109,6 +138,32 @@
   ;~  biff
     next-file-square
     next-rank-square
+  ==
+::
+::  return the squares involved in a move
+++  get-squares
+  |=  [move=chess-move player=chess-side]
+  ::  XX: give this type a name
+  ^-  (pair @t @t)
+  ?-  -.move
+      %move
+    :-  (cat 3 -.from.move (scot %ud +.from.move))
+    (cat 3 -.to.move (scot %ud +.to.move))
+  ::
+      %castle
+    ?-  +.move
+        %queenside
+      ?-  player
+        %white  ['e1' 'c1']
+        %black  ['e8' 'c8']
+      ==
+    ::
+        %kingside
+      ?-  player
+        %white  ['e1' 'g1']
+        %black  ['e8' 'g8']
+      ==
+    ==
   ==
 ::
 ::  knight moves start from (2 forward, 1 right)
@@ -290,10 +345,10 @@
             ==
   ==
 ::
-::  XX: delete or support this
-::
 ::  render board as list of files and ranks
 ::  (maybe a leftover from before app had a frontend)
+::
+::  XX: unused, but worth keeping around
 ++  render-board
   |_  board=chess-board
   ++  $
@@ -404,6 +459,68 @@
       ==
   --
 ::
+::  pgn conversion logic
+::
+::  convert the moves listed in a game into
+::  chess notation as a list of @t
+++  algebraicize
+  |=  game=chess-game
+  ^-  (list @t)
+  %+  spun  moves.game
+  |=  [move=[chess-move chess-fen chess-san] position=chess-position]
+  ^-  [@t chess-position]
+  :-  (~(algebraicize with-position position) -.move)
+  (need (~(apply-move with-position position) -.move))
+::
+::  keep count of every move
+::  add the move number to chess notation
+++  algebraicize-and-number
+  |=  game=chess-game
+  ^-  (list @t)
+  =/  alg-moves  (algebraicize game)
+  =/  white  &
+  =/  move  1
+  =/  moves  *(list @t)
+  =/  string  ''
+  |-  ^-  (list @t)
+  ?~  alg-moves
+    ?:  =('' string)
+      moves
+    (snoc moves string)
+  ?:  white
+    %=  $
+      white      |
+      string     (rap 3 ~[(scot %ud move) '. ' i.alg-moves])
+      alg-moves  t.alg-moves
+    ==
+  %=  $
+    white      &
+    string     ''
+    move       +(move)
+    moves      (snoc moves (rap 3 ~[string ' ' i.alg-moves]))
+    alg-moves  t.alg-moves
+  ==
+::
+::  produce portable game notation
+::  add a sting of every move in chess notation
+++  to-pgn
+  |=  game=chess-game
+  ^-  wain
+  =/  tags
+    %+  turn
+    :~  "[UrbitGameID \"{<game-id.game>}\"]"
+        "[Date \"{(tail (scow %da date.game))}\"]"
+        "[White \"{(trip (scot %p white.game))}\"]"
+        "[Black \"{(trip (scot %p black.game))}\"]"
+        "[Result \"{(trip (result-string result.game))}\"]"
+    ==
+    crip
+  ;:  weld
+    tags
+    ~['']
+    (algebraicize-and-number game)
+  ==
+::
 ::
 +|  %parsing
 ::
@@ -503,8 +620,7 @@
   ++  white-castle-helper
     |*  [rul=rule pre=tape res=chess-castle]
     ;~(pfix rul (funk pre (easy res)))
---  --
-|%
+  --
 ::
 ::  miscellaneous game logic
 +|  %game-logic
@@ -631,11 +747,11 @@
     ^-  ?
     =/  king  (king side)
     =/  threats
-    %-  zing
-    %+  map-by-side  (opposite-side side)
-    |=  piece=chess-piece-on-square
-    ^-  (list chess-square)
-    ~(threatens with-piece-on-square piece)
+      %-  zing
+      %+  map-by-side  (opposite-side side)
+      |=  piece=chess-piece-on-square
+      ^-  (list chess-square)
+      ~(threatens with-piece-on-square piece)
     ?~  (find ~[king] threats)
       |
     &
@@ -1284,37 +1400,10 @@
       --
     --
   --
---
-|%
-::
-::  produce @t version of player name
-++  player-string
-  |=  player=chess-player
-  ?-  -.player
-    %unknown  'Unknown'
-    %name     +.player
-    %ship     (scot %p +.player)
-  ==
-::
-::  produce @t version of the round number
-::  ex: '1.2.3.4.5'
-++  round-string
-  |=  round=(unit (list @))
-  ^-  @t
-  ?~  round  '?'
-  %-  crip  %+  join  '.'
-  %+  turn  u.round
-  (cury scot %ud)
-::
-::  convert a sting of rounds back into a list
-++  string-to-round
-  |=  round=@t
-  ^-  (unit (list @))
-  ?:  =(round '?')
-    ~
-  (rush round (more dot dem))
 ::
 ::  play out all moves of an in-complete game
+::
+::  XX: unused, but worth keeping
 ++  play
   |=  game=chess-game
   ^-  (unit chess-position)
@@ -1329,126 +1418,5 @@
               |=  p=chess-position
               (~(apply-move with-position p) -.i.moves.game)
     moves.game  t.moves.game
-  ==
-::
-::  pgn conversion logic
-::
-::  convert the moves listed in a game into
-::  chess notation as a list of @t
-++  algebraicize
-  |=  game=chess-game
-  ^-  (list @t)
-  %+  spun  moves.game
-  |=  [move=[chess-move chess-fen chess-san] position=chess-position]
-  ^-  [@t chess-position]
-  :-  (~(algebraicize with-position position) -.move)
-  (need (~(apply-move with-position position) -.move))
-::
-::  keep count of every move
-::  add the move number to chess notation
-::  XX: should we remove this if we're not only not using
-::      it, but won't use it due to undo functionality?
-++  algebraicize-and-number
-  |=  game=chess-game
-  ^-  (list @t)
-  =/  alg-moves  (algebraicize game)
-  =/  white  &
-  =/  move  1
-  =/  moves  *(list @t)
-  =/  string  ''
-  |-  ^-  (list @t)
-  ?~  alg-moves
-    ?:  =('' string)
-      moves
-    (snoc moves string)
-  ?:  white
-    %=  $
-      white      |
-      string     (rap 3 ~[(scot %ud move) '. ' i.alg-moves])
-      alg-moves  t.alg-moves
-    ==
-  %=  $
-    white      &
-    string     ''
-    move       +(move)
-    moves      (snoc moves (rap 3 ~[string ' ' i.alg-moves]))
-    alg-moves  t.alg-moves
-  ==
-::
-::  produce portable game notation
-::  add a sting of every move in chess notation
-++  to-pgn
-    |=  game=chess-game
-    ^-  wain
-    =/  tags
-      %+  turn
-      :~  "[UrbitGameID \"{<game-id.game>}\"]"
-          "[Event \"{(trip event.game)}\"]"
-          "[Site \"{(trip site.game)}\"]"
-          "[Date \"{(tail (scow %da date.game))}\"]"
-          "[Round \"{(trip (round-string round.game))}\"]"
-          "[White \"{(trip (player-string white.game))}\"]"
-          "[Black \"{(trip (player-string black.game))}\"]"
-          "[Result \"{(trip (result-string result.game))}\"]"
-      ==
-      crip
-    ;:  weld
-      tags
-      ~['']
-      (algebraicize-and-number game)
-    ==
-::
-::  not used in the code,
-::  but useful for testing.
-++  empty-board
-  ^-  chess-board
-  ~
-::
-::  a test game
-::  a game that ends in four moves with black side winning
-++  fools-mate
-  ^-  chess-game
-  :*  game-id=~2021.2.2..11.01.55..e145.92d5.dbbe.aeaa
-      event='?'
-      site='?'
-      date=*@da
-      round=~
-      white=[%name 'Fool']
-      black=[%name 'Black']
-      result=`%'0-1'
-  :~
-    ::  1. f3 e5
-     [[%move [%f %2] [%f %3] ~] 'rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1' 'f3']
-     [[%move [%e %7] [%e %5] ~] 'rnbqkbnr/pppp1ppp/8/4p3/8/5P2/PPPPP1PP/RNBQKBNR w KQkq e6 0 1' 'e5']
-     ::  2. g4 Qh4#
-     [[%move [%g %2] [%g %4] ~] 'rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 1' 'g4']
-     [[%move [%d %8] [%h %4] ~] 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1' 'Qh4#']
-  ==
-  ==
-::
-::  return the squares involved in a move
-++  get-squares
-  |=  [move=chess-move player=chess-side]
-  ::  XX: give this type a name
-  ^-  (pair @t @t)
-  ?-  -.move
-      %move
-    :-  (cat 3 -.from.move (scot %ud +.from.move))
-    (cat 3 -.to.move (scot %ud +.to.move))
-  ::
-      %castle
-    ?-  +.move
-        %queenside
-      ?-  player
-        %white  ['e1' 'c1']
-        %black  ['e8' 'c8']
-      ==
-    ::
-        %kingside
-      ?-  player
-        %white  ['e1' 'g1']
-        %black  ['e8' 'g8']
-      ==
-    ==
   ==
 --

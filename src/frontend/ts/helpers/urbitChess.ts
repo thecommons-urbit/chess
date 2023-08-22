@@ -1,14 +1,17 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Result, Action, MoveActionAction, GameID, Rank, File, Ship, ChessAction, ChessChallengeAction, ChessAcceptAction, ChessDeclineAction, ChessGameAction, OfferDrawAction, AcceptDrawAction, DeclineDrawAction, MoveAction, MoveMoveAction, CastleMoveAction, ChangeSpecialDrawPreferenceAction, ClaimSpecialDrawAction, ResignAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Action, MoveActionAction, Rank, File, Ship, GameID, ChessAction, ChessChallengeAction, ChessSendChallengeAction, ChessDeclineChallengeAction, ChessAcceptChallengeAction, ChessGameAction, ResignAction, OfferDrawAction, RevokeDrawAction, DeclineDrawAction, AcceptDrawAction, ClaimSpecialDrawAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction, RevokeUndoAction, MoveAction, CastleAction, ChangeSpecialDrawPreferenceAction } from '../types/urbitChess'
 
+//
+// Eyre actions
+//
+
+// Helper function for null callbacks
 function emptyFunction (): void {}
-
-// Poke and scry functions
 
 export function pokeAction (urbit: Urbit, action: ChessAction, onError?: () => void, onSuccess?: () => void) {
   const pokeInput = {
     app: 'chess',
-    mark: 'chess-action',
+    mark: 'chess-user-action',
     json: action,
     onError: (typeof onError !== 'undefined') ? onError : emptyFunction,
     onSuccess: (typeof onSuccess !== 'undefined') ? onSuccess : emptyFunction
@@ -17,62 +20,113 @@ export function pokeAction (urbit: Urbit, action: ChessAction, onError?: () => v
   urbit.poke(pokeInput)
 }
 
-export function scry (app: string, path: string) {
+export function scryAction (app: string, path: string) {
   const urbit = new Urbit('')
   return urbit.scry({ app: app, path: path })
 }
 
-// Pokes
+//
+// Poke helpers
+//
 
-export function challenge (who: Ship, side: Side, description: string) {
-  const action: ChessChallengeAction = {
-    'chess-action': Action.Challenge,
+//  Challenges
+
+export function sendChallengePoke (who: Ship, side: Side, description: string) {
+  const action: ChessSendChallengeAction = {
+    'chess-user-action': Action.SendChallenge,
     'who': who,
     'challenger-side': side,
-    'event': description,
-    'round': ''
+    'event': description
   }
 
   return action
 }
 
-export function acceptGame (who: Ship) {
-  const action: ChessAcceptAction = {
-    'chess-action': Action.AcceptGame,
+function respondToChallenge<T> (action: Action, who: Ship) : ChessChallengeAction {
+  const response = {
+    'chess-user-action': action,
     'who': who
   }
 
-  return action
+  return response
 }
 
-export function declineGame (who: Ship) {
-  const action: ChessDeclineAction = {
-    'chess-action': Action.DeclineGame,
-    'who': who
+export function acceptChallengePoke (who: Ship) {
+  return respondToChallenge<ChessAcceptChallengeAction>(Action.AcceptChallenge, who)
+}
+
+export function declineChallengePoke (who: Ship) {
+  return respondToChallenge<ChessDeclineChallengeAction>(Action.DeclineChallenge, who)
+}
+
+//  Games
+
+function chessAction<T> (action: Action, gameId: GameID) : ChessGameAction {
+  const chessAction = {
+    'chess-user-action': action,
+    'game-id': gameId
   }
 
-  return action
+  return chessAction
 }
 
-export function changeSpecialDrawPreference (gameId: GameID, setting: boolean): ChangeSpecialDrawPreferenceAction {
-  const action: ChangeSpecialDrawPreferenceAction = {
-    'chess-action': Action.ChangeSpecialDrawPreference,
-    'game-id': gameId,
-    'setting': setting
-  }
+//    Resignations
 
-  return action
+export function resignPoke (gameId: GameID) {
+  return chessAction<ResignAction>(Action.Resign, gameId)
 }
 
-export function move (
+//    Draws
+
+export function offerDrawPoke (gameId: GameID) {
+  return chessAction<OfferDrawAction>(Action.OfferDraw, gameId)
+}
+
+export function revokeDrawPoke (gameId: GameID) {
+  return chessAction<RevokeDrawAction>(Action.RevokeDraw, gameId)
+}
+
+export function declineDrawPoke (gameId: GameID) {
+  return chessAction<DeclineDrawAction>(Action.DeclineDraw, gameId)
+}
+
+export function acceptDrawPoke (gameId: GameID) {
+  return chessAction<AcceptDrawAction>(Action.AcceptDraw, gameId)
+}
+
+export function claimSpecialDrawPoke (gameId: GameID) {
+  return chessAction<ClaimSpecialDrawAction>(Action.ClaimSpecialDraw, gameId)
+}
+
+//    Undos
+
+export function requestUndoPoke (gameId: GameID) {
+  return chessAction<RequestUndoAction>(Action.RequestUndo, gameId)
+}
+
+export function revokeUndoPoke (gameId: GameID) {
+  return chessAction<RevokeUndoAction>(Action.RevokeUndo, gameId)
+}
+
+export function declineUndoPoke (gameId: GameID) {
+  return chessAction<DeclineUndoAction>(Action.DeclineUndo, gameId)
+}
+
+export function acceptUndoPoke (gameId: GameID) {
+  return chessAction<AcceptUndoAction>(Action.AcceptUndo, gameId)
+}
+
+//    Moves
+
+export function movePoke (
   gameId: GameID,
   srcRank: Rank,
   srcFile: File,
   destRank: Rank,
   destFile: File,
-  promotion: PromotionRole): MoveMoveAction {
-  const move: MoveMoveAction = {
-    'chess-action': Action.Move,
+  promotion: PromotionRole): MoveAction {
+  const move: MoveAction = {
+    'chess-user-action': Action.MakeMove,
     'chess-move': MoveActionAction.Move,
     'game-id': gameId,
     'from-rank': srcRank,
@@ -85,9 +139,9 @@ export function move (
   return move
 }
 
-export function castle (gameId: GameID, side: CastleSide): CastleMoveAction {
-  const move: CastleMoveAction = {
-    'chess-action': Action.Move,
+export function castlePoke (gameId: GameID, side: CastleSide): CastleAction {
+  const move: CastleAction = {
+    'chess-user-action': Action.MakeMove,
     'chess-move': MoveActionAction.Castle,
     'game-id': gameId,
     'castle-side': side
@@ -96,81 +150,26 @@ export function castle (gameId: GameID, side: CastleSide): CastleMoveAction {
   return move
 }
 
-export function offerDraw (gameId: GameID): OfferDrawAction {
-  const move: OfferDrawAction = {
-    'chess-action': Action.OfferDraw,
-    'game-id': gameId
-  }
+//    Preferences
 
-  return move
-}
-
-export function acceptDraw (gameId: GameID): AcceptDrawAction {
-  const move = {
-    'chess-action': Action.AcceptDraw,
-    'game-id': gameId
-  }
-
-  return (move as AcceptDrawAction)
-}
-
-export function declineDraw (gameId: GameID): DeclineDrawAction {
-  const move: DeclineDrawAction = {
-    'chess-action': Action.DeclineDraw,
-    'game-id': gameId
-  }
-
-  return move
-}
-
-export function claimSpecialDraw (gameId: GameID): ClaimSpecialDrawAction {
-  const action: ClaimSpecialDrawAction = {
-    'chess-action': Action.ClaimSpecialDraw,
-    'game-id': gameId
+export function changeSpecialDrawPreferencePoke (
+  gameId: GameID,
+  setting: boolean): ChangeSpecialDrawPreferenceAction {
+  const action: ChangeSpecialDrawPreferenceAction = {
+    'chess-user-action': Action.ChangeSpecialDrawPreference,
+    'game-id': gameId,
+    'setting': setting
   }
 
   return action
 }
 
-export function resign (gameId: GameID): ResignAction {
-  const action: ResignAction = {
-    'chess-action': Action.Resign,
-    'game-id': gameId
-  }
-
-  return action
-}
-
-export function requestUndo (gameId: GameID): RequestUndoAction {
-  const action: RequestUndoAction = {
-    'chess-action': Action.RequestUndo,
-    'game-id': gameId
-  }
-
-  return action
-}
-
-export function declineUndo (gameId: GameID): DeclineUndoAction {
-  const action: DeclineUndoAction = {
-    'chess-action': Action.DeclineUndo,
-    'game-id': gameId
-  }
-
-  return action
-}
-
-export function acceptUndo (gameId: GameID): AcceptUndoAction {
-  const action: AcceptUndoAction = {
-    'chess-action': Action.AcceptUndo,
-    'game-id': gameId
-  }
-
-  return action
-}
-
-// Scries
+//
+// Scry helpers
+//
 
 export const findFriends = async (app: string, path: string) => {
-  const scryOutput: { friends: Array<Ship>} = JSON.parse(JSON.stringify(await scry(app, path), null, 2))
+  const scryOutput: { friends: Array<Ship> } = JSON.parse(JSON.stringify(await scryAction(app, path), null, 2))
+
   return scryOutput.friends
 }

@@ -21,7 +21,6 @@
             ['who' [%s (scot %p who.upd)]]
             ['challengerSide' [%s challenger-side.challenge.upd]]
             ['event' [%s event.challenge.upd]]
-            ['round' [%s (round-string:chess round.challenge.upd)]]
         ==
       %challenge-received
         %-  pairs:enjs
@@ -29,7 +28,6 @@
             ['who' [%s (scot %p who.upd)]]
             ['challengerSide' [%s challenger-side.challenge.upd]]
             ['event' [%s event.challenge.upd]]
-            ['round' [%s (round-string:chess round.challenge.upd)]]
         ==
       %challenge-resolved
         %-  pairs:enjs
@@ -60,9 +58,29 @@
             ['gameID' [%s (scot %da game-id.upd)]]
             ['result' [%s result.upd]]
         ==
-      %draw-offer
+      %offered-draw
         %-  pairs:enjs
-        :~  ['chessUpdate' [%s 'draw-offer']]
+        :~  ['chessUpdate' [%s 'offered-draw']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %draw-offered
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'draw-offered']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %revoked-draw
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'revoked-draw']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %draw-revoked
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'draw-revoked']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %declined-draw
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'declined-draw']]
             ['gameID' [%s (scot %da game-id.upd)]]
         ==
       %draw-declined
@@ -76,15 +94,42 @@
             ['gameID' [%s (scot %da game-id.upd)]]
             ['setting' [%b setting.upd]]
         ==
-      %undo-request
+      %requested-undo
         %-  pairs:enjs
-        :~  ['chessUpdate' [%s 'undo-request']]
+        :~  ['chessUpdate' [%s 'requested-undo']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %undo-requested
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'undo-requested']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %revoked-undo
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'revoked-undo']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %undo-revoked
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'undo-revoked']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %declined-undo
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'declined-undo']]
             ['gameID' [%s (scot %da game-id.upd)]]
         ==
       %undo-declined
         %-  pairs:enjs
         :~  ['chessUpdate' [%s 'undo-declined']]
             ['gameID' [%s (scot %da game-id.upd)]]
+        ==
+      %accepted-undo
+        %-  pairs:enjs
+        :~  ['chessUpdate' [%s 'accepted-undo']]
+            ['gameID' [%s (scot %da game-id.upd)]]
+            ['position' [%s position.upd]]
+            ['undoMoves' [%n undo-moves.upd]]
         ==
       %undo-accepted
         %-  pairs:enjs

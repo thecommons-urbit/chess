@@ -19,8 +19,6 @@ const PROMOTION_ROLES: RoleDictionary[] = [
 ]
 
 export const CHESS = {
-  pieceWhiteKnight: '♘',
-  pieceBlackKnight: '♞',
   defaultFEN: DEFAULT_FEN,
   promotionRoles: PROMOTION_ROLES
 }
