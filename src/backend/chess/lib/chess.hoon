@@ -39,6 +39,18 @@
          [[%move [%d %8] [%h %4] ~] 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1' 'Qh4#']
   ==  ==
 ::
+::  return material value of a piece
+++  piece-value
+  |=  piece=chess-piece
+  ^-  @ud
+  ?-  +.piece
+    %pawn    1
+    %knight  3
+    %bishop  3
+    %rook    5
+    %queen   9
+  ==
+::
 ::  return info about ranks,
 ::  files, adjacent squares, etc.
 +|  %squares
@@ -624,6 +636,40 @@
 ::
 ::  miscellaneous game logic
 +|  %game-logic
+::
+++  calculate-captured
+  |=  position=chess-position
+  ^-  (map chess-side (map chess-piece @ud))
+  %-  malt
+  ~[[%white %+  capture-helper  %white
+              (~(map-by-side with-board board.position))  %white
+              |=  piece=chess-piece-on-square  +.+.piece]
+    [%black %+  capture-helper  %black
+              (~(map-by-side with-board board.position))  %black
+              |=  piece=chess-piece-on-square  +.+.piece]]
+++  capture-helper
+  |=  [side=chess-side pieces=(list chess-piece)]
+  ^-  (map chess-piece @ud)
+  =/  index  0
+  =/  piece-numbers  (limo ~[[%pawn 8] [%knight 2] [%bishop 2] [%rook 2] [%queen 1]])
+  =/  capture-map  *(map chess-piece @ud)
+  |-
+  ?:  =(index 5)
+    capture-map
+  =*  current-piece  (snag index piece-numbers)
+  ?:  (lth (lent (fand ~[-.current-piece] pieces)) +.current-piece)
+    (~(put by capture-map) [side -.current-piece] (sub +.current-piece (lent (fand ~[-.current-piece] pieces))))
+  $(index +(index))
+++  calculate-material-advantage
+  |=  [white-map=(map chess-piece @ud) black-map=(map chess-piece @ud)]
+  ^-  [@ud $?(chess-side %none)]
+  =*  captured-white  (~(rep by white-map) |=([p=[chess-piece @ud] q=@] (add (piece-value +.p) q)))
+  =*  captured-black  (~(rep by black-map) |=([p=[chess-piece @ud] q=@] (add (piece-value +.p) q)))
+  ?:  =(captured-white captured-black)
+    [0 %none]
+  ?:  (gth captured-white captured black)
+    [(sub captured-white captured-black) %white]
+  [(sub captured-black captured-white) %black]
 ::
 ++  with-board
   |_  board=chess-board

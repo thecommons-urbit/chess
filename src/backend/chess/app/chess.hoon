@@ -18,6 +18,9 @@
       position=chess-position
       fen-repetition=(map @t @ud)
       special-draw-available=?
+      white-has-captured=(map chess-piece @ud)
+      black-has-captured=(map chess-piece @ud)
+      material-advantage=[@ud $?(chess-side %none)]
       auto-claim-special-draws=?
       sent-draw-offer=?
       got-draw-offer=?
@@ -757,6 +760,29 @@
             ?:  =(ship-to-move our.bowl)
               (snip (snip moves.game))
             (snip moves.game)
+          =/  updated-capture
+            ?.  ?:  =(ship-to-move our.bowl)
+                  ?|  =('x' `@t`(cut 3 [1 1] (tail (tail (rear (snip moves.game))))))
+                      =('x' `@t`(cut 3 [2 1] (tail (tail (rear (snip moves.game))))))
+                      =('x' `@t`(cut 3 [1 1] (tail (tail (rear moves.game)))))
+                      =('x' `@t`(cut 3 [2 1] (tail (tail (rear moves.game)))))
+                  ==
+                ?|  =('x' `@t`(cut 3 [1 1] (tail (tail (rear moves.game)))))
+                    =('x' `@t`(cut 3 [2 1] (tail (tail (rear moves.game)))))
+                ==
+              ~
+            %+  calculate-captured
+            ?:  =(ship-to-move our.bowl)
+              (fen-to-position (head (tail (rear (snip (snip moves.game))))))
+            (fen-to-position (head (tail (rear (snip moves.game)))))
+          =/  updated-white-capture
+            ?~  updated-capture
+              white-has-captured.u.game-state
+            (~(got by updated-capture) %white)
+          =/  updated-black-capture
+            ?~  updated-capture
+              black-has-captured.u.game-state
+            (~(got by updated-capture) %black)
           =:
               moves.game
             updated-moves
@@ -767,6 +793,15 @@
             ?:  =(ship-to-move our.bowl)
               (fen-to-position (head (tail (rear (snip (snip moves.game))))))
             (fen-to-position (head (tail (rear (snip moves.game)))))
+          ::
+              white-has-captured.u.game-state
+            updated-white-capture
+          ::
+              black-has-captured.u.game-state
+            updated-black-capture
+          ::
+              material-advantage
+            (calculate-material-advantage updated-white-capture updated-black-capture)
           ::
               sent-undo-request.u.game-state
             |
@@ -1100,6 +1135,7 @@
                         fen.move
                         san.move
                         special-draw-available.game-state
+                        ::  update with new state
             ==      ==
             (opposite-side player)
       =?  cards  got-draw-offer.game-state
@@ -1449,6 +1485,27 @@
     (increment-repetition fen-repetition.game-state new-position)
   =/  san
     (~(algebraicize with-position position.game-state) move)
+  =/  capture
+    ?|  =('x' `@t`(cut 3 [1 1] san))
+        =('x' `@t`(cut 3 [2 1] san))
+    ==
+  =/  new-white-capture
+    ?.  ?&  =(%white (player-to-move.position.game-state))
+            capture
+        ==
+      white-has-captured.game-state
+    %+  add-capture
+      white-has-captured.game-state
+    (~(get by board.position.game-state) to.move)
+  =/  new-black-capture
+    ?.  ?&  =(%black (player-to-move.position.game-state))
+            capture
+        ==
+      black-has-captured.game-state
+    %+  add-capture
+      black-has-captured.game-state
+    (~(get by board.position.game-state) to.move)
+  =/  new-advantage  (calculate-material-advantage new-white-capture new-black-capture)
   =/  in-checkmate
     ~(in-checkmate with-position new-position)
   =/  in-stalemate
@@ -1485,7 +1542,10 @@
         new-position
         new-fen-repetition
         special-draw-available
-        |4.game-state
+        new-white-capture
+        new-black-capture
+        new-advantage
+        |7.game-state
     ==
   :*  %give
       %fact
@@ -1497,6 +1557,9 @@
               (position-to-fen new-position)
               san
               special-draw-available
+              ::  new-white-capture
+              ::  new-black-capture
+              ::  new-advantage
   ==      ==
 ++  increment-repetition
   |=  [fen-repetition=(map @t @ud) position=chess-position]
@@ -1518,6 +1581,13 @@
    |=  position=chess-position
    ^-  ?
    (gte ply-50-move-rule.position 100)
+++  add-capture
+  |=  [capture-map=(map chess-piece @ud) piece=chess-piece]
+  ^-  (map chess-piece @ud)
+  =*  count  (~(get by fen-repetition) fen)
+  ?~  count
+    (~(put by capture-map) piece 1)
+  (~(put by capture-map) piece +(need count))
 +|  %convenience
 ++  ship-to-move
   |=  state=active-game-state
