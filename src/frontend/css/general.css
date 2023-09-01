@@ -82,6 +82,12 @@ div.game-panel {
 /*   border: 1px green solid; */
 }
 
+div.game-panel .captured {
+  font-size: 1.4em;
+  /* DD */
+  /* border: 1px solid blue; */
+}
+
 div.game-panel .timer {
   font-size: 1.4em;
   /* DD */
@@ -93,6 +99,10 @@ div.game-panel .player {
   line-height: 1.6em;
   /* DD */
 /*   border: 1px solid yellow; */
+}
+
+div.game-panel #opp-captured {
+  justify-content: left;
 }
 
 div.game-panel #opp-timer {
@@ -128,6 +138,10 @@ div.game-panel #our-player {
 }
 
 div.game-panel #our-timer {
+  justify-content: right;
+}
+
+div.game-panel #our-captured {
   justify-content: right;
 }
 
