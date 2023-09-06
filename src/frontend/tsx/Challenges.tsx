@@ -12,7 +12,7 @@ export function Challenges () {
   const [who, setWho] = useState('')
   const [description, setDescription] = useState('')
   const [side, setSide] = useState(Side.Random)
-  const { urbit, incomingChallenges, outgoingChallenges, friends } = useChessStore()
+  const { urbit, incomingChallenges, outgoingChallenges, friends, tallies } = useChessStore()
   // interface
   const [modalOpen, setModalOpen] = useState(false)
   const [challengingFriend, setChallengingFriend] = useState(false)
@@ -178,8 +178,7 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      {/* XX: win/loss history with this friend */}
-                      <p className='score'>0-0</p>
+                      <p className='score'>{tallies.get(friend)}</p>
                     </div>
                   </div>
                   <div className='col'>
