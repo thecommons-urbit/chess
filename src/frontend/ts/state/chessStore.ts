@@ -20,6 +20,7 @@ const useChessStore = create<ChessState>((set, get) => ({
   incomingChallenges: new Map(),
   outgoingChallenges: new Map(),
   friends: [],
+  tallies: new Map(),
   displayIndex: 0,
   //
   setUrbit: (urbit: Urbit) => set({ urbit }),
@@ -115,6 +116,53 @@ const useChessStore = create<ChessState>((set, get) => ({
 
     await get().fetchArchivedMoves(gameID)
     get().setDisplayGame(get().archivedGames.get(gameID))
+  },
+  countTallies: async (archivedGames: Map<GameID, ArchivedGameInfo>) => {
+    const tallies = get().tallies
+    const newTallies: Map<Ship, { wins: number, losses: number, draws: number }> = new Map();
+
+    // iterate over archived games
+    archivedGames.forEach((game, gameID) => {
+      const { white, black, result } = game;
+
+      // ensure each ship has an entry in newTallies
+      if (newTallies.has(white)) {
+        newTallies.set(white, { wins: 0, losses: 0, draws: 0 });
+      }
+      if (newTallies.has(black)) {
+        newTallies.set(black, { wins: 0, losses: 0, draws: 0 });
+      }
+
+      // switch on result
+      switch (result) {
+          case "1-0":
+            newTallies.get(white)!.wins += 1;
+            newTallies.get(black)!.losses += 1;
+            break;
+          case "0-1":
+            newTallies.get(black)!.wins += 1;
+            newTallies.get(white)!.losses += 1;
+            break;
+          case "½–½":
+            newTallies.get(white)!.draws += 1;
+            newTallies.get(black)!.draws += 1;
+            break;
+        }
+    })
+
+    // convert the tally map into the desired format
+    const finalTally: Map<Ship, String> = new Map();
+    newTallies.forEach((tally, ship) => {
+      const whiteWhole = tally.wins + Math.floor(tally.draws / 2);
+      const blackWhole = tally.losses + Math.floor(tally.draws / 2);
+      
+      const whiteFraction = (tally.draws % 2) === 1 ? "½" : ""; 
+      const blackFraction = (tally.draws % 2) === 1 ? "½" : "";
+      
+      finalTally.set(ship, `${whiteWhole}${whiteFraction} - ${blackWhole}${blackFraction}`);
+    });
+
+    return finalTally;
   },
   receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
