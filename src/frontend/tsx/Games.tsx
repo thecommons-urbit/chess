@@ -17,7 +17,11 @@ export function Games () {
     setShowingActive(true)
   }
 
+<<<<<<< HEAD
   const openArchive = () => {
+=======
+  const openArchive = async () => {
+>>>>>>> 6f463aa (add functionality for browsing completed games)
     setShowingActive(false)
   }
 
