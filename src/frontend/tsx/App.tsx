@@ -2,15 +2,15 @@ import React from 'react'
 import { Beforeunload } from 'react-beforeunload'
 import Urbit from '@urbit/http-api'
 import useChessStore from '../ts/state/chessStore'
-import { GameInfo, ChallengeUpdate } from '../ts/types/urbitChess'
-import { findFriends } from '../ts/helpers/urbitChess'
+import { ChallengeUpdate, ActiveGameInfo, ArchivedGameInfo } from '../ts/types/urbitChess'
+import { scryFriends } from '../ts/helpers/urbitChess'
 import { Chessboard } from './Chessboard'
 import { Menu } from './Menu'
 import { GamePanel } from './GamePanel'
 import { PracticePanel } from './PracticePanel'
 
 export function App () {
-  const { urbit, setUrbit, receiveChallengeUpdate, receiveGame, displayGame, setFriends } = useChessStore()
+  const { urbit, setUrbit, receiveChallengeUpdate, receiveActiveGame, receiveArchivedGame, displayGame, setFriends } = useChessStore()
 
   //
   // Helper functions
@@ -31,11 +31,18 @@ export function App () {
       app: 'chess',
       path: '/active-games',
       err: () => {},
-      event: (data: GameInfo) => receiveGame(data),
+      event: (data: ActiveGameInfo) => receiveActiveGame(data),
+      quit: () => {}
+    })
+    await newUrbit.subscribe({
+      app: 'chess',
+      path: '/archived-games',
+      err: () => {},
+      event: (data: ArchivedGameInfo) => receiveArchivedGame(data),
       quit: () => {}
     })
 
-    setFriends(await findFriends('chess', '/friends'))
+    setFriends(await scryFriends('chess', '/friends'))
   }
 
   const teardown = () => {

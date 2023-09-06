@@ -1,8 +1,8 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
-import { findFriends } from '../helpers/urbitChess'
+import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
+import { scryFriends, scryMoves } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
 // TODO: should log which function was called with the bad ID
@@ -16,20 +16,24 @@ const useChessStore = create<ChessState>((set, get) => ({
   displayGame: null,
   practiceBoard: '',
   activeGames: new Map(),
+  archivedGames: new Map(),
   incomingChallenges: new Map(),
   outgoingChallenges: new Map(),
   friends: [],
-  displayIndex: null,
+  displayIndex: 0,
   //
   setUrbit: (urbit: Urbit) => set({ urbit }),
-  setDisplayGame: (displayGame: ActiveGameInfo | null) => {
-    set({ displayGame, displayIndex: null })
+  setDisplayGame: (displayGame: GameInfo | null) => {
+    const newIndex = ((displayGame !== null) && Array.isArray(displayGame.moves) && displayGame.moves.length > 0)
+      ? (displayGame.moves.length - 1)
+      : 0
+
+    set({ displayGame, displayIndex: newIndex })
   },
   setPracticeBoard: (practiceBoard: String | null) => set({ practiceBoard }),
   setFriends: async (friends: Array<Ship>) => set({ friends }),
-  setDisplayIndex: (displayIndex: number | null) => {
+  setDisplayIndex: (displayIndex: number) => {
     set({ displayIndex })
-    console.log('setDisplayIndex displayIndex: ' + displayIndex)
   },
   //
   receiveChallengeUpdate: (data: ChallengeUpdate) => {
@@ -63,19 +67,8 @@ const useChessStore = create<ChessState>((set, get) => ({
       }
     }
   },
-  receiveGame: async (data: GameInfo) => {
-    const activeGame: ActiveGameInfo = {
-      position: CHESS.defaultFEN,
-      gotDrawOffer: false,
-      sentDrawOffer: false,
-      drawClaimAvailable: false,
-      autoClaimSpecialDraws: false,
-      gotUndoRequest: false,
-      sentUndoRequest: false,
-      info: data
-    }
-
-    set(state => ({ activeGames: state.activeGames.set(data.gameID, activeGame) }))
+  receiveActiveGame: async (data: ActiveGameInfo) => {
+    set(state => ({ activeGames: state.activeGames.set(data.gameID, data) }))
 
     await get().urbit.subscribe({
       app: 'chess',
@@ -85,10 +78,44 @@ const useChessStore = create<ChessState>((set, get) => ({
       quit: () => {}
     })
   },
+  receiveArchivedGame: async (data: ArchivedGameInfo) => {
+    set(state => ({ archivedGames: state.archivedGames.set(data.gameID, data) }))
+  },
+  fetchArchivedMoves: async (gameID: GameID) => {
+    const currentGame = get().archivedGames.get(gameID)
+
+    if (currentGame === null) {
+      badGameId(gameID)
+      return
+    }
+
+    //  TODO: resolve this so that only the first condition is necessary
+    if (currentGame.moves === null || currentGame.moves.length === 0) {
+      const movesData = await scryMoves('chess', '/game/' + gameID + '/moves')
+
+      const archivedGame: ArchivedGameInfo = {
+        ...currentGame,
+        moves: movesData
+      }
+
+      set(state => ({ archivedGames: state.archivedGames.set(gameID, archivedGame) }))
+    }
+  },
+  displayArchivedGame: async (gameID: GameID) => {
+    const currentGame = get().archivedGames.get(gameID)
+
+    if (currentGame === null) {
+      badGameId(gameID)
+      return
+    }
+
+    await get().fetchArchivedMoves(gameID)
+    get().setDisplayGame(get().archivedGames.get(gameID))
+  },
   receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
       const displayGame = get().displayGame
-      if ((displayGame !== null) && (updatedGame.info.gameID === displayGame.info.gameID)) {
+      if ((displayGame !== null) && (updatedGame.gameID === displayGame.gameID)) {
         set({ displayGame: updatedGame })
       }
     }
@@ -106,25 +133,20 @@ const useChessStore = create<ChessState>((set, get) => ({
         }
 
         if (move.san !== null && move.fen !== null) {
-          currentGame.info.moves.push(move)
+          currentGame.moves.push(move)
 
           const updatedGame: ActiveGameInfo = {
+            ...currentGame,
             position: move.fen,
-            gotDrawOffer: currentGame.gotDrawOffer,
-            sentDrawOffer: currentGame.sentDrawOffer,
-            drawClaimAvailable: positionData.specialDrawAvailable,
-            autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
-            gotUndoRequest: currentGame.gotUndoRequest,
-            sentUndoRequest: currentGame.sentUndoRequest,
-            info: currentGame.info
+            drawClaimAvailable: positionData.specialDrawAvailable
           }
+          // Math.max() gives a zero default in case currentGame moves is null
+          const newIndex: number = Math.max(currentGame.moves.length - 1, 0)
 
-          set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: null }))
+          set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: newIndex }))
           updateDisplayGame(updatedGame)
 
           console.log('RECEIVED POSITION UPDATE FOR ' + gameID)
-          console.log('Update.Position displayIndex: ' + (get().displayIndex))
-          console.log('Update.Position fen: ' + move.fen)
         }
 
         break
@@ -133,16 +155,29 @@ const useChessStore = create<ChessState>((set, get) => ({
       case Update.Result: {
         const resultData = data as ResultUpdate
         const gameID = resultData.gameID
+        const currentGame = get().activeGames.get(gameID)
+        //  this game already exists in archivedGame, because of the
+        //  ordering of cards coming from %chess
+        const archivedGame = get().archivedGames.get(gameID)
 
-        const displayGame = get().displayGame
-        if ((displayGame !== null) && (gameID === displayGame.info.gameID)) {
-          get().setDisplayGame(null)
+        //  copy moves to archived version before deleting
+        const updatedGame: ArchivedGameInfo = {
+          ...archivedGame,
+          moves: currentGame.moves
         }
 
         var activeGames: Map<GameID, ActiveGameInfo> = get().activeGames
         activeGames.delete(gameID)
 
-        set({ activeGames })
+        set(state => ({
+          activeGames: activeGames,
+          archivedGames: state.archivedGames.set(gameID, updatedGame)
+        }))
+
+        // display the archived version
+        if (gameID === get().displayGame.gameID) {
+          get().setDisplayGame(updatedGame)
+        }
 
         console.log('RECEIVED RESULT UPDATE ' + resultData.result + ' FOR ' + gameID)
         break
@@ -181,14 +216,9 @@ const useChessStore = create<ChessState>((set, get) => ({
         })()
 
         const updatedGame: ActiveGameInfo = {
-          position: currentGame.position,
+          ...currentGame,
           gotDrawOffer: gotDrawOffer,
-          sentDrawOffer: sentDrawOffer,
-          drawClaimAvailable: currentGame.drawClaimAvailable,
-          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
-          gotUndoRequest: currentGame.gotUndoRequest,
-          sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info
+          sentDrawOffer: sentDrawOffer
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -210,14 +240,8 @@ const useChessStore = create<ChessState>((set, get) => ({
         }
 
         const updatedGame: ActiveGameInfo = {
-          position: currentGame.position,
-          gotDrawOffer: currentGame.gotDrawOffer,
-          sentDrawOffer: currentGame.sentDrawOffer,
-          drawClaimAvailable: currentGame.drawClaimAvailable,
-          autoClaimSpecialDraws: setting,
-          gotUndoRequest: currentGame.gotUndoRequest,
-          sentUndoRequest: currentGame.sentUndoRequest,
-          info: currentGame.info
+          ...currentGame,
+          autoClaimSpecialDraws: setting
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -260,14 +284,9 @@ const useChessStore = create<ChessState>((set, get) => ({
         })()
 
         const updatedGame: ActiveGameInfo = {
-          position: currentGame.position,
-          gotDrawOffer: currentGame.gotDrawOffer,
-          sentDrawOffer: currentGame.sentDrawOffer,
-          drawClaimAvailable: currentGame.drawClaimAvailable,
-          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
+          ...currentGame,
           gotUndoRequest: gotUndoRequest,
-          sentUndoRequest: sentUndoRequest,
-          info: currentGame.info
+          sentUndoRequest: sentUndoRequest
         }
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame) }))
@@ -282,25 +301,22 @@ const useChessStore = create<ChessState>((set, get) => ({
         const undoData = data as UndoAcceptedUpdate
         const gameID = undoData.gameID
         const currentGame = get().activeGames.get(gameID)
-
         if (currentGame === null) {
           badGameId(gameID)
           return
         }
 
-        currentGame.info.moves.splice(currentGame.info.moves.length - undoData.undoMoves, undoData.undoMoves)
+        currentGame.moves.splice(currentGame.moves.length - undoData.undoMoves, undoData.undoMoves)
         const updatedGame: ActiveGameInfo = {
+          ...currentGame,
           position: undoData.position,
-          gotDrawOffer: currentGame.gotDrawOffer,
-          sentDrawOffer: currentGame.sentDrawOffer,
-          drawClaimAvailable: currentGame.drawClaimAvailable,
-          autoClaimSpecialDraws: currentGame.autoClaimSpecialDraws,
           gotUndoRequest: false,
-          sentUndoRequest: false,
-          info: currentGame.info
+          sentUndoRequest: false
         }
+        // Math.max() gives a zero default in case currentGame moves is null
+        const newIndex: number = Math.max(currentGame.moves.length - 1, 0)
 
-        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: null }))
+        set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: newIndex }))
         updateDisplayGame(updatedGame)
 
         console.log('RECEIVED ACCEPTED UNDO UPDATE FOR ' + gameID)

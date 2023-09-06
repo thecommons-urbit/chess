@@ -13,7 +13,7 @@ export function PracticePanel () {
       <div className="game-panel col">
         <button
           className='option'
-          disabled={hasGame || !practiceHasMoved}
+          disabled={!practiceHasMoved}
           onClick={() => setPracticeBoard(null)}>
           Reset Practice Board
         </button>

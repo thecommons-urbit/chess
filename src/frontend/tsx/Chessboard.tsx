@@ -12,7 +12,7 @@ import { pokeAction, movePoke, castlePoke, declineDrawPoke, claimSpecialDrawPoke
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { PromotionMove } from '../ts/types/chessground'
-import { Side, CastleSide, PromotionRole, Rank, File, GameID, GameInfo, ActiveGameInfo } from '../ts/types/urbitChess'
+import { Side, CastleSide, PromotionRole, Result, Rank, File, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo } from '../ts/types/urbitChess'
 
 //
 // Declare custom HTML elements used by Chessground
@@ -47,20 +47,20 @@ export function Chessboard () {
   //
 
   const orientation: Side = (displayGame !== null)
-    ? (urbit.ship === displayGame.info.white.substring(1))
+    ? (urbit.ship === displayGame.white.substring(1))
       ? Side.White
       : Side.Black
     : Side.White
   const sideToMove: Side = (displayGame !== null)
-    ? (displayGame.position.split(' ')[1] === WHITE)
+    ? ((displayGame.moves.length % 2) === 0)
       ? Side.White
       : Side.Black
     : getCgColor(chess.turn()) as Side
-  const isViewOnly = (displayIndex == null)
-    ? false
-    : (displayGame.info.moves == null)
-      ? false
-      : (displayIndex < displayGame.info.moves.length - 1)
+  const isViewOnly = displayGame !== null &&
+    (displayGame.archived ||
+      ((displayGame.moves !== null) &&
+        (displayGame.moves.length > 0) &&
+        ((displayGame.moves.length - 1) > displayIndex)))
   const toShowDests = !isViewOnly
 
   //
@@ -81,8 +81,8 @@ export function Chessboard () {
   const updateChess = () => {
     const practiceBoard = localStorage.getItem('practiceBoard')
 
-    if (displayGame !== null) {
-      chess.load(displayGame.position)
+    if (displayGame !== null && !displayGame.archived) {
+      chess.load((displayGame as ActiveGameInfo).position)
     } else if (practiceBoard !== null) {
       chess.load(practiceBoard)
     } else {
@@ -112,7 +112,7 @@ export function Chessboard () {
       }
 
       const attemptUrbitMove = async (flag: string) => {
-        const gameID: GameID = displayGame.info.gameID
+        const gameID: GameID = displayGame.gameID
 
         if (flag === FLAGS.KSIDE_CASTLE) {
           await pokeAction(urbit, castlePoke(gameID, CastleSide.King), onError)
@@ -132,11 +132,11 @@ export function Chessboard () {
         }
 
         //  XX: should moving decline draw offer in backend instead?
-        if (displayGame.gotDrawOffer) {
+        if ((displayGame as ActiveGameInfo).gotDrawOffer) {
           await pokeAction(urbit, declineDrawPoke(gameID))
         }
         //  XX: should moving decline undo request in backend instead?
-        if (displayGame.gotUndoRequest) {
+        if ((displayGame as ActiveGameInfo).gotUndoRequest) {
           await pokeAction(urbit, declineUndoPoke(gameID))
         }
       }
@@ -189,20 +189,17 @@ export function Chessboard () {
 
   const updateBoard = () => {
     const stateConfig: CgConfig = {
-      fen: (displayIndex == null || displayGame.info.moves == null)
+      fen: displayGame == null
         ? chess.fen()
-        : displayGame.info.moves[displayIndex].fen,
-      lastMove: (displayGame == null || displayGame.info.moves == null || (displayGame.info.moves.length === 0))
+        : ((displayGame.moves == null) || (displayGame.moves.length === 0))
+          ? CHESS.defaultFEN
+          : displayGame.moves[displayIndex].fen,
+      lastMove: (displayGame == null || displayGame.moves == null || (displayGame.moves.length === 0))
         ? null
-        : (displayIndex == null)
-          ? [
-            displayGame.info.moves[displayGame.info.moves.length - 1].from,
-            displayGame.info.moves[displayGame.info.moves.length - 1].to
-          ]
-          : [
-            displayGame.info.moves[displayIndex].from,
-            displayGame.info.moves[displayIndex].to
-          ],
+        : [
+          displayGame.moves[displayIndex].from,
+          displayGame.moves[displayIndex].to
+        ],
       viewOnly: isViewOnly,
       turnColor: sideToMove as cg.Color,
       check: chess.in_check(),
@@ -296,6 +293,24 @@ export function Chessboard () {
   // HTML element generation functions
   //
 
+  const infoText = () => {
+    if ((displayGame !== null) && displayGame.archived) {
+      switch ((displayGame as ArchivedGameInfo).result) {
+        case Result.WhiteVictory: {
+          return 'winner: ' + displayGame.white
+        }
+        case Result.BlackVictory: {
+          return 'winner: ' + displayGame.black
+        }
+        default: {
+          return 'draw'
+        }
+      }
+    } else {
+      return (sideToMove + ' to move...')
+    }
+  }
+
   const promotionTiles = () => {
     const { orig, dest } = promotionMove
 
@@ -322,7 +337,7 @@ export function Chessboard () {
         })
 
         const attemptUrbitMove = async () => {
-          const gameID: GameID = displayGame.info.gameID
+          const gameID: GameID = displayGame.gameID
 
           await pokeAction(
             urbit,
@@ -336,11 +351,11 @@ export function Chessboard () {
             onError)
 
           //  XX: should moving decline draw offer in backend instead?
-          if (displayGame.gotDrawOffer) {
+          if ((displayGame as ActiveGameInfo).gotDrawOffer) {
             await pokeAction(urbit, declineDrawPoke(gameID))
           }
           //  XX: should moving decline undo request in backend instead?
-          if (displayGame.gotUndoRequest) {
+          if ((displayGame as ActiveGameInfo).gotUndoRequest) {
             await pokeAction(urbit, declineUndoPoke(gameID))
           }
         }
@@ -383,10 +398,13 @@ export function Chessboard () {
     <div className='game-container'>
       <div className={`board-container ${boardTheme} ${pieceTheme}`}>
         <div ref={boardRef} className='chessboard cg-wrap' />
-        { (promotionMove !== null) ? renderPromotionInterface() : <div/> }
+        { ((displayGame !== null) && !(displayGame.archived) && (promotionMove !== null))
+          ? renderPromotionInterface()
+          : <div/>
+        }
       </div>
-      <div className='turn-container'>
-        <p className='turn-text'>{`${sideToMove} to move...`}</p>
+      <div className='info-container'>
+        <p className='info-text'>{infoText()}</p>
       </div>
     </div>
   )

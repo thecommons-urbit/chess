@@ -1,4 +1,3 @@
-/-  *chess
 /+  chess
 =,  format
 |_  game=chess-game:chess
@@ -15,8 +14,16 @@
         ['event' [%s event.game]]
         ['white' [%s (scot %p white.game)]]
         ['black' [%s (scot %p black.game)]]
-        ['result' [%s ?~(result.game '' u.result.game)]]
+        ['archived' [%b %.n]]
+        ::  default values. updated thru [%game @ta %updates ~] sub.
         ['moves' [%a ~]]
+        ['position' [%s '']]
+        ['gotDrawOffer' [%b %.n]]
+        ['sentDrawOffer' [%b %.n]]
+        ['drawClaimAvailable' [%b %.n]]
+        ['autoClaimSpecialDraws' [%b %.n]]
+        ['gotUndoRequest' [%b %.n]]
+        ['sentUndoRequest' [%b %.n]]
     ==
   --
 ++  grad  %noun
