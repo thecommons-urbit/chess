@@ -78,7 +78,11 @@ const useChessStore = create<ChessState>((set, get) => ({
       quit: () => {}
     })
   },
+<<<<<<< HEAD
   receiveArchivedGame: (data: ArchivedGameInfo) => {
+=======
+  receiveArchivedGame: async (data: ArchivedGameInfo) => {
+>>>>>>> 6f463aa (add functionality for browsing completed games)
     set(state => ({ archivedGames: state.archivedGames.set(data.gameID, data) }))
   },
   fetchArchivedMoves: async (gameID: GameID) => {
