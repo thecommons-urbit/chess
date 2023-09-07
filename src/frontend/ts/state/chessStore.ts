@@ -164,7 +164,7 @@ const useChessStore = create<ChessState>((set, get) => ({
       const whiteFraction = (tally.draws % 2) === 1 ? "½" : ""; 
       const blackFraction = (tally.draws % 2) === 1 ? "½" : "";
       
-      finalTally.set(ship, `${whiteWhole}${whiteFraction} - ${blackWhole}${blackFraction}`);
+      finalTally.set(ship, `${blackWhole}${blackFraction} - ${whiteWhole}${whiteFraction}`);
     });
 
     set(state => ({ tallies: finalTally }))
