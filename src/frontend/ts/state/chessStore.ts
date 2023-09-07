@@ -86,7 +86,6 @@ const useChessStore = create<ChessState>((set, get) => ({
 >>>>>>> 6f463aa (add functionality for browsing completed games)
     set(state => ({ archivedGames: state.archivedGames.set(data.gameID, data) }))
     get().countTallies(get().archivedGames.set(data.gameID, data))
-    // console.log(get().tallies)
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)
@@ -168,8 +167,6 @@ const useChessStore = create<ChessState>((set, get) => ({
     });
 
     set(state => ({ tallies: finalTally }))
-    // console.log(finalTally)
-    // console.log(tallies)
   },
   receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
