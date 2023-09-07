@@ -171,8 +171,8 @@ export function Challenges () {
       <ul id="friends" className='game-list' style={{ display: (showingFriends ? 'flex' : ' none') }}>
         {
           Array.from(friends).map((friend: Ship, key: number) => {
-            console.log(tallies)
-            console.log(tallies.get(`${friend}`))
+            // console.log(tallies)
+            // console.log(tallies.get(`${friend}`))
             const colorClass = (key % 2) ? 'odd' : 'even'
             return (
               <li className={`game challenge ${colorClass}`} key={key}>
@@ -180,7 +180,7 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      <p className='score'>{tallies.get(`${friend}`)}</p>
+                      <p className='score'>{tallies.get(`~${friend}`)}</p>
                     </div>
                   </div>
                   <div className='col'>

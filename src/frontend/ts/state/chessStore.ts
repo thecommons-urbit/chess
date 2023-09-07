@@ -85,6 +85,8 @@ const useChessStore = create<ChessState>((set, get) => ({
   receiveArchivedGame: async (data: ArchivedGameInfo) => {
 >>>>>>> 6f463aa (add functionality for browsing completed games)
     set(state => ({ archivedGames: state.archivedGames.set(data.gameID, data) }))
+    get().countTallies(get().archivedGames.set(data.gameID, data))
+    // console.log(get().tallies)
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)
@@ -126,24 +128,27 @@ const useChessStore = create<ChessState>((set, get) => ({
       const { white, black, result } = game;
 
       // ensure each ship has an entry in newTallies
-      if (newTallies.has(white)) {
+      if (!newTallies.has(white)) {
         newTallies.set(white, { wins: 0, losses: 0, draws: 0 });
       }
-      if (newTallies.has(black)) {
+      if (!newTallies.has(black)) {
         newTallies.set(black, { wins: 0, losses: 0, draws: 0 });
       }
 
       // switch on result
       switch (result) {
           case "1-0":
+            // assumes wins/losses will never be undefined
             newTallies.get(white)!.wins += 1;
             newTallies.get(black)!.losses += 1;
             break;
           case "0-1":
+            // assumes wins/losses will never be undefined
             newTallies.get(black)!.wins += 1;
             newTallies.get(white)!.losses += 1;
             break;
           case "½–½":
+            // assumes wins/losses will never be undefined
             newTallies.get(white)!.draws += 1;
             newTallies.get(black)!.draws += 1;
             break;
@@ -162,7 +167,9 @@ const useChessStore = create<ChessState>((set, get) => ({
       finalTally.set(ship, `${whiteWhole}${whiteFraction} - ${blackWhole}${blackFraction}`);
     });
 
-    return finalTally;
+    set(state => ({ tallies: finalTally }))
+    // console.log(finalTally)
+    // console.log(tallies)
   },
   receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
