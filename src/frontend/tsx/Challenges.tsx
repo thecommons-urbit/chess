@@ -180,7 +180,7 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      <p className='score'>{tallies.get(`~${friend}`)}</p>
+                      <p className='score'>{( tallies.get(`~${friend}`) === undefined ? '0 - 0' : tallies.get(`~${friend}`))}</p>
                     </div>
                   </div>
                   <div className='col'>
