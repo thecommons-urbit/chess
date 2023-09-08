@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Popup from 'reactjs-popup'
+import 'urbit-ob'
 import { pokeAction, sendChallengePoke, acceptChallengePoke, declineChallengePoke } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
@@ -95,6 +96,8 @@ export function Challenges () {
     setIncomingList(false)
     setFriendsList(false)
   }
+
+  const ob = require('urbit-ob')
 
   return (
     <div className='challenges-container col'>
@@ -210,9 +213,25 @@ export function Challenges () {
               key={badChallengeAttempts}
               disabled={ challengingFriend }/>
           </div>
-          <div className="new-opp-tally-container" style={newOpp === '' ? {display: 'none'} : {}}>
+          <div
+            className="new-opp-tally-container"
+            style={
+              newOpp === ''
+              ? {display: 'none'}
+              : !ob.isValidPatp(`${newOpp}`)
+              ? {display: 'none'}
+              : {display: 'block'}
+            }
+          >
             <p className="new-opp-tally">
-                { newOpp === '' ? '' : (tallies.get(`${newOpp}`) === undefined ? '0 - 0' : tallies.get(`${newOpp}`))}
+                { newOpp === ''
+                  ? ''
+                  : !ob.isValidPatp(`${newOpp}`)
+                  ? ''
+                  : (tallies.get(`${newOpp}`) === undefined
+                  ? '0 - 0'
+                  : tallies.get(`${newOpp}`))
+                }
             </p>
           </div>
           <div className='challenge-input-container row'>
