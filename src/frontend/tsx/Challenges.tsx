@@ -28,6 +28,7 @@ export function Challenges () {
 
   const closeModal = () => {
     setModalOpen(false)
+    setNewOpp('')
   }
 
   const incrementBadChallengeAttempts = () => {
