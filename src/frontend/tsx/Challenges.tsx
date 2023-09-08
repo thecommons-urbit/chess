@@ -12,6 +12,7 @@ export function Challenges () {
   const [who, setWho] = useState('')
   const [description, setDescription] = useState('')
   const [side, setSide] = useState(Side.Random)
+  const [newOpp, setNewOpp] = useState('')
   const { urbit, incomingChallenges, outgoingChallenges, friends, tallies } = useChessStore()
   // interface
   const [modalOpen, setModalOpen] = useState(false)
@@ -190,6 +191,7 @@ export function Challenges () {
           })
         }
       </ul>
+      {/* New Challenge popup */}
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
         <div className='new-challenge-container col'>
           <p className='new-challenge-header'>New Challenge</p>
@@ -200,9 +202,17 @@ export function Challenges () {
               type="text"
               placeholder={'~sampel-palnet'}
               value={who}
-              onChange={(e) => setWho(e.target.value)}
+              onChange={(e) => {
+                  setWho(e.target.value);
+                  setNewOpp(e.target.value);
+              }}
               key={badChallengeAttempts}
               disabled={ challengingFriend }/>
+          </div>
+          <div className="new-opp-tally-container">
+            <p className="new-opp-tally">
+            { newOpp === '' ? '' : ( tallies.get(`${newOpp}`) === undefined ? '0 - 0' : tallies.get(`${newOpp}`)) }
+            </p>
           </div>
           <div className='challenge-input-container row'>
             <p>Description:</p>
