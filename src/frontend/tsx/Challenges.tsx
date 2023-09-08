@@ -183,7 +183,7 @@ export function Challenges () {
                     </div>
                   </div>
                   <div className='col'>
-                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); openModal() }}>Challenge</button>
+                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); setNewOpp('~' + friend); openModal() }}>Challenge</button>
                   </div>
                 </div>
               </li>
@@ -209,9 +209,9 @@ export function Challenges () {
               key={badChallengeAttempts}
               disabled={ challengingFriend }/>
           </div>
-          <div className="new-opp-tally-container">
+          <div className="new-opp-tally-container" style={newOpp === '' ? {display: 'none'} : {}}>
             <p className="new-opp-tally">
-            { newOpp === '' ? '' : ( tallies.get(`${newOpp}`) === undefined ? '0 - 0' : tallies.get(`${newOpp}`)) }
+                { newOpp === '' ? '' : (tallies.get(`${newOpp}`) === undefined ? '0 - 0' : tallies.get(`${newOpp}`))}
             </p>
           </div>
           <div className='challenge-input-container row'>
