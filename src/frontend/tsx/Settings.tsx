@@ -3,6 +3,7 @@ import { pokeAction, changeSpecialDrawPreferencePoke } from '../ts/helpers/urbit
 import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 import { pieceThemes, boardThemes } from '../ts/constants/themes'
+import { ActiveGameInfo } from '../ts/types/urbitChess'
 
 export function Settings () {
   const { urbit, displayGame, activeGames } = useChessStore()
@@ -10,8 +11,8 @@ export function Settings () {
   const hasGame: boolean = (displayGame !== null)
 
   const handleCheckboxChange = async () => {
-    const newAutoClaimPreference = !displayGame.autoClaimSpecialDraws
-    const gameID = displayGame.info.gameID
+    const newAutoClaimPreference = !(displayGame as ActiveGameInfo).autoClaimSpecialDraws
+    const gameID = displayGame.gameID
     await pokeAction(urbit, changeSpecialDrawPreferencePoke(gameID, newAutoClaimPreference))
   }
 
@@ -74,7 +75,7 @@ export function Settings () {
           <label>
             <input
               type="checkbox"
-              checked={displayGame.autoClaimSpecialDraws}
+              checked={(displayGame as ActiveGameInfo).autoClaimSpecialDraws}
               onChange={handleCheckboxChange}
             />
             Auto-Claim Special Draws

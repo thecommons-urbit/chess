@@ -1,25 +1,29 @@
 import Urbit from '@urbit/http-api'
-import { Ship, GameID, SAN, FENPosition, Move, GameInfo, ActiveGameInfo, Challenge, ChessUpdate, ChallengeUpdate } from '../types/urbitChess'
+import { Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Challenge, ChessUpdate, ChallengeUpdate } from '../types/urbitChess'
 
 interface ChessState {
   // properties
   urbit: Urbit | null
-  displayGame: ActiveGameInfo | null
-  displayIndex: number | null
+  displayGame: GameInfo | null
+  displayIndex: number
   practiceBoard: String | null
   activeGames: Map<GameID, ActiveGameInfo>
+  archivedGames: Map<GameID, ArchivedGameInfo>
   incomingChallenges: Map<Ship, Challenge>
   outgoingChallenges: Map<Ship, Challenge>
   friends: Array<Ship>
   // frontend state functions
   setUrbit: (urbit: Urbit) => void
-  setDisplayGame: (displayGame: ActiveGameInfo | null) => void
-  setDisplayIndex: (displayIndex: number | null) => void
+  setDisplayGame: (displayGame: GameInfo | null) => void
+  setDisplayIndex: (displayIndex: number) => void
   setPracticeBoard: (practiceBoard: String | null) => void
   setFriends: (friends: Array<Ship>) => void
+  fetchArchivedMoves: (gameId: GameID) => void
+  displayArchivedGame: (gameId: GameID) => void
   // backend update functions
   receiveChallengeUpdate: (data: ChallengeUpdate) => void
-  receiveGame: (data: GameInfo) => void
+  receiveActiveGame: (data: ActiveGameInfo) => void
+  receiveArchivedGame: (data: ArchivedGameInfo) => void
   receiveGameUpdate: (data: ChessUpdate) => void
 }
 

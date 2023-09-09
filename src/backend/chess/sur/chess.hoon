@@ -190,7 +190,9 @@
 +|  %rendering
 ::
 ::  chess-fen is a FEN position
-+$  chess-fen  @t
++$  chess-fen
+  $~  'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+  @t
 ::
 ::  chess-san is one move's SAN
 +$  chess-san  @t
@@ -259,6 +261,10 @@
     ::    e.g. 0-1
     result=(unit chess-result)
     ::  a list of the moves played, in Urbit, FEN, and SAN notation
+    ::
+    ::  XX: we should probably have a named type
+    ::      for [chess-move chess-fen chess-san].
+    ::      and possibly a type for a list of it.
     moves=(list [chess-move chess-fen chess-san])
   ==
 ::

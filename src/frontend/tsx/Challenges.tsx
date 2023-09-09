@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Popup from 'reactjs-popup'
-import { pokeAction, sendChallengePoke, acceptChallengePoke, declineChallengePoke, findFriends } from '../ts/helpers/urbitChess'
+import { pokeAction, sendChallengePoke, acceptChallengePoke, declineChallengePoke } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
 
