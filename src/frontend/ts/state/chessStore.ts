@@ -116,53 +116,55 @@ const useChessStore = create<ChessState>((set, get) => ({
   },
   countTallies: async (archivedGames: Map<GameID, ArchivedGameInfo>) => {
     const tallies = get().tallies
-    const newTallies: Map<Ship, { wins: number, losses: number, draws: number }> = new Map();
+    // initialize empty record of players' wins, losses, and draws
+    const winsLossesDraws: Map<Ship, { wins: number, losses: number, draws: number }> = new Map();
 
     // iterate over archived games
     archivedGames.forEach((game, gameID) => {
       const { white, black, result } = game;
 
-      // ensure each ship has an entry in newTallies
-      if (!newTallies.has(white)) {
-        newTallies.set(white, { wins: 0, losses: 0, draws: 0 });
+      // initialize both players' records in winsLossesDraws
+      if (!winsLossesDraws.has(white)) {
+        winsLossesDraws.set(white, { wins: 0, losses: 0, draws: 0 });
       }
-      if (!newTallies.has(black)) {
-        newTallies.set(black, { wins: 0, losses: 0, draws: 0 });
+      if (!winsLossesDraws.has(black)) {
+        winsLossesDraws.set(black, { wins: 0, losses: 0, draws: 0 });
       }
 
-      // switch on result
+      // increment both players' records based on game's result
       switch (result) {
           case "1-0":
-            // assumes wins/losses will never be undefined
-            newTallies.get(white)!.wins += 1;
-            newTallies.get(black)!.losses += 1;
+            winsLossesDraws.get(white)!.wins += 1;
+            winsLossesDraws.get(black)!.losses += 1;
             break;
           case "0-1":
-            // assumes wins/losses will never be undefined
-            newTallies.get(black)!.wins += 1;
-            newTallies.get(white)!.losses += 1;
+            winsLossesDraws.get(white)!.losses += 1;
+            winsLossesDraws.get(black)!.wins += 1;
             break;
           case "½–½":
-            // assumes wins/losses will never be undefined
-            newTallies.get(white)!.draws += 1;
-            newTallies.get(black)!.draws += 1;
+            winsLossesDraws.get(white)!.draws += 1;
+            winsLossesDraws.get(black)!.draws += 1;
             break;
         }
     })
 
-    // convert the tally map into the desired format
-    const finalTally: Map<Ship, String> = new Map();
-    newTallies.forEach((tally, ship) => {
-      const whiteWhole = tally.wins + Math.floor(tally.draws / 2);
-      const blackWhole = tally.losses + Math.floor(tally.draws / 2);
-      
-      const whiteFraction = (tally.draws % 2) === 1 ? "½" : ""; 
-      const blackFraction = (tally.draws % 2) === 1 ? "½" : "";
-      
-      finalTally.set(ship, `${blackWhole}${blackFraction} - ${whiteWhole}${whiteFraction}`);
+    // initialize map to output
+    const outputTallies: Map<Ship, String> = new Map();
+
+    // convert opponents' wins/losses/draws into output strings
+    winsLossesDraws.forEach((tally, ship) => {
+      // count wins and losses
+      const winsWhole = tally.wins + Math.floor(tally.draws / 2);
+      const lossesWhole = tally.losses + Math.floor(tally.draws / 2);
+      // count draws
+      const winsFraction = (tally.draws % 2) === 1 ? "½" : ""; 
+      const lossesFraction = (tally.draws % 2) === 1 ? "½" : "";
+
+      // output final tally
+      outputTallies.set(ship, `${lossesWhole}${lossesFraction} - ${winsWhole}${winsFraction}`);
     });
 
-    set(state => ({ tallies: finalTally }))
+    set(state => ({ tallies: outputTallies }))
   },
   receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
