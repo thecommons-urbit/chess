@@ -190,7 +190,9 @@
 +|  %rendering
 ::
 ::  chess-fen is a FEN position
-+$  chess-fen  @t
++$  chess-fen
+  $~  'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+  @t
 ::
 ::  chess-san is one move's SAN
 +$  chess-san  @t

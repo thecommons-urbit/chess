@@ -1,9 +1,9 @@
-/+  chess
+/-  *chess
 =,  format
-|_  game=chess-game:chess
+|_  game=chess-game
 ++  grab
   |%
-  ++  noun  chess-game:chess
+  ++  noun  chess-game
   --
 ++  grow
   |%
@@ -17,7 +17,7 @@
         ['archived' [%b %.n]]
         ::  default values. updated thru [%game @ta %updates ~] sub.
         ['moves' [%a ~]]
-        ['position' [%s '']]
+        ['position' [%s *chess-fen]]
         ['gotDrawOffer' [%b %.n]]
         ['sentDrawOffer' [%b %.n]]
         ['drawClaimAvailable' [%b %.n]]

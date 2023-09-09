@@ -16,8 +16,6 @@ export function GamePanel () {
   const canUndo: boolean = (displayGame.moves.length >= 2)
     ? true
     : (urbit.ship === displayGame.white.substring(1) && displayGame.moves.length >= 1)
-  console.log('displayGame, what is in moves?')
-  console.log(displayGame)
   const lastFen: string = (displayGame.moves.length > 0)
     ? displayGame.moves[displayGame.moves.length - 1].fen
     : CHESS.defaultFEN

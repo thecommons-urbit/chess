@@ -63,6 +63,10 @@ export function Chessboard () {
         ((displayGame.moves.length - 1) > displayIndex)))
   const toShowDests = !isViewOnly
 
+  if (api) {
+    api.state.viewOnly = isViewOnly
+  }
+
   //
   // React hook helper functions
   //
@@ -81,10 +85,16 @@ export function Chessboard () {
   const updateChess = () => {
     const practiceBoard = localStorage.getItem('practiceBoard')
 
+    // active game
     if (displayGame !== null && !displayGame.archived) {
       chess.load((displayGame as ActiveGameInfo).position)
-    } else if (practiceBoard !== null) {
+    // archived game with moves made
+    } else if ((displayGame !== null) && (displayGame.moves !== null) && (displayGame.moves.length > 0)) {
+      chess.load(displayGame.moves[displayGame.moves.length - 1].fen)
+    // no display game and saved practice board state
+    } else if (displayGame == null && practiceBoard !== null) {
       chess.load(practiceBoard)
+    // no saved practice board state or archived game has no moves
     } else {
       chess.load(CHESS.defaultFEN)
     }
@@ -143,6 +153,7 @@ export function Chessboard () {
 
       if (moveAttempt !== null) {
         if (displayGame !== null) {
+          console.assert(!displayGame.archived, 'display error 421')
           attemptUrbitMove(moveAttempt.flags)
         }
 
@@ -178,6 +189,7 @@ export function Chessboard () {
             }
 
             if (displayGame == null) {
+              console.assert(!displayGame.archived, 'display error 420')
               forceRenderWorkaround(Date.now())
             }
           }
@@ -200,7 +212,6 @@ export function Chessboard () {
           displayGame.moves[displayIndex].from,
           displayGame.moves[displayIndex].to
         ],
-      viewOnly: isViewOnly,
       turnColor: sideToMove as cg.Color,
       check: chess.in_check(),
       selected: null,
@@ -209,9 +220,6 @@ export function Chessboard () {
         showDests: toShowDests
       }
     }
-    // XX move these console logs to 'dev' branch once that exists
-    console.log('updateBoard fen: ' + stateConfig.fen)
-    console.log('updateBoard displayIndex: ' + displayIndex)
     api?.set(stateConfig)
   }
 
@@ -362,6 +370,7 @@ export function Chessboard () {
 
         if (attemptMove !== null) {
           if (displayGame !== null) {
+            console.assert(!displayGame.archived, 'display error 422')
             attemptUrbitMove()
           }
         } else {
@@ -398,7 +407,7 @@ export function Chessboard () {
     <div className='game-container'>
       <div className={`board-container ${boardTheme} ${pieceTheme}`}>
         <div ref={boardRef} className='chessboard cg-wrap' />
-        { ((displayGame !== null) && !(displayGame.archived) && (promotionMove !== null))
+        { ((displayGame !== null) && (promotionMove !== null))
           ? renderPromotionInterface()
           : <div/>
         }
