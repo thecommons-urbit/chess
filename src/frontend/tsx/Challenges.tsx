@@ -4,6 +4,7 @@ import 'urbit-ob'
 import { pokeAction, sendChallengePoke, acceptChallengePoke, declineChallengePoke } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
+import { getTallies } from '../ts/helpers/chess'
 
 const selectedSideButtonClasses = 'side radio-selected'
 const unselectedSideButtonClasses = 'side radio-unselected'
@@ -183,7 +184,7 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      <p className='score'>{( tallies.get(`~${friend}`) === undefined ? '0 - 0' : tallies.get(`~${friend}`))}</p>
+                      <p className='score'>{( tallies.has(`~${friend}`) ? '0 - 0' : getTallies(`~${friend}`, tallies.get(`~${friend}`)) )}</p>
                     </div>
                   </div>
                   <div className='col'>
@@ -217,20 +218,16 @@ export function Challenges () {
             className="new-opp-tally-container"
             style={
               newOpp === ''
-              ? {display: 'none'}
-              : !ob.isValidPatp(`${newOpp}`)
-              ? {display: 'none'}
-              : {display: 'block'}
+                ? {display: 'none'}
+                : !ob.isValidPatp(`${newOpp}`)
+                  ? {display: 'none'}
+                  : {display: 'block'}
             }
           >
             <p className="new-opp-tally">
-                { newOpp === ''
-                  ? ''
-                  : !ob.isValidPatp(`${newOpp}`)
-                  ? ''
-                  : (tallies.get(`${newOpp}`) === undefined
-                  ? '0 - 0'
-                  : tallies.get(`${newOpp}`))
+                { tallies.has(`${newOpp}`)
+                    ? '0 - 0'
+                    : getTallies(`${newOpp}`, tallies.get(`${newOpp}`))
                 }
             </p>
           </div>

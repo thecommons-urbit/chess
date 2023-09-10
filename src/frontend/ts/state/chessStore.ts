@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
+import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Results, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
 import { scryFriends, scryMoves } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
@@ -80,8 +80,60 @@ const useChessStore = create<ChessState>((set, get) => ({
     })
   },
   receiveArchivedGame: (data: ArchivedGameInfo) => {
-    set(state => ({ archivedGames: state.archivedGames.set(data.gameID, data) }))
-    get().countTallies(get().archivedGames.set(data.gameID, data))
+    const tallies = get().tallies
+
+    let opponent: Ship = data.white === window.ship
+      ? data.black
+      : data.white
+    let oppResults: Results = tallies.has(opponent)
+      ? tallies.get(opponent)
+      : { wins: 0, losses: 0, draws: 0 }
+    let newOppResults: Results | null = null
+
+    switch (data.result) {
+      case "1-0":
+        if (data.white == window.ship) {
+          newOppResults = {
+            ...oppResults,
+            wins: oppResults.wins + 1
+          }
+        } else {
+          newOppResults = {
+            ...oppResults,
+            losses: oppResults.losses + 1
+          }
+        }
+        break;
+      case "0-1":
+        if (data.white == window.ship) {
+          newOppResults = {
+            ...oppResults,
+            losses: oppResults.losses + 1
+          }
+        } else {
+          newOppResults = {
+            ...oppResults,
+            wins: oppResults.wins + 1
+          }
+        }
+        break;
+      case "½–½":
+        newOppResults = {
+          ...oppResults,
+          draws: oppResults.draws + 1
+        }
+        break;
+      default:
+        throw new Error('Invalid result: ' + data.result);
+    }
+
+    set(state => ({
+      archivedGames: state.archivedGames.set(data.gameID, data),
+      tallies: state.tallies.set(opponent, newOppResults)
+      }))
+
+    console.log('archivedGames: ' + get().archivedGames)
+    console.log('tallies: ' + tallies)
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)
@@ -113,58 +165,6 @@ const useChessStore = create<ChessState>((set, get) => ({
 
     await get().fetchArchivedMoves(gameID)
     get().setDisplayGame(get().archivedGames.get(gameID))
-  },
-  countTallies: async (archivedGames: Map<GameID, ArchivedGameInfo>) => {
-    const tallies = get().tallies
-    // initialize empty record of players' wins, losses, and draws
-    const winsLossesDraws: Map<Ship, { wins: number, losses: number, draws: number }> = new Map();
-
-    // iterate over archived games
-    archivedGames.forEach((game, gameID) => {
-      const { white, black, result } = game;
-
-      // initialize both players' records in winsLossesDraws
-      if (!winsLossesDraws.has(white)) {
-        winsLossesDraws.set(white, { wins: 0, losses: 0, draws: 0 });
-      }
-      if (!winsLossesDraws.has(black)) {
-        winsLossesDraws.set(black, { wins: 0, losses: 0, draws: 0 });
-      }
-
-      // increment both players' records based on game's result
-      switch (result) {
-          case "1-0":
-            winsLossesDraws.get(white)!.wins += 1;
-            winsLossesDraws.get(black)!.losses += 1;
-            break;
-          case "0-1":
-            winsLossesDraws.get(white)!.losses += 1;
-            winsLossesDraws.get(black)!.wins += 1;
-            break;
-          case "½–½":
-            winsLossesDraws.get(white)!.draws += 1;
-            winsLossesDraws.get(black)!.draws += 1;
-            break;
-        }
-    })
-
-    // initialize map to output
-    const outputTallies: Map<Ship, String> = new Map();
-
-    // convert opponents' wins/losses/draws into output strings
-    winsLossesDraws.forEach((tally, ship) => {
-      // count wins and losses
-      const winsWhole = tally.wins + Math.floor(tally.draws / 2);
-      const lossesWhole = tally.losses + Math.floor(tally.draws / 2);
-      // count draws
-      const winsFraction = (tally.draws % 2) === 1 ? "½" : ""; 
-      const lossesFraction = (tally.draws % 2) === 1 ? "½" : "";
-
-      // output final tally
-      outputTallies.set(ship, `${lossesWhole}${lossesFraction} - ${winsWhole}${winsFraction}`);
-    });
-
-    set(state => ({ tallies: outputTallies }))
   },
   receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {

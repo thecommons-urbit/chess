@@ -152,6 +152,12 @@ export interface ArchivedGameInfo extends GameInfo {
   result: Result
 }
 
+export interface Results {
+  wins: number,
+  losses: number,
+  draws: number
+}
+
 //
 // Updates
 //

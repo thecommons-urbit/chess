@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Challenge, ChessUpdate, ChallengeUpdate } from '../types/urbitChess'
+import { Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Results, Challenge, ChessUpdate, ChallengeUpdate } from '../types/urbitChess'
 
 interface ChessState {
   // properties
@@ -12,7 +12,7 @@ interface ChessState {
   incomingChallenges: Map<Ship, Challenge>
   outgoingChallenges: Map<Ship, Challenge>
   friends: Array<Ship>
-  tallies: Map<Ship, String>
+  tallies: Map<Ship, Results>
   // frontend state functions
   setUrbit: (urbit: Urbit) => void
   setDisplayGame: (displayGame: GameInfo | null) => void
@@ -21,7 +21,6 @@ interface ChessState {
   setFriends: (friends: Array<Ship>) => void
   fetchArchivedMoves: (gameId: GameID) => void
   displayArchivedGame: (gameId: GameID) => void
-  countTallies: (archivedGames: Map<GameID, ArchivedGameInfo>) => void
   // backend update functions
   receiveChallengeUpdate: (data: ChallengeUpdate) => void
   receiveActiveGame: (data: ActiveGameInfo) => void
