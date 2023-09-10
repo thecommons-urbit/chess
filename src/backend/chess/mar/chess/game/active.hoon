@@ -1,18 +1,9 @@
-<<<<<<< HEAD
 /-  *chess
 =,  format
 |_  game=chess-game
 ++  grab
   |%
   ++  noun  chess-game
-=======
-/+  chess
-=,  format
-|_  game=chess-game:chess
-++  grab
-  |%
-  ++  noun  chess-game:chess
->>>>>>> 6f463aa (add functionality for browsing completed games)
   --
 ++  grow
   |%
@@ -26,11 +17,7 @@
         ['archived' [%b %.n]]
         ::  default values. updated thru [%game @ta %updates ~] sub.
         ['moves' [%a ~]]
-<<<<<<< HEAD
         ['position' [%s *chess-fen]]
-=======
-        ['position' [%s '']]
->>>>>>> 6f463aa (add functionality for browsing completed games)
         ['gotDrawOffer' [%b %.n]]
         ['sentDrawOffer' [%b %.n]]
         ['drawClaimAvailable' [%b %.n]]
