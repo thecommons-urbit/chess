@@ -184,7 +184,9 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      <p className='score'>{( tallies.has(`~${friend}`) ? '0 - 0' : getTallies(`~${friend}`, tallies.get(`~${friend}`)) )}</p>
+                      {/* <p className='score'>{( tallies.has(`~${friend}`) ? '0 - 0' : getTallies(`~${friend}`, tallies.get(`~${friend}`)) )}</p> */}
+                      {/* <p className='score'>{( getTallies(tallies.get(`~${friend}`)) === undefined ? '0 - 0' : tallies.get(`~${friend}`))}</p> */}
+                      <p className='score'>0 - 0</p>
                     </div>
                   </div>
                   <div className='col'>
@@ -218,17 +220,32 @@ export function Challenges () {
             className="new-opp-tally-container"
             style={
               newOpp === ''
-                ? {display: 'none'}
-                : !ob.isValidPatp(`${newOpp}`)
-                  ? {display: 'none'}
-                  : {display: 'block'}
+              ? {display: 'none'}
+              : !ob.isValidPatp(`${newOpp}`)
+              ? {display: 'none'}
+              : {display: 'block'}
             }
+            // style={
+            //   newOpp === ''
+            //     ? {display: 'none'}
+            //     : !ob.isValidPatp(`${newOpp}`)
+            //       ? {display: 'none'}
+            //       : {display: 'block'}
+            // }
           >
-            <p className="new-opp-tally">
-                { tallies.has(`${newOpp}`)
+            <p className="new-opp-tally">0 - 0
+                 {/*{ newOpp === ''
+                  ? ''
+                  : !ob.isValidPatp(`${newOpp}`)
+                  ? ''
+                  : (tallies.get(`${newOpp}`) === undefined
+                  ? '0 - 0'
+                  : tallies.get(`${newOpp}`))
+                }*/}
+                {/*{ tallies.has(`${newOpp}`)
                     ? '0 - 0'
                     : getTallies(`${newOpp}`, tallies.get(`${newOpp}`))
-                }
+                }*/}
             </p>
           </div>
           <div className='challenge-input-container row'>
