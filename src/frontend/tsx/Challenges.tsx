@@ -184,9 +184,6 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      {/* <p className='score'>{( tallies.has(`~${friend}`) ? '0 - 0' : getTally(`~${friend}`, tallies.get(`~${friend}`)) )}</p> */}
-                      {/* <p className='score'>{( getTally(tallies.get(`~${friend}`)) === undefined ? '0 - 0' : tallies.get(`~${friend}`))}</p> */}
-                      {/* <p className='score'>0 - 0</p> */}
                       <p className="score">{( getTally(`~${friend}`) )}</p>
                     </div>
                   </div>
@@ -229,18 +226,6 @@ export function Challenges () {
           >
             <p className="new-opp-tally">
             {( getTally(`${newOpp}`) )}
-                 {/*{ newOpp === ''
-                  ? ''
-                  : !ob.isValidPatp(`${newOpp}`)
-                  ? ''
-                  : (tallies.get(`${newOpp}`) === undefined
-                  ? '0 - 0'
-                  : tallies.get(`${newOpp}`))
-                }*/}
-                {/*{ tallies.has(`${newOpp}`)
-                    ? '0 - 0'
-                    : getTally(`${newOpp}`, tallies.get(`${newOpp}`))
-                }*/}
             </p>
           </div>
           <div className='challenge-input-container row'>

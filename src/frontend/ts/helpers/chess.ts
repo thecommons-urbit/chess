@@ -34,38 +34,18 @@ export function getChessDests (chess: ChessInstance): Map<string, string[]> {
 export function getTally (ship: Ship): String {
   const { tallies } = useChessStore()
 
-  const outputTally: String = '420 - 69'
+  let tally: string;
 
-  return outputTally
+  if (!tallies.has(ship)) {
+    tally = '0 - 0';
+  } else {
+      const results = tallies.get(ship)
+      const ourWins = results.losses + Math.floor(results.draws / 2)
+      const oppWins = results.wins + Math.floor(results.draws / 2)
+      const draws = (results.draws % 2) === 1 ? "½" : "";
 
-  // console.log('ship')
-  // console.log(ship)
-  // console.log('results')
-  // console.log(results)
-  // // initialize map to output
-  // const outputTallies: Map<Ship, String> = new Map();
-  // console.log('outputTallies')
-  // console.log(outputTallies)
+      tally = `${ourWins}${draws} - ${oppWins}${draws}`
+  }
 
-  // // XX Output '0 - 0' if Results is { 0, 0, 0 }
-
-  // // count wins and losses
-  // const winsWhole = results.wins + Math.floor(results.draws / 2);
-  // console.log('winsWhole')
-  // console.log(winsWhole)
-  // const lossesWhole = results.losses + Math.floor(results.draws / 2);
-  // console.log('lossesWhole')
-  // console.log(lossesWhole)
-  // // count draws
-  // const winsFraction = (results.draws % 2) === 1 ? "½" : "";
-  // console.log('winsFraction')
-  // console.log(winsFraction)
-  // const lossesFraction = (results.draws % 2) === 1 ? "½" : "";
-  // console.log('lossesFraction')
-  // console.log(lossesFraction)
-
-  // // output final tally
-  // outputTallies.set(ship, `${lossesWhole}${lossesFraction} - ${winsWhole}${winsFraction}`);
-  // console.log('outputTallies')
-  // console.log(outputTallies)
+  return tally
 }
