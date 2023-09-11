@@ -95,12 +95,12 @@ const useChessStore = create<ChessState>((set, get) => ({
         if (data.white == window.ship) {
           newOppResults = {
             ...oppResults,
-            wins: oppResults.wins + 1
+            losses: oppResults.losses + 1
           }
         } else {
           newOppResults = {
             ...oppResults,
-            losses: oppResults.losses + 1
+            wins: oppResults.wins + 1
           }
         }
         break;
@@ -108,12 +108,12 @@ const useChessStore = create<ChessState>((set, get) => ({
         if (data.white == window.ship) {
           newOppResults = {
             ...oppResults,
-            losses: oppResults.losses + 1
+            wins: oppResults.wins + 1
           }
         } else {
           newOppResults = {
             ...oppResults,
-            wins: oppResults.wins + 1
+            losses: oppResults.losses + 1
           }
         }
         break;
