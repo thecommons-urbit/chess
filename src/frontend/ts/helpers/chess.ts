@@ -1,5 +1,6 @@
 import { ChessInstance, Square, SQUARES, WHITE, PAWN } from 'chess.js'
 import { Ship, Results } from '../types/urbitChess'
+import useChessStore from '..//state/chessStore'
 
 /**
  * Determine if a chess move is a pawn promotion
@@ -30,7 +31,13 @@ export function getChessDests (chess: ChessInstance): Map<string, string[]> {
   return dests
 }
 
-export function getTally (ship: Ship, results: Results): String {
+export function getTally (ship: Ship): String {
+  const { tallies } = useChessStore()
+
+  const outputTally: String = '420 - 69'
+
+  return outputTally
+
   // console.log('ship')
   // console.log(ship)
   // console.log('results')
@@ -61,8 +68,4 @@ export function getTally (ship: Ship, results: Results): String {
   // outputTallies.set(ship, `${lossesWhole}${lossesFraction} - ${winsWhole}${winsFraction}`);
   // console.log('outputTallies')
   // console.log(outputTallies)
-
-  const outputTally: String = '420 - 69'
-
-  return outputTally
 }

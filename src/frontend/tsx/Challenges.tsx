@@ -187,7 +187,7 @@ export function Challenges () {
                       {/* <p className='score'>{( tallies.has(`~${friend}`) ? '0 - 0' : getTally(`~${friend}`, tallies.get(`~${friend}`)) )}</p> */}
                       {/* <p className='score'>{( getTally(tallies.get(`~${friend}`)) === undefined ? '0 - 0' : tallies.get(`~${friend}`))}</p> */}
                       {/* <p className='score'>0 - 0</p> */}
-                      <p className="score">{( getTally(`~${friend}`, tallies.get(`~${friend}`)) )}</p>
+                      <p className="score">{( getTally(`~${friend}`) )}</p>
                     </div>
                   </div>
                   <div className='col'>
@@ -228,7 +228,7 @@ export function Challenges () {
             }
           >
             <p className="new-opp-tally">
-            {( getTally(`${newOpp}`, tallies.get(`~${newOpp}`)) )}
+            {( getTally(`${newOpp}`) )}
                  {/*{ newOpp === ''
                   ? ''
                   : !ob.isValidPatp(`${newOpp}`)
