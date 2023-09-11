@@ -80,6 +80,7 @@ const useChessStore = create<ChessState>((set, get) => ({
     })
   },
   receiveArchivedGame: (data: ArchivedGameInfo) => {
+    // XX don't count games between yourself and yourself
     const tallies = get().tallies
 
     let opponent: Ship = data.white === `~${window.ship}`
@@ -132,8 +133,8 @@ const useChessStore = create<ChessState>((set, get) => ({
       tallies: state.tallies.set(opponent, newOppResults)
       }))
 
-    console.log('archivedGames: ', get().archivedGames)
-    console.log('archivedGames tallies: ', tallies)
+    // console.log(`~${window.ship}'s archivedGames: `, get().archivedGames)
+    // console.log(`~${window.ship}'s archivedGames tallies: `, tallies)
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)

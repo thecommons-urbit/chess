@@ -197,6 +197,7 @@ export function Challenges () {
         }
       </ul>
       {/* New Challenge popup */}
+      {/* XX getTally runs on each chance to the description field */}
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
         <div className='new-challenge-container col'>
           <p className='new-challenge-header'>New Challenge</p>
