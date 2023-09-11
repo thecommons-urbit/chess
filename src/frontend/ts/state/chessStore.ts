@@ -82,7 +82,7 @@ const useChessStore = create<ChessState>((set, get) => ({
   receiveArchivedGame: (data: ArchivedGameInfo) => {
     const tallies = get().tallies
 
-    let opponent: Ship = data.white === window.ship
+    let opponent: Ship = data.white === `~${window.ship}`
       ? data.black
       : data.white
     let oppResults: Results = tallies.has(opponent)
@@ -92,7 +92,7 @@ const useChessStore = create<ChessState>((set, get) => ({
 
     switch (data.result) {
       case "1-0":
-        if (data.white == window.ship) {
+        if (data.white === `~${window.ship}`) {
           newOppResults = {
             ...oppResults,
             losses: oppResults.losses + 1
@@ -105,7 +105,7 @@ const useChessStore = create<ChessState>((set, get) => ({
         }
         break;
       case "0-1":
-        if (data.white == window.ship) {
+        if (data.white === `~${window.ship}`) {
           newOppResults = {
             ...oppResults,
             wins: oppResults.wins + 1
@@ -132,8 +132,8 @@ const useChessStore = create<ChessState>((set, get) => ({
       tallies: state.tallies.set(opponent, newOppResults)
       }))
 
-    console.log('archivedGames: ' + get().archivedGames)
-    console.log('tallies: ' + tallies)
+    console.log('archivedGames: ', get().archivedGames)
+    console.log('archivedGames tallies: ', tallies)
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)

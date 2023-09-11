@@ -225,7 +225,7 @@ export function Challenges () {
             }
           >
             <p className="new-opp-tally">
-            {( getTally(`${newOpp}`) )}
+            {( getTally(newOpp) )}
             </p>
           </div>
           <div className='challenge-input-container row'>

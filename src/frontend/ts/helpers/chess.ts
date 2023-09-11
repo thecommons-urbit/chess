@@ -36,13 +36,16 @@ export function getTally (ship: Ship): String {
 
   let tally: string;
 
+  console.log('getTally tallies', tallies)
   if (!tallies.has(ship)) {
     tally = '0 - 0';
   } else {
       const results = tallies.get(ship)
-      const ourWins = results.losses + Math.floor(results.draws / 2)
-      const oppWins = results.wins + Math.floor(results.draws / 2)
-      const draws = (results.draws % 2) === 1 ? "½" : "";
+      console.log('getTally results:', results);
+      const ourWins = results.losses
+      const oppWins = results.wins
+      const draws = (results.draws % 2) === 1 ? '½' : '';
+      console.log('getTally draws:', draws);
 
       tally = `${ourWins}${draws} - ${oppWins}${draws}`
   }
