@@ -32,23 +32,23 @@ export function getChessDests (chess: ChessInstance): Map<string, string[]> {
 }
 
 export function getTally (ship: Ship): String {
-  // const { urbit, tallies } = useChessStore()
-  const { tallies } = useChessStore()
+  const { urbit, tallies } = useChessStore()
 
   let tally: string;
 
-  // console.log(`~${urbit.ship}'s getTally tallies`, tallies)
-  if (!tallies.has(ship)) {
-    tally = '0 - 0';
+  if (ship === `~${urbit.ship}`) {
+    tally = '';
   } else {
-      const results = tallies.get(ship)
-      // console.log(`~${urbit.ship}'s getTally results:`, results);
-      const ourWins = results.losses
-      const oppWins = results.wins
-      const draws = (results.draws % 2) === 1 ? '½' : '';
-      // console.log(`~${urbit.ship}'s getTally draws:`, draws);
+    if (!tallies.has(ship)) {
+      tally = '0 - 0';
+    } else {
+        const results = tallies.get(ship)
+        const ourWins = results.losses
+        const oppWins = results.wins
+        const draws = (results.draws % 2) === 1 ? '½' : '';
 
-      tally = `${ourWins}${draws} - ${oppWins}${draws}`
+        tally = `${ourWins}${draws} - ${oppWins}${draws}`
+    }
   }
 
   return tally

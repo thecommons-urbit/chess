@@ -219,8 +219,10 @@ export function Challenges () {
             className="new-opp-tally-container"
             style={
               newOpp === ''
+              ? {display: 'none'}
+              : !ob.isValidPatp(newOpp)
                 ? {display: 'none'}
-                : !ob.isValidPatp(`${newOpp}`)
+                : newOpp === `~${urbit.ship}`
                   ? {display: 'none'}
                   : {display: 'block'}
             }
