@@ -184,7 +184,7 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      <p className="score">{( getTally(`~${friend}`) )}</p>
+                      <p className="score">{(getTally(`~${friend}`))}</p>
                     </div>
                   </div>
                   <div className='col'>
@@ -209,8 +209,8 @@ export function Challenges () {
               placeholder={'~sampel-palnet'}
               value={who}
               onChange={(e) => {
-                  setWho(e.target.value);
-                  setNewOpp(e.target.value);
+                setWho(e.target.value)
+                setNewOpp(e.target.value)
               }}
               key={badChallengeAttempts}
               disabled={ challengingFriend }/>
@@ -219,16 +219,16 @@ export function Challenges () {
             className="new-opp-tally-container"
             style={
               newOpp === ''
-              ? {display: 'none'}
-              : !ob.isValidPatp(newOpp)
-                ? {display: 'none'}
-                : newOpp === `~${urbit.ship}`
-                  ? {display: 'none'}
-                  : {display: 'block'}
+                ? { display: 'none' }
+                : !ob.isValidPatp(newOpp)
+                  ? { display: 'none' }
+                  : newOpp === `~${urbit.ship}`
+                    ? { display: 'none' }
+                    : { display: 'block' }
             }
           >
             <p className="new-opp-tally">
-            {( getTally(newOpp) )}
+              {(getTally(newOpp))}
             </p>
           </div>
           <div className='challenge-input-container row'>

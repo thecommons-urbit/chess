@@ -91,7 +91,7 @@ const useChessStore = create<ChessState>((set, get) => ({
     let newOppResults: Results | null = null
 
     switch (data.result) {
-      case "1-0":
+      case '1-0':
         if (data.white === `~${window.ship}`) {
           newOppResults = {
             ...oppResults,
@@ -103,8 +103,8 @@ const useChessStore = create<ChessState>((set, get) => ({
             wins: oppResults.wins + 1
           }
         }
-        break;
-      case "0-1":
+        break
+      case '0-1':
         if (data.white === `~${window.ship}`) {
           newOppResults = {
             ...oppResults,
@@ -116,21 +116,21 @@ const useChessStore = create<ChessState>((set, get) => ({
             losses: oppResults.losses + 1
           }
         }
-        break;
-      case "½–½":
+        break
+      case '½–½':
         newOppResults = {
           ...oppResults,
           draws: oppResults.draws + 1
         }
-        break;
+        break
       default:
-        throw new Error('Invalid result: ' + data.result);
+        throw new Error('Invalid result: ' + data.result)
     }
 
     set(state => ({
       archivedGames: state.archivedGames.set(data.gameID, data),
       tallies: state.tallies.set(opponent, newOppResults)
-      }))
+    }))
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)
