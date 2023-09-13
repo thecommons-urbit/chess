@@ -42,10 +42,10 @@ export function getTally (ship: Ship): String {
     if (!tallies.has(ship)) {
       tally = '0 - 0'
     } else {
-      const results = tallies.get(ship)
-      const ourWins = results.losses
-      const oppWins = results.wins
-      const draws = (results.draws % 2) === 1 ? '½' : ''
+      const results: Results = tallies.get(ship)
+      const ourWins: number = results.losses
+      const oppWins: number = results.wins
+      const draws: string = (results.draws % 2) === 1 ? '½' : ''
 
       tally = `${ourWins}${draws} - ${oppWins}${draws}`
     }
