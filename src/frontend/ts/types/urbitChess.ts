@@ -122,7 +122,8 @@ export interface Move {
 export interface Challenge {
   who: Ship,
   challengerSide: Side,
-  event: string
+  event: string,
+  isPractice: Boolean
 }
 
 //
@@ -178,12 +179,14 @@ export interface ChallengeSentUpdate extends ChallengeUpdate {
   chessUpdate: Update.ChallengeSent
   challengerSide: Side
   event: string
+  isPractice: Boolean
 }
 
 export interface ChallengeReceivedUpdate extends ChallengeUpdate {
   chessUpdate: Update.ChallengeReceived
   challengerSide: Side
   event: string
+  isPractice: Boolean
 }
 
 export interface PositionUpdate extends ChessUpdate {
@@ -252,6 +255,7 @@ export interface ChessSendChallengeAction extends ChessChallengeAction {
   'chess-user-action': Action.SendChallenge
   'challenger-side': Side
   'event': string
+  'practice-game': boolean
 }
 
 export interface ChessAcceptChallengeAction extends ChessChallengeAction {

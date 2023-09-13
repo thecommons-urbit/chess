@@ -220,10 +220,18 @@ const useChessStore = create<ChessState>((set, get) => ({
         var activeGames: Map<GameID, ActiveGameInfo> = get().activeGames
         activeGames.delete(gameID)
 
-        set(state => ({
-          activeGames: activeGames,
-          archivedGames: state.archivedGames.set(gameID, updatedGame)
-        }))
+        // TODO: need to get practice info from backend to frontend to fix bug
+        // that displays a completed game in the archive until page is refreshed
+        // if (currentGame.isPractice === false) {
+          set(state => ({
+            activeGames: activeGames,
+            archivedGames: state.archivedGames.set(gameID, updatedGame)
+          }))
+        // } else {
+        //   set(state => ({
+        //     activeGames: activeGames
+        //   }))
+        // }
 
         // display the archived version
         if (gameID === get().displayGame.gameID) {

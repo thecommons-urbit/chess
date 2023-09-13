@@ -155,15 +155,18 @@
 ::  types for challenging another player
 +|  %challenge
 ::
-::  a challenge is the side as which the challenger would like to play and
-::  a message or description for the game to be played
+::  a challenge is the side as which the challenger would like to play,
+::  a message or description for the game to be played,
+::  and whether the game is practice (not added to archive on completion)
 +$  chess-challenge
   $~  :*  challenger-side=%random
           event=''
+          practice-game=|
       ==
   $:
     challenger-side=?(chess-side %random)
     event=@t
+    practice-game=?
   ==
 ::
 ::  message type for the handshake used to randomly assign sides

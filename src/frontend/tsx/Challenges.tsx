@@ -14,6 +14,7 @@ export function Challenges () {
   const [who, setWho] = useState('')
   const [description, setDescription] = useState('')
   const [side, setSide] = useState(Side.Random)
+  const [practiceSetting, setPracticeSetting] = useState(false)
   const [newOpp, setNewOpp] = useState('')
   const { urbit, incomingChallenges, outgoingChallenges, friends, tallies } = useChessStore()
   // interface
@@ -40,6 +41,7 @@ export function Challenges () {
   const resetChallengeInterface = () => {
     setWho('')
     setDescription('')
+    setPracticeSetting(false)
     setSide(Side.Random)
     setChallengingFriend(false)
     setBadChallengeAttempts(0)
@@ -77,7 +79,7 @@ export function Challenges () {
       resetChallengeInterface()
     }
 
-    await pokeAction(urbit, sendChallengePoke(who, side, description), onError, onSuccess)
+    await pokeAction(urbit, sendChallengePoke(who, side, description, practiceSetting), onError, onSuccess)
   }
 
   const openFriends = async () => {
@@ -116,6 +118,7 @@ export function Challenges () {
             const colorClass = (key % 2) ? 'odd' : 'even'
             const description = challenge.event
             const mySide = (challenge.challengerSide === Side.White) ? 'b' : 'w'
+            const isPractice = challenge.isPractice
             return (
               <li className={`game challenge ${colorClass}`} key={key}>
                 <div className='challenge-box'>
@@ -130,6 +133,7 @@ export function Challenges () {
                         className='challenger-desc'
                       >
                         {description}
+                        {isPractice && <p>Practice Game</p>}
                       </p>
                     </div>
                   </div>
@@ -150,6 +154,7 @@ export function Challenges () {
             const colorClass = (key % 2) ? 'odd' : 'even'
             const description = challenge.event
             const mySide = (challenge.challengerSide === Side.White) ? 'w' : 'b'
+            const isPractice = challenge.isPractice
             return (
               <li className={`game challenge ${colorClass}`} key={key}>
                 <div className='challenge-box'>
@@ -164,6 +169,7 @@ export function Challenges () {
                         className='challenger-desc'
                       >
                         {description}
+                        {isPractice && <p>Practice Game</p>}
                       </p>
                     </div>
                   </div>
@@ -237,6 +243,12 @@ export function Challenges () {
               type="text"
               placeholder={'(optional)'}
               onChange={(e) => setDescription(e.target.value)}/>
+          </div>
+          <div className='challenge-practice-container row'>
+            <p>Practice Game:</p>
+            <input
+              type="checkbox"
+              onChange={(e) => setPracticeSetting(e.target.checked)}/>
           </div>
           <div className='challenge-side-container row'>
             <button
