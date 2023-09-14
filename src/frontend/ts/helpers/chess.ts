@@ -43,8 +43,8 @@ export function getTally (ship: Ship): String {
       tally = '0 - 0'
     } else {
       const results: Results = tallies.get(ship)
-      const ourWins: number = results.losses
-      const oppWins: number = results.wins
+      const ourWins: number = results.losses + Math.floor(results.draws / 2)
+      const oppWins: number = results.wins + Math.floor(results.draws / 2)
       const draws: string = (results.draws % 2) === 1 ? '½' : ''
 
       tally = `${ourWins}${draws} - ${oppWins}${draws}`
