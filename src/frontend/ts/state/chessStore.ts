@@ -1,7 +1,7 @@
 import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
-import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
+import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Results, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
 import { scryFriends, scryMoves } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
@@ -20,6 +20,7 @@ const useChessStore = create<ChessState>((set, get) => ({
   incomingChallenges: new Map(),
   outgoingChallenges: new Map(),
   friends: [],
+  tallies: new Map(),
   displayIndex: 0,
   //
   setUrbit: (urbit: Urbit) => set({ urbit }),
@@ -79,7 +80,57 @@ const useChessStore = create<ChessState>((set, get) => ({
     })
   },
   receiveArchivedGame: (data: ArchivedGameInfo) => {
-    set(state => ({ archivedGames: state.archivedGames.set(data.gameID, data) }))
+    const tallies = get().tallies
+
+    let opponent: Ship = data.white === `~${window.ship}`
+      ? data.black
+      : data.white
+    let oppResults: Results = tallies.has(opponent)
+      ? tallies.get(opponent)
+      : { wins: 0, losses: 0, draws: 0 }
+    let newOppResults: Results | null = null
+
+    switch (data.result) {
+      case '1-0':
+        if (data.white === `~${window.ship}`) {
+          newOppResults = {
+            ...oppResults,
+            losses: oppResults.losses + 1
+          }
+        } else {
+          newOppResults = {
+            ...oppResults,
+            wins: oppResults.wins + 1
+          }
+        }
+        break
+      case '0-1':
+        if (data.white === `~${window.ship}`) {
+          newOppResults = {
+            ...oppResults,
+            wins: oppResults.wins + 1
+          }
+        } else {
+          newOppResults = {
+            ...oppResults,
+            losses: oppResults.losses + 1
+          }
+        }
+        break
+      case '½–½':
+        newOppResults = {
+          ...oppResults,
+          draws: oppResults.draws + 1
+        }
+        break
+      default:
+        throw new Error('Invalid result: ' + data.result)
+    }
+
+    set(state => ({
+      archivedGames: state.archivedGames.set(data.gameID, data),
+      tallies: state.tallies.set(opponent, newOppResults)
+    }))
   },
   fetchArchivedMoves: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)

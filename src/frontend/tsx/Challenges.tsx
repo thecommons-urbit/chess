@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import Popup from 'reactjs-popup'
+import 'urbit-ob'
 import { pokeAction, sendChallengePoke, acceptChallengePoke, declineChallengePoke } from '../ts/helpers/urbitChess'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
+import { getTally } from '../ts/helpers/chess'
 
 const selectedSideButtonClasses = 'side radio-selected'
 const unselectedSideButtonClasses = 'side radio-unselected'
@@ -12,7 +14,8 @@ export function Challenges () {
   const [who, setWho] = useState('')
   const [description, setDescription] = useState('')
   const [side, setSide] = useState(Side.Random)
-  const { urbit, incomingChallenges, outgoingChallenges, friends } = useChessStore()
+  const [newOpp, setNewOpp] = useState('')
+  const { urbit, incomingChallenges, outgoingChallenges, friends, tallies } = useChessStore()
   // interface
   const [modalOpen, setModalOpen] = useState(false)
   const [challengingFriend, setChallengingFriend] = useState(false)
@@ -27,6 +30,7 @@ export function Challenges () {
 
   const closeModal = () => {
     setModalOpen(false)
+    setNewOpp('')
   }
 
   const incrementBadChallengeAttempts = () => {
@@ -93,6 +97,8 @@ export function Challenges () {
     setIncomingList(false)
     setFriendsList(false)
   }
+
+  const ob = require('urbit-ob')
 
   return (
     <div className='challenges-container col'>
@@ -178,12 +184,11 @@ export function Challenges () {
                   <div className='row'>
                     <div className='col'>
                       <p className='friend'>~{friend}</p>
-                      {/* XX: win/loss history with this friend */}
-                      <p className='score'>0-0</p>
+                      <p className="score">{(getTally(`~${friend}`))}</p>
                     </div>
                   </div>
                   <div className='col'>
-                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); openModal() }}>Challenge</button>
+                    <button className='quick-game' onClick={() => { setChallengingFriend(true); setWho('~' + friend); setNewOpp('~' + friend); openModal() }}>Challenge</button>
                   </div>
                 </div>
               </li>
@@ -191,6 +196,8 @@ export function Challenges () {
           })
         }
       </ul>
+      {/* New Challenge popup */}
+      {/* XX getTally runs on each chance to the description field */}
       <Popup open={modalOpen} onClose={resetChallengeInterface}>
         <div className='new-challenge-container col'>
           <p className='new-challenge-header'>New Challenge</p>
@@ -201,9 +208,28 @@ export function Challenges () {
               type="text"
               placeholder={'~sampel-palnet'}
               value={who}
-              onChange={(e) => setWho(e.target.value)}
+              onChange={(e) => {
+                setWho(e.target.value)
+                setNewOpp(e.target.value)
+              }}
               key={badChallengeAttempts}
               disabled={ challengingFriend }/>
+          </div>
+          <div
+            className="new-opp-tally-container"
+            style={
+              newOpp === ''
+                ? { display: 'none' }
+                : !ob.isValidPatp(newOpp)
+                  ? { display: 'none' }
+                  : newOpp === `~${urbit.ship}`
+                    ? { display: 'none' }
+                    : { display: 'block' }
+            }
+          >
+            <p className="new-opp-tally">
+              {(getTally(newOpp))}
+            </p>
           </div>
           <div className='challenge-input-container row'>
             <p>Description:</p>
