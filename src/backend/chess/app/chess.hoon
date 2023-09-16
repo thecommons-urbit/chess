@@ -480,7 +480,7 @@
             %=  this
               potential-states  (~(put by potential-states) game-id.action (snoc future-states u.move-result))
             ==
-          ::  did we win?
+          ::  is the game over?
           ?~  result.game.new-game-state
             ::  special draw available?
             ?:  ?&  special-draw-available.new-game-state
@@ -504,7 +504,7 @@
                     %chess-agent-action
                     !>([%receive-move game-id.action move.action])
             ==  ==
-          ::  tell opponent we won
+          ::  tell opponent checkmate or stalemate
           :~  :*  %pass
                   /poke/game/(scot %da game-id.action)/ended/[(need result.game.new-game-state)]
                   %agent
@@ -869,6 +869,11 @@
             ?:  =(result.action %'½–½')
               ::  is a draw now available?
               ?:  special-draw-available.result-game-state
+                (output-quip game.result-game-state(result `result.action) (bind move-result tail))
+              ::  does the move result in a draw?
+              ?:  ?&  ?=(^ result.game.new.u.move-result)
+                      ?=(%'½–½' u.result.game.new.u.move-result)
+                  ==
                 (output-quip game.result-game-state(result `result.action) (bind move-result tail))
               =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
               %+  poke-nack  this
