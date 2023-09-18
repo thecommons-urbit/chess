@@ -16,6 +16,7 @@
         :~  [%who (se:dejs %p)]
             [%challenger-side so:dejs]
             [%event so:dejs]
+            [%practice-game bo:dejs]
         ==
       %decline-challenge
         :-  %decline-challenge

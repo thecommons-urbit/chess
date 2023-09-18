@@ -21,6 +21,7 @@
             ['who' [%s (scot %p who.upd)]]
             ['challengerSide' [%s challenger-side.challenge.upd]]
             ['event' [%s event.challenge.upd]]
+            ['isPractice' [%b practice-game.challenge.upd]]
         ==
       %challenge-received
         %-  pairs:enjs
@@ -28,6 +29,7 @@
             ['who' [%s (scot %p who.upd)]]
             ['challengerSide' [%s challenger-side.challenge.upd]]
             ['event' [%s event.challenge.upd]]
+            ['isPractice' [%b practice-game.challenge.upd]]
         ==
       %challenge-resolved
         %-  pairs:enjs

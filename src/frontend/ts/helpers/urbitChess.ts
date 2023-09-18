@@ -31,12 +31,13 @@ export function scryAction (app: string, path: string) {
 
 //  Challenges
 
-export function sendChallengePoke (who: Ship, side: Side, description: string) {
+export function sendChallengePoke (who: Ship, side: Side, description: string, setting: boolean) {
   const action: ChessSendChallengeAction = {
     'chess-user-action': Action.SendChallenge,
     'who': who,
     'challenger-side': side,
-    'event': description
+    'event': description,
+    'practice-game': setting
   }
 
   return action

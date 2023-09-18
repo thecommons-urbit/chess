@@ -24,6 +24,7 @@
       sent-undo-request=?
       got-undo-request=?
       opponent=ship
+      practice-game=?
   ==
 +$  state-1
   $:  %1
@@ -614,7 +615,7 @@
             ::  remove our challenge from challenges-sent
             challenges-sent  (~(del by challenges-sent) src.bowl)
             ::  put our new game into the map of games
-            games  (~(put by games) game-id.action [new-game *chess-position *(map @t @ud) | | | | | | src.bowl])
+            games  (~(put by games) game-id.action [new-game *chess-position *(map @t @ud) | | | | | | src.bowl practice-game.u.challenge])
           ==
         %draw-offered
           =/  game-state
@@ -847,7 +848,7 @@
                 ?:  ?|  sent-draw-offer.u.game-state
                         special-draw-available.u.game-state
                     ==
-                  (output-quip game.u.game-state(result `result.action) ~)
+                  (output-quip game.u.game-state(result `result.action) ~ practice-game.u.game-state)
                 %+  poke-nack  this
                 "{<our.bowl>} did not send draw offer for {<game-id.action>}"
               ::  is opponent resigning?
@@ -855,7 +856,7 @@
                   ?:  =(our.bowl white.game.u.game-state)
                     %'1-0'
                   %'0-1'
-                (output-quip game.u.game-state(result `result.action) ~)
+                (output-quip game.u.game-state(result `result.action) ~ practice-game.u.game-state)
               %+  poke-nack  this
               "{<our.bowl>} does not resign game {<game-id.action>}"
             ::  apply move
@@ -869,12 +870,12 @@
             ?:  =(result.action %'½–½')
               ::  is a draw now available?
               ?:  special-draw-available.result-game-state
-                (output-quip game.result-game-state(result `result.action) (bind move-result tail))
+                (output-quip game.result-game-state(result `result.action) (bind move-result tail) practice-game.u.game-state)
               ::  does the move result in a draw?
               ?:  ?&  ?=(^ result.game.new.u.move-result)
                       ?=(%'½–½' u.result.game.new.u.move-result)
                   ==
-                (output-quip game.result-game-state(result `result.action) (bind move-result tail))
+                (output-quip game.result-game-state(result `result.action) (bind move-result tail) practice-game.u.game-state)
               =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
               %+  poke-nack  this
               "no special draw available for game {<game-id.action>} after {<san>}"
@@ -885,12 +886,17 @@
               "move {<san>} does not end game {<game-id.action>}"
             ::  has opponent won?
             ?:  =(result.action u.result.game.result-game-state)
-              (output-quip game.result-game-state (bind move-result tail))
+              (output-quip game.result-game-state (bind move-result tail) practice-game.u.game-state)
             %+  poke-nack  this
             "{<src.bowl>} does not win game {<game-id.action>}"
           ++  output-quip
-            |=  [archived-game=chess-game move=(unit card)]
+            |=  [archived-game=chess-game move=(unit card) practice-game=?]
             :_
+              ?:  =(& practice-game)
+                %=  this
+                  ::  remove game from our map of active games
+                  games    (~(del by games) game-id.action)
+                ==
               %=  this
                 ::  remove game from our map of active games
                 games    (~(del by games) game-id.action)
@@ -1289,7 +1295,7 @@
             ::  remove our challenger from challenges-received
             challenges-received  (~(del by challenges-received) src.bowl)
             ::  put our new game into the map of games
-            games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | | | src.bowl])
+            games  (~(put by games) game-id [new-game *chess-position *(map @t @ud) | | | | | | src.bowl practice-game.challenge])
           ==
         ::  if nacked, print error
         %-  (slog u.p.sign)
@@ -1438,10 +1444,15 @@
           =*  updated-game  game.game-state
           =.  result.updated-game  `result
           :_
+            ?:  =(& practice-game.game-state)
+              %=  this
+                ::  remove this game from our map of active games
+                games    (~(del by games) game-id)
+              ==
             %=  this
               ::  remove this game from our map of active games
               games    (~(del by games) game-id)
-              ::  add this game to our archive
+              ::  add this game to our archive if not a practice game
               archive  (put:arch-orm archive game-id updated-game)
             ==
           %+  weld
