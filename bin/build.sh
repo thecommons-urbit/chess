@@ -22,12 +22,14 @@ usage() {
   fi
 
   echo -e ""
-  echo -e "Usage:\t$SCRIPT_NAME [-h] [-n] [-s SHIP_NAME] [-u URL]"
+  echo -e "Usage:\t$SCRIPT_NAME [-h] [-k KELVIN] [-l] [-n] [-s SHIP_NAME] [-u URL]"
   echo -e ""
   echo -e "Build the app frontend and the desk files required to install it in Grid"
   echo -e ""
   echo -e "Options:"
   echo -e "  -h\tPrint script usage info"
+  echo -e "  -k\tSet alternative kelvin version to use (default: $DEFAULT_KELVIN)"
+  echo -e "  -l\tFix formatting errors raised by eslint"
   echo -e "  -n\tUse npm natively instead of through Docker"
   echo -e "  -s\tSet ship name to use (default: $DEFAULT_SHIP)"
   echo -e "  -u\tUse given URL to distribute glob over HTTP instead of over Ames"
@@ -76,6 +78,7 @@ FRONTEND_DIR="$BUILD_DIR/frontend"
 
 DOCKER=1
 DOCKER_IMAGE="urbit-chess"
+LINT_FIX=0
 
 VERSION_MAJOR=0
 VERSION_MINOR=9
@@ -84,6 +87,8 @@ VERSION_FULL="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH"
 
 DEFAULT_KELVIN=412
 DEFAULT_SHIP="finmep-lanteb"
+
+KELVIN=$DEFAULT_KELVIN
 SHIP=$DEFAULT_SHIP
 
 # --------------------------------------
@@ -91,7 +96,7 @@ SHIP=$DEFAULT_SHIP
 # --------------------------------------
 
 # Parse arguments
-OPTS=":hs:u:n"
+OPTS=":hns:u:k:l"
 while getopts ${OPTS} opt; do
   case ${opt} in
     h)
@@ -105,6 +110,12 @@ while getopts ${OPTS} opt; do
       ;;
     u)
       URL=$OPTARG
+      ;;
+    k)
+      KELVIN=$OPTARG
+      ;;
+    l)
+      LINT_FIX=1
       ;;
     :)
       echo "$SCRIPT_NAME: Missing argument for '-${OPTARG}'" >&2
@@ -143,6 +154,10 @@ if [ $DOCKER -eq 1 ]; then
 
   # Copy additional src files for frontend
   sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}
+elif [ $LINT_FIX -eq 0 ]; then
+  # Run linter, refuse to build if there are errors
+  (cd "$ROOT_DIR/src/frontend"; npm run lint; npm run build-no-docker)
 else
-  (cd "$ROOT_DIR/src/frontend"; npm run build-no-docker)
+  # Run linter, fix errors, then build
+  (cd "$ROOT_DIR/src/frontend"; npm run lint -- --fix; npm run build-no-docker)
 fi
