@@ -18,17 +18,22 @@ Ray paused work on `%chess` in March 2021 due to personal reasons. In August 202
 distribution in an update to Arvo. `~finmep-lanteb` updated `%chess` to work with this update as a broadly-visible
 example of app distribution for Assembly 2021.
 
-In September, 2021, `~bonbud-macryg`, `~nordus-mocwyl`, and `~rovmug-ticfyn` began working on `%chess` in their spare
-time for an [Urbit Foundation bounty](https://urbit.org/grants/chess-bounty).
+In September, 2022, `~bonbud-macryg`, `~nordus-mocwyl`, and `~rovmug-ticfyn` began working on `%chess` in their spare
+time for an [Urbit Foundation bounty](https://urbit.org/grants/chess-bounty), which they completed in September, 2023.
 
-`%chess` is a community sandbox for Urbit apps. As Urbit evolves, so too should `%chess`. `%chess` should seek at all
-times to incorporate the most modern Urbit programming techniques. It should also strive to provide well-documented,
-clear, concise code that beginner Hoon coders can use as a reference. While it doesn't at present meet all of those
-goals, they *are* aspirational.
+## Mission
+
+`%chess` seeks to be a community sandbox for Urbit apps. As Urbit evolves, so too should `%chess`. `%chess` should seek
+at all times to incorporate the most modern Urbit programming techniques. It should strive to provide well-documented,
+clear, concise code that beginner Hoon coders can use as a reference.
+
+Whether or not `%chess` meets all of these goals at any particular moment, they are the aspirations of the repo.
 
 ## News
 
-Milestones 1 and 2 of the [Chess Improvements Bounty](https://urbit.org/grants/chess-bounty) are nearing completion.
+The "Chess Improvements Bounty" has been completed. Pharaoh has set the chess slaves free!
+
+![go now be free](https://0x0.st/HV0I.png)
 
 ## Installation
 
