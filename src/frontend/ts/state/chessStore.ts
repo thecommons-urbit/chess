@@ -223,10 +223,10 @@ const useChessStore = create<ChessState>((set, get) => ({
         // TODO: need to get practice info from backend to frontend to fix bug
         // that displays a completed game in the archive until page is refreshed
         // if (currentGame.isPractice === false) {
-          set(state => ({
-            activeGames: activeGames,
-            archivedGames: state.archivedGames.set(gameID, updatedGame)
-          }))
+        set(state => ({
+          activeGames: activeGames,
+          archivedGames: state.archivedGames.set(gameID, updatedGame)
+        }))
         // } else {
         //   set(state => ({
         //     activeGames: activeGames

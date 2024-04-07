@@ -35,6 +35,7 @@
   "scripts": {
     "build": "webpack",
     "build-no-docker": "webpack --config ./webpack.config.nodocker.js",
+    "dev": "vite",
     "lint": "eslint --ext ts --ext tsx ."
   },
   "engines": {
