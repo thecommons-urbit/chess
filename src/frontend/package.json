@@ -43,6 +43,8 @@
   },
   "dependencies": {
     "@urbit/http-api": "^2.3.0",
+    "@urbit/vite-plugin-urbit": "1.0.0",
+    "@vitejs/plugin-react": "4.0.4",
     "chess.js": "^0.13.4",
     "chessground": "^8.3.10",
     "react": "^18.2.0",
@@ -51,6 +53,7 @@
     "react-tabs": "^6.0.1",
     "reactjs-popup": "^2.0.5",
     "urbit-ob": "^5.0.1",
+    "vite": "4.4.9",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
