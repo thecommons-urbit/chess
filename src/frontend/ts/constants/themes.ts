@@ -1,10 +1,10 @@
 export const pieceThemes:string[] = [
-  'tatiana', 'cardinal', 'kosal',
-  'maestro', 'california', 'alpha'
+  'omega', 'cardinal', 'kosal',
+  'maestro', 'tatiana', 'california'
 ]
+
 export const boardThemes:string[] = [
-  'blue', 'blue2', 'red',
-  'marble', 'default', 'purple',
-  'green', 'grey', 'brown',
-  'red2'
+  'rosebud', 'blue2', 'emerald',
+  'marble', 'default', 'grey',
+  'powder', 'purple', 'clay'
 ]
