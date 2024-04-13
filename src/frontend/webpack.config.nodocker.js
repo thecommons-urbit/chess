@@ -29,7 +29,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: 'body',
-      template: './html/index.html',
+      template: './index.html',
       filename: 'index.html'
     })
   ],
