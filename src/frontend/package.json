@@ -35,6 +35,7 @@
   "scripts": {
     "build": "webpack",
     "build-no-docker": "webpack --config ./webpack.config.nodocker.js",
+    "dev": "vite",
     "lint": "eslint --ext ts --ext tsx ."
   },
   "engines": {
@@ -42,7 +43,9 @@
     "npm": "^9.4.1"
   },
   "dependencies": {
-    "@urbit/http-api": "^2.1.1",
+    "@urbit/http-api": "^2.3.0",
+    "@urbit/vite-plugin-urbit": "1.0.0",
+    "@vitejs/plugin-react": "4.0.4",
     "chess.js": "^0.13.4",
     "chessground": "^8.3.7",
     "react": "^18.2.0",
@@ -50,7 +53,9 @@
     "react-dom": "^18.2.0",
     "react-tabs": "^6.0.0",
     "reactjs-popup": "^2.0.5",
-    "zustand": "^4.3.2"
+    "urbit-ob": "^5.0.1",
+    "vite": "4.4.9",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@types/chess.js": "^0.13.4",

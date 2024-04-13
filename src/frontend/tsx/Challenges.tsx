@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Popup from 'reactjs-popup'
 import { pokeAction, challenge, acceptGame, declineGame } from '../ts/helpers/urbitChess'
+import { isValidPatp } from 'urbit-ob'
 import useChessStore from '../ts/state/chessStore'
 import { Challenge, Side, Ship } from '../ts/types/urbitChess'
 
