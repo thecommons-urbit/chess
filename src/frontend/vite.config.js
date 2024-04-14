@@ -1,3 +1,4 @@
+const path = require('path')
 import { loadEnv, defineConfig } from 'vite';
 import reactRefresh from '@vitejs/plugin-react';
 import { urbitPlugin } from '@urbit/vite-plugin-urbit';
@@ -9,6 +10,12 @@ export default ({ mode }) => {
   console.log(SHIP_URL);
 
   return defineConfig({
-    plugins: [urbitPlugin({ base: 'chess', target: SHIP_URL, secure: false }), reactRefresh()],
+    build: {
+      outDir: path.resolve(__dirname, '../../build/frontend')
+    },
+    plugins: [
+      urbitPlugin({ base: 'chess', target: SHIP_URL, secure: false }),
+      reactRefresh()
+    ],
   });
 };
