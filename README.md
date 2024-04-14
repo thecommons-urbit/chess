@@ -66,18 +66,18 @@ and would be good "first-time" Urbit contributions.
 See [this guide](https://developers.urbit.org/guides/core/environment) on the Urbit developers portal for information on
 how to get the Urbit binaries and what sort of software may be useful for developing Urbit applications.
 
-#### Docker & Webpack
+#### Docker & Vite
 
 To spare you from the nightmare that is the JS development environment, `%chess`'s build script is equipped to use
-[Docker](https://www.docker.com); if you'd like to use Docker, make sure that you have it
+[Docker](https://www.docker.com). If you'd like to use Docker, make sure that you have it
 [installed](https://docs.docker.com/engine/install/) and that your user account on your machine has `sudo` privileges.
 
 (NOTE: [Do not use the 'docker' group](https://fosterelli.co/privilege-escalation-via-docker.html).)
 
-If you are already in the nightmare that is the JS development environment and cannot wake up, you can build `%chess`
-natively with [Webpack](https://webpack.js.org).
+If you are already in the nightmare that is the JS development environment, and cannot wake up, you can build `%chess`
+natively with [Vite](https://vitejs.dev/).
 
-This guide will cover both workflows regardless. For the Webpack build, we assume you have
+This guide will cover both workflows. For the native Vite build, we only assume you have
 [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed already.
 
 ### 1. Pull a copy of the `%chess` code
@@ -119,18 +119,9 @@ To run the Docker build, substitute the name of your dev ship using the `-s` opt
 ./bin/build.sh -s zod
 ```
 
-#### Webpack build
+#### Vite build
 
-To run the Webpack build you'll need to install Webpack and htmlWebpackPlugin if you don't have them already. `cd` to
-`/src/frontend` and install Webpack and [htmlWebpackPlugin](https://webpack.js.org/plugins/html-webpack-plugin/):
-```
-npm install --save-dev webpack
-npm install --save-dev html-webpack-plugin
-```
-
-(The `--save-dev` flag keeps `%chess`'s dependency list clean for our collaborators using Docker.)
-
-To run the build script with Webpack, add an `-n` flag like so:
+To run the build script without Docker, add an `-n` flag like so:
 ```
 ./bin/build.sh -s zod -n
 ```
@@ -155,6 +146,8 @@ Next, tell the fake ship to install the app:
 This is only necessary the first time you install `%chess` on a fake ship. If you're updating the files on a ship which
 already has `%chess` installed, just committing the new files is enough.
 
+#### Globbing the frontend
+
 The dev ship is now awaiting the frontend files to link to the app. Installation is not complete until these files are
 provided. Login to your dev ship through your browser (the URL at which the ship's interface is running is posted on
 launch; it should look something like `http://localhost:8080`). Navigate to the docket glob interface (e.g.
@@ -162,6 +155,16 @@ launch; it should look something like `http://localhost:8080`). Navigate to the 
 ship.
 
 Once globbing is completed, you can return to Landscape on the dev ship and see that `%chess` is installed.
+
+#### Testing the frontend
+
+You can use Vite to test changes to the frontend as soon as you save those changes in your editor. Run your fakeship at `localhost:8080` and run `npm run dev` in the `/src/frontend` folder, then open `localhost:5173/apps/chess` in any browser in which you're logged into the fakeship.
+
+You may need to run the following commands in your fakeship's Dojo for it to accept requests from Vite.
+```
+> |cors-approve 'http://localhost:5173'
+> |cors-approve 'http://localhost:8080'
+```
 
 #### NOTE: About browsers
 
