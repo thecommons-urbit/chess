@@ -34,7 +34,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "build-no-docker": "webpack --config ./webpack.config.nodocker.js",
+    "build-no-docker": "vite build",
     "dev": "vite",
     "lint": "eslint --ext ts --ext tsx ."
   },
