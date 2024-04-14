@@ -22,7 +22,7 @@ RUN npm run-script build
 
 # Copy output files
 RUN mkdir output
-RUN cp -rfL html/index.html css js output/
+RUN cp -rfL ../../build/frontend/* output/
 
 # Assumes that some local dir is mounted as a volume at /app/output
 # (e.g. the way ./bin/build.sh calls 'docker run')

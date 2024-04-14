@@ -156,8 +156,8 @@ if [ $DOCKER -eq 1 ]; then
   sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}
 elif [ $LINT_FIX -eq 0 ]; then
   # Run linter, refuse to build if there are errors
-  (cd "$ROOT_DIR/src/frontend"; npm run lint; npm run build-no-docker)
+  (cd "$ROOT_DIR/src/frontend"; npm run lint; npm run build)
 else
   # Run linter, fix errors, then build
-  (cd "$ROOT_DIR/src/frontend"; npm run lint -- --fix; npm run build-no-docker)
+  (cd "$ROOT_DIR/src/frontend"; npm run lint -- --fix; npm run build)
 fi
