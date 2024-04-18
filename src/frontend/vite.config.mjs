@@ -10,6 +10,17 @@ export default ({ mode }) => {
   console.log(SHIP_URL)
 
   return defineConfig({
+    resolve: {
+      alias: {
+        $california: path.resolve('./assets/pieces/California'),
+        $cardinal: path.resolve('./assets/pieces/Cardinal'),
+        $cburnett: path.resolve('./assets/pieces/Cburnett'),
+        $kosal: path.resolve('./assets/pieces/Kosal'),
+        $maestro: path.resolve('./assets/pieces/Maestro'),
+        $omega: path.resolve('./assets/pieces/Omega'),
+        $tatiana: path.resolve('./assets/pieces/Tatiana')
+      }
+    },
     build: {
       outDir: path.resolve(__dirname, '../../build/frontend')
     },
