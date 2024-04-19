@@ -1,8 +1,8 @@
 #!/bin/bash
 # ==============================================================================
 #
-# build - Build the app frontend and the desk files required to install it in
-#         Grid.
+# build - Build the chess app, its frontend, and the desk files required to
+#         install it in Landscape.
 #
 # ==============================================================================
 
@@ -22,18 +22,17 @@ usage() {
   fi
 
   echo -e ""
-  echo -e "Usage:\t$SCRIPT_NAME [-h] [-k KELVIN] [-l] [-n] [-s SHIP_NAME] [-u URL]"
+  echo -e "Usage:\t$SCRIPT_NAME [-h] [-k KELVIN] [-s SHIP_NAME] [-u URL] [-- <chess-ui options>]"
   echo -e ""
-  echo -e "Build the app frontend and the desk files required to install it in Grid"
+  echo -e "Build the app frontend and the desk files required to install %chess in Landscape"
   echo -e ""
   echo -e "Options:"
   echo -e "  -h\tPrint script usage info"
   echo -e "  -k\tSet alternative kelvin version to use (default: $DEFAULT_KELVIN)"
-  echo -e "  -l\tFix formatting errors raised by eslint"
-  echo -e "  -n\tUse npm natively instead of through Docker"
   echo -e "  -s\tSet ship name to use (default: $DEFAULT_SHIP)"
   echo -e "  -u\tUse given URL to distribute glob over HTTP instead of over Ames"
   echo -e ""
+  ./chess-ui/bin/build.sh -h
   exit $1
 }
 
@@ -96,14 +95,11 @@ SHIP=$DEFAULT_SHIP
 # --------------------------------------
 
 # Parse arguments
-OPTS=":hns:u:k:l"
+OPTS=":hk:s:u:"
 while getopts ${OPTS} opt; do
   case ${opt} in
     h)
       usage 0
-      ;;
-    n)
-      DOCKER=0
       ;;
     s)
       SHIP=$OPTARG
@@ -113,9 +109,6 @@ while getopts ${OPTS} opt; do
       ;;
     k)
       KELVIN=$OPTARG
-      ;;
-    l)
-      LINT_FIX=1
       ;;
     :)
       echo "$SCRIPT_NAME: Missing argument for '-${OPTARG}'" >&2
@@ -128,9 +121,15 @@ while getopts ${OPTS} opt; do
   esac
 done
 
+# All remaining arguments (if any) are for chess-ui
+if [ "$1" = "--" ]; then
+  shift
+fi
+
 # Clean up dirs before running
 rm -rf $BUILD_DIR
 mkdir -p $DESK_DIR
+mkdir -p $FRONTEND_DIR
 
 # Build desk.bill
 echo ":~  %chess  ==" > $DESK_DIR/desk.bill
@@ -145,19 +144,5 @@ echo "~$SHIP" > $DESK_DIR/desk.ship
 echo "[%zuse $KELVIN]" > $DESK_DIR/sys.kelvin
 
 # Build frontend
-if [ $DOCKER -eq 1 ]; then
-  # Need to use legacy builder ( DOCKER_BUILDKIT=0) so that MacOS builds work until this issue is resolved:
-  #   https://github.com/moby/buildkit/issues/1271
-  # sudo docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
-  sudo DOCKER_BUILDKIT=0 docker build --tag ${DOCKER_IMAGE}:${VERSION_FULL} .
-  sudo docker run --rm -v ${FRONTEND_DIR}:/app/output/ ${DOCKER_IMAGE}:${VERSION_FULL}
-
-  # Copy additional src files for frontend
-  sudo chown -R ${USER}:${USER} ${FRONTEND_DIR}
-elif [ $LINT_FIX -eq 0 ]; then
-  # Run linter, refuse to build if there are errors
-  (cd "$ROOT_DIR/src/frontend"; npm run lint; npm run build-no-docker)
-else
-  # Run linter, fix errors, then build
-  (cd "$ROOT_DIR/src/frontend"; npm run lint -- --fix; npm run build-no-docker)
-fi
+./chess-ui/bin/build.sh $@ -v $VERSION_FULL
+cp -rfL chess-ui/build/* ${FRONTEND_DIR}

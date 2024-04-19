@@ -1,0 +1,8 @@
+[submodule "chess-app"]
+	path = chess-app
+	url = git@github.com:thecommons-urbit/chess-app.git
+	branch = master
+[submodule "chess-ui"]
+	path = chess-ui
+	url = git@github.com:thecommons-urbit/chess-ui.git
+	branch = master
